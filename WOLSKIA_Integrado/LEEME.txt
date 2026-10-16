@@ -1,0 +1,19 @@
+WOLSKIA Integrado (versión liviana para subir / desplegar)
+=========================================================
+
+ESTRUCTURA
+  backend/   Flask + IA (claves SOLO aquí en .env)
+  frontend/  React Studio (UI; sin panel de claves)
+
+CONFIGURAR (admin, una vez)
+  1. Copiá backend/.env.example → backend/.env
+  2. Pegá GEMINI_API_KEY=tu_clave
+  3. Arrancá backend (puerto 5050) y frontend (8080)
+
+USUARIOS
+  La interfaz principal abre directamente, sin pantalla de login.
+  y chatean. No ven claves API.
+
+ESTE ZIP NO incluye node_modules ni .venv (así pesa poco).
+  Primera vez: en frontend → npm install
+               en backend  → python -m venv .venv && pip install -r requirements.txt
