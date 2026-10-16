@@ -151,11 +151,83 @@ def get_project(pid):
         abort(404)
     return ps[i]
 
+LOOPBACK = {"127.0.0.1", "::1", "::ffff:127.0.0.1", "localhost"}
+
+# Modo ONLINE (WOLSKIA_ALLOW_REMOTE=1): solo atiende pedidos que traen el secreto
+# compartido con el sitio (Vercel). Quien entre directo a Render recibe 403.
+import hmac, time, threading
+from collections import defaultdict, deque
+
+RATE_PER_MIN = int(os.getenv("WOLSKIA_RATE_PER_MIN", "20"))
+DAILY_CAP = int(os.getenv("WOLSKIA_DAILY_CAP", "300"))
+_hits = defaultdict(deque)
+_day = {"d": "", "n": 0}
+_lock = threading.Lock()
+
+
+def online() -> bool:
+    return os.getenv("WOLSKIA_ALLOW_REMOTE") == "1"
+
+
+def client_ip() -> str:
+    """Local: IP del socket (o XFF si viene de un proxy local).
+    Online: IP que el proxy del sitio reenvia, ya autenticado con el secreto."""
+    if online():
+        return (request.headers.get("X-Wolskia-Client-IP") or request.remote_addr or "0.0.0.0").strip()[:64]
+    xff = request.headers.get("X-Forwarded-For", "")
+    if xff and request.remote_addr in LOOPBACK:
+        return xff.split(",")[-1].strip()
+    return request.remote_addr or "127.0.0.1"
+
+
+def _secret_ok() -> bool:
+    secret = os.getenv("WOLSKIA_PROXY_SECRET", "")
+    got = request.headers.get("X-Wolskia-Secret", "")
+    return bool(secret) and hmac.compare_digest(secret.encode(), got.encode())
+
+
+def _limited(ip: str, expensive: bool) -> str | None:
+    now = time.time()
+    with _lock:
+        q = _hits[ip]
+        while q and now - q[0] > 60:
+            q.popleft()
+        if len(q) >= RATE_PER_MIN:
+            return "Demasiados pedidos. Esperá un minuto."
+        q.append(now)
+        if expensive:
+            today = time.strftime("%Y-%m-%d")
+            if _day["d"] != today:
+                _day.update(d=today, n=0)
+            if _day["n"] >= DAILY_CAP:
+                return "Se alcanzó el tope diario de consultas del sitio. Probá mañana."
+            _day["n"] += 1
+    return None
+
+
+def local_only(fn):
+    """Local: solo esta computadora. Online: solo con el secreto del proxy + limites."""
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        if online():
+            if not _secret_ok():
+                return jsonify({"error": "forbidden", "message": "Acceso directo no permitido."}), 403
+            msg = _limited(client_ip(), expensive=request.path == "/api/ai/chat")
+            if msg:
+                return jsonify({"error": "rate_limited", "message": msg, "status": "rate_limit"}), 429
+        elif client_ip() not in LOOPBACK:
+            return jsonify({"error": "forbidden", "message": "Solo se permite acceso desde esta computadora."}), 403
+        return fn(*args, **kwargs)
+    return wrapper
+
+
 @app.get("/")
+@local_only
 def home():
     return render_template("index.html")
 
 @app.get("/api/tools")
+@local_only
 def tools():
     ps = scan()
     return jsonify({
@@ -164,6 +236,7 @@ def tools():
     })
 
 @app.post("/api/search")
+@local_only
 def search():
     q = str((request.json or {}).get("query", "")).strip()
     if not q:
@@ -181,6 +254,7 @@ def search():
     })
 
 @app.get("/api/project/<pid>/download")
+@local_only
 def download(pid):
     p = get_project(pid)
     folder = Path(p["path"])
@@ -206,6 +280,7 @@ def download(pid):
     return send_file(mem, mimetype="application/zip", as_attachment=True, download_name=f"{safe}.zip")
 
 @app.post("/api/chat")
+@local_only
 def chat():
     """Endpoint de chat: delega al servicio modular de IA."""
     from services.ai_service import chat as ai_chat
@@ -219,29 +294,6 @@ def chat():
     return jsonify(result)
 
 # ─── API de IA (consumida por WOLSKIA Studio) ──────────────────────────────
-
-LOOPBACK = {"127.0.0.1", "::1", "::ffff:127.0.0.1", "localhost"}
-
-
-def client_ip() -> str:
-    """IP real del cliente. Detrás del proxy de Vite (xfwd) se toma la ÚLTIMA
-    entrada de X-Forwarded-For, la que agregó el proxy y no se puede falsear."""
-    xff = request.headers.get("X-Forwarded-For", "")
-    if xff and request.remote_addr in LOOPBACK:
-        return xff.split(",")[-1].strip()
-    return request.remote_addr or "127.0.0.1"
-
-
-def local_only(fn):
-    """Los endpoints /api/ai/* gastan tu cuota y manejan tus claves:
-    solo se atienden desde esta misma máquina (WOLSKIA_ALLOW_REMOTE=1 lo desactiva)."""
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        if os.getenv("WOLSKIA_ALLOW_REMOTE") != "1" and client_ip() not in LOOPBACK:
-            return jsonify({"error": "forbidden", "message": "Solo se permite acceso desde esta computadora."}), 403
-        return fn(*args, **kwargs)
-    return wrapper
-
 
 @app.get("/api/ai/status")
 @local_only
@@ -287,7 +339,7 @@ def ai_chat_endpoint():
         client_ip=client_ip(),
         prefer=str(data.get("provider", "auto")),
         user=str(data.get("user", "default")),
-        role=str(data.get("role", "worker")),
+        role="worker" if online() else str(data.get("role", "worker")),
         workspace=workspace(),
     )
     return jsonify(result)
@@ -376,4 +428,4 @@ def health():
     })
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=int(os.getenv("PORT", "5050")), debug=False)
+    app.run(host="0.0.0.0" if online() else "127.0.0.1", port=int(os.getenv("PORT", "5050")), debug=False)

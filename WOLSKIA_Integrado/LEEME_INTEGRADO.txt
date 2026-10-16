@@ -6,7 +6,7 @@ REQUISITOS
 
 USO (Windows)
   1. Doble clic en INICIAR_TODO.bat  (la primera vez instala todo; tarda unos minutos)
-  2. Se abre http://127.0.0.1:8080 directamente, sin pantalla de login.
+  2. Se abre http://127.0.0.1:8080   ->  usuario: admin   clave: admin123
   3. En el panel "Modelos de IA" pegue su clave de Gemini y/o de Grok (xai-...) o Groq (gsk_...)
   4. "Guardar y probar"  ->  escriba en el chat.
 
@@ -43,8 +43,6 @@ NOVEDADES v5 — IA CON HERRAMIENTAS
   Endpoints nuevos: GET/POST /api/space[/tasks|notes|events], PATCH|DELETE /api/space/<col>/<id>, POST /api/space/import
   Solo "admin" escribe archivos (WOLSKIA_WORKERS_CAN_WRITE=1 para permitirlo a todos).
   Datos viejos de localStorage se migran solos al primer ingreso.
-  Tu espacio se guarda en backend/data/espacio.json, separado por identificador de perfil del navegador.
-  IMPORTANTE: el acceso sin login no brinda privacidad real para un servicio público; antes de publicar, configurar autenticación/autorización del lado del servidor y una base persistente.
 
   PESTAÑA HERRAMIENTAS: ahora muestra VOLKSIA Workspace (https://pazglezerpasante-code.github.io/volksia-workspace/)
   embebido. Para cambiar la URL: frontend/.env  ->  VITE_WORKSPACE_URL=...

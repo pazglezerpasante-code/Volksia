@@ -18,4 +18,5 @@ Mac o Linux
   npm run dev
 
 Cuentas
-  La interfaz abre directamente, sin pantalla de login.
+  Direccion: admin / admin123
+  Operaciones: trabajador / trab123

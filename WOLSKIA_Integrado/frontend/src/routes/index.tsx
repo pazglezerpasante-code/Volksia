@@ -35,31 +35,27 @@ export const Route = createFileRoute("/")({ component: Home });
 type Role = "admin" | "worker";
 type Page = "chat" | "tools" | "tasks" | "notes" | "calendar";
 
-/** Sin pantalla de acceso: se crea un identificador estable para este navegador.
- * Nota: no equivale a autenticación; no usarlo para proteger datos sensibles en un despliegue público. */
-function Home() {
-  const [profile, setProfile] = useState<{ user: string; role: Role; name: string } | null>(null);
-  useEffect(() => {
-    try {
-      const old = localStorage.getItem("wolskia-session");
-      const parsed = old ? JSON.parse(old) as { user?: string; role?: Role; name?: string } : null;
-      let user = parsed?.user;
-      if (!user) {
-        user = localStorage.getItem("wolskia-profile-id") ?? "";
-        if (!user) {
-          user = `perfil-${Math.random().toString(36).slice(2, 12)}${Date.now().toString(36).slice(-5)}`;
-          localStorage.setItem("wolskia-profile-id", user);
-        }
-      }
-      localStorage.setItem("wolskia-profile-id", user);
-      localStorage.removeItem("wolskia-session");
-      setProfile({ user, role: "admin", name: "Mi espacio" });
-    } catch {
-      setProfile({ user: "perfil-local", role: "admin", name: "Mi espacio" });
+/** Sin login: cada navegador tiene su propio espacio, identificado por un id al azar. */
+function getVisitorId(): string {
+  try {
+    let id = localStorage.getItem("wolskia-visitor");
+    if (!id || !/^[a-z0-9-]{8,40}$/.test(id)) {
+      id = "v-" + crypto.randomUUID().replace(/-/g, "").slice(0, 20);
+      localStorage.setItem("wolskia-visitor", id);
     }
+    return id;
+  } catch {
+    return "v-" + Math.random().toString(36).slice(2, 12).padEnd(10, "0");
+  }
+}
+
+function Home() {
+  const [session, setSession] = useState<{ user: string; role: Role; name: string } | null>(null);
+  useEffect(() => {
+    setSession({ user: getVisitorId(), role: "worker", name: "Invitado" });
   }, []);
-  if (!profile) return <main className="min-h-screen bg-bg" aria-label="Cargando WOLSKIA" />;
-  return <Studio session={profile} />;
+  if (!session) return <main className="min-h-screen bg-bg" />;
+  return <Studio session={session} />;
 }
 
 const NAV: IconBarItem[] = [
@@ -77,7 +73,7 @@ function Studio({ session }: { session: { user: string; role: Role; name: string
     setPage(key as Page);
     setMood("idle");
   };
-  const roleLabel = session.role === "admin" ? "Administracion" : "Operaciones";
+  const roleLabel = "Espacio personal";
 
   /* Pantalla fija: la ventana nunca se estira ni scrollea. Lo que no
      entra se corta con "…" o scrollea dentro de su propio recuadro. */
@@ -85,15 +81,13 @@ function Studio({ session }: { session: { user: string; role: Role; name: string
     <SpaceProvider user={session.user}>
     <div className="wol-aurora flex h-dvh overflow-hidden">
       {/* Escritorio: riel vertical con el Icon bar */}
-      <aside className="relative hidden w-24 shrink-0 md:block">
+      <aside className="hidden w-24 shrink-0 flex-col items-center justify-between py-6 md:flex">
         <img
           src="/robot/wolskia-avatar.jpg"
           alt="WOLSKIA"
-          className="absolute left-1/2 top-6 h-12 w-12 -translate-x-1/2 rounded-full object-cover ring-2 ring-accent-2/40 shadow-[0_0_24px_rgba(106,212,255,0.35)]"
+          className="h-12 w-12 rounded-full object-cover ring-2 ring-accent-2/40 shadow-[0_0_24px_rgba(106,212,255,0.35)]"
         />
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <IconBar items={NAV} value={page} onChange={go} axis="column" />
-        </div>
+        <IconBar items={NAV} value={page} onChange={go} axis="column" />
       </aside>
       <section className="flex min-w-0 flex-1 flex-col">
         <header className="flex shrink-0 items-center justify-between gap-3 px-4 py-4 md:px-6 md:pl-0">
@@ -109,7 +103,6 @@ function Studio({ session }: { session: { user: string; role: Role; name: string
               <div className="truncate text-sm font-medium">{session.name}</div>
               <div className="truncate text-xs text-muted">{roleLabel}</div>
             </div>
-
           </div>
         </header>
         <div
@@ -466,132 +459,49 @@ const eventLabel = (e: EventItem) => `${e.date ?? "Sin fecha"}${e.time ? ` ${e.t
 const byDate = (a: EventItem, b: EventItem) =>
   `${a.date ?? "9999"} ${a.time ?? ""}`.localeCompare(`${b.date ?? "9999"} ${b.time ?? ""}`);
 
-const SECTION_STYLE = {
-  tasks: { rgb: "47,141,255", text: "text-[#6ab4ff]", title: "Tus próximas tareas", hint: "«Recordame revisar el informe mañana»" },
-  notes: { rgb: "167,139,250", text: "text-[#b9a5fb]", title: "Notas guardadas", hint: "«Anotá esta idea para después»" },
-  calendar: { rgb: "61,214,164", text: "text-[#5fe0b8]", title: "Tu agenda", hint: "«Agendá una reunión para el viernes»" },
-} as const;
-
 function WorkspaceOverview() {
-  const { data, error } = useSpace();
+  const { data } = useSpace();
   const [section, setSection] = useState<"tasks" | "notes" | "calendar">("tasks");
   const events = [...data.events].sort(byDate);
-  const total = data.tasks.length + data.notes.length + data.events.length;
   const tabs = [
-    { id: "tasks", label: "Tareas", count: data.tasks.length, Icon: SquareCheckBig },
-    { id: "notes", label: "Notas", count: data.notes.length, Icon: NotebookPen },
-    { id: "calendar", label: "Agenda", count: data.events.length, Icon: CalendarDays },
+    { id: "tasks", label: "Tareas", count: data.tasks.length },
+    { id: "notes", label: "Notas", count: data.notes.length },
+    { id: "calendar", label: "Eventos", count: data.events.length },
   ] as const;
-  const chosen: string[] = section === "tasks"
-    ? data.tasks.map(taskLabel)
-    : section === "notes"
-      ? data.notes.map(noteLabel)
-      : events.map(eventLabel);
-  const where = section === "tasks" ? "tareas" : section === "notes" ? "notas" : "eventos";
-  const ActiveIcon = tabs.find((item) => item.id === section)?.Icon ?? SquareCheckBig;
-  const st = SECTION_STYLE[section];
-  const rgb = st.rgb;
+  const chosen: string[] =
+    section === "tasks" ? data.tasks.map(taskLabel) : section === "notes" ? data.notes.map(noteLabel) : events.map(eventLabel);
+  const where = section === "tasks" ? "Tareas" : section === "notes" ? "Notas" : "Calendario";
   return (
-    <section className="glass relative flex h-full min-h-0 flex-col overflow-hidden rounded-[1.75rem] p-5">
-      <div className="pointer-events-none absolute -right-14 -top-20 h-48 w-48 rounded-full blur-3xl transition-colors duration-500" style={{ background: `rgba(${rgb},0.16)` }} />
-      <div className="pointer-events-none absolute -bottom-24 -left-16 h-48 w-48 rounded-full bg-accent-2/5 blur-3xl" />
-
-      <div className="relative flex shrink-0 items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-accent-2">
-            <span className="h-px w-5 bg-accent-2/60" />Panel personal
-          </div>
-          <h2 className="mt-2 text-[22px] font-semibold leading-none tracking-tight">Tu espacio</h2>
-          <p className="mt-2 text-xs leading-5 text-muted">Todo lo importante, en un solo lugar.</p>
-        </div>
-        <div className="flex shrink-0 flex-col items-end">
-          <span className="text-3xl font-semibold leading-none tabular-nums">{total}</span>
-          <span className="mt-1 text-[10px] uppercase tracking-widest text-muted">en total</span>
-        </div>
+    <section className="glass flex h-full min-h-0 flex-col overflow-hidden rounded-3xl p-5">
+      <h2 className="truncate text-base font-semibold">Tu espacio</h2>
+      <div role="tablist" className="mt-4 grid shrink-0 grid-cols-3 gap-1 rounded-xl bg-bg/60 p-1">
+        {tabs.map((item) => (
+          <button
+            key={item.id}
+            role="tab"
+            aria-selected={section === item.id}
+            type="button"
+            onClick={() => setSection(item.id)}
+            className={`flex min-w-0 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs transition-colors ${section === item.id ? "bg-accent/20 text-fg" : "text-muted hover:text-fg"}`}
+          >
+            <span className="truncate">{item.label}</span>
+            <span className="shrink-0 font-semibold text-accent-2">{item.count}</span>
+          </button>
+        ))}
       </div>
-
-      <div className="relative mt-5 grid shrink-0 grid-cols-3 gap-2">
-        {tabs.map((item) => {
-          const on = section === item.id;
-          const c = SECTION_STYLE[item.id].rgb;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setSection(item.id)}
-              aria-pressed={on}
-              className="group relative overflow-hidden rounded-2xl border px-3 py-3 text-left transition-all duration-300 hover:-translate-y-0.5"
-              style={{
-                borderColor: on ? `rgba(${c},0.55)` : "rgba(23,43,64,0.9)",
-                background: on ? `linear-gradient(160deg, rgba(${c},0.20), rgba(${c},0.04))` : "rgba(5,11,19,0.40)",
-                boxShadow: on ? `0 10px 28px -14px rgba(${c},0.8), inset 0 1px 0 rgba(255,255,255,0.06)` : "none",
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <item.Icon size={16} className={on ? SECTION_STYLE[item.id].text : "text-muted"} />
-                {on ? <span className="h-1.5 w-1.5 rounded-full" style={{ background: `rgb(${c})`, boxShadow: `0 0 10px rgb(${c})` }} /> : null}
-              </div>
-              <div className="mt-3 text-2xl font-semibold leading-none tabular-nums">{item.count}</div>
-              <div className="mt-1.5 text-[11px] text-muted">{item.label}</div>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="relative mt-4 flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-line/70 bg-bg/40">
-        <div className="flex shrink-0 items-center justify-between gap-2 border-b border-line/60 px-4 py-3">
-          <div className="flex min-w-0 items-center gap-2.5 text-sm font-medium">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg" style={{ background: `rgba(${rgb},0.14)` }}>
-              <ActiveIcon size={14} className={st.text} />
-            </span>
-            <span className="truncate">{st.title}</span>
-          </div>
-          <span className="shrink-0 rounded-full border border-line/70 bg-white/[0.03] px-2.5 py-0.5 text-[10px] text-muted">
-            {chosen.length} {chosen.length === 1 ? "elemento" : "elementos"}
-          </span>
-        </div>
-
-        {chosen.length ? (
-          <ul className="no-scrollbar min-h-0 flex-1 space-y-1.5 overflow-y-auto p-2.5">
-            {chosen.slice(0, 8).map((item, i) => (
-              <li
-                key={`${item}-${i}`}
-                title={item}
-                className="flex items-start gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm transition hover:border-line/80 hover:bg-white/[0.03]"
-              >
-                <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: `rgb(${rgb})`, boxShadow: `0 0 10px rgba(${rgb},0.7)` }} />
-                <span className="min-w-0 flex-1 text-fg/85 [overflow-wrap:anywhere]">{item}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden px-5 py-4 text-center">
-            <div className="relative grid h-16 w-16 place-items-center">
-              <span className="absolute inset-0 rounded-full blur-xl" style={{ background: `rgba(${rgb},0.28)` }} />
-              <span
-                className="relative grid h-14 w-14 place-items-center rounded-2xl border"
-                style={{ borderColor: `rgba(${rgb},0.40)`, background: `linear-gradient(160deg, rgba(${rgb},0.22), rgba(${rgb},0.05))` }}
-              >
-                <ActiveIcon size={24} className={st.text} />
-              </span>
-            </div>
-            <h3 className="mt-4 text-sm font-semibold">Todavía no hay {where}</h3>
-            <p className="mt-1.5 max-w-[230px] text-xs leading-5 text-muted">
-              Agregalos desde su sección o pedíselo a Wolskia en el chat.
-            </p>
-            <div className="mt-4 hidden max-w-full items-center gap-2 rounded-full border border-line/70 bg-white/[0.03] px-3.5 py-1.5 text-[11px] text-muted [@media(min-height:760px)]:flex">
-              <span className="shrink-0 font-medium text-fg">Probá:</span>
-              <span className="truncate">{st.hint}</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="relative mt-3 flex shrink-0 items-center gap-1.5 text-[11px] text-muted">
-        <span className={`h-1.5 w-1.5 rounded-full ${error ? "bg-warn" : "bg-ok"}`} />
-        {error ? "No se pudo sincronizar" : "Espacio sincronizado"}
-      </div>
-      {error ? <p role="status" className="mt-2 shrink-0 text-xs text-warn">{error}</p> : null}
+      {chosen.length ? (
+        <ul className="mt-3 grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)] content-start divide-y divide-line/60 overflow-hidden">
+          {chosen.slice(0, 8).map((item, i) => (
+            <li key={`${item}-${i}`} title={item} className="truncate py-2.5 text-sm text-muted">
+              {item}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-3 text-sm leading-6 text-muted">
+          Todavía no hay nada acá. Lo que agregues en {where} —o le pidas a Wolskia en el chat— aparece en este resumen.
+        </p>
+      )}
     </section>
   );
 }

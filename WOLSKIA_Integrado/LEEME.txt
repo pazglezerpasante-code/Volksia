@@ -11,7 +11,7 @@ CONFIGURAR (admin, una vez)
   3. Arrancá backend (puerto 5050) y frontend (8080)
 
 USUARIOS
-  La interfaz principal abre directamente, sin pantalla de login.
+  Entran a la web, login admin/admin123 o trabajador/trab123
   y chatean. No ven claves API.
 
 ESTE ZIP NO incluye node_modules ni .venv (así pesa poco).

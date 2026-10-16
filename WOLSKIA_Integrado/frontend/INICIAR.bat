@@ -27,7 +27,8 @@ if not exist node_modules\vite\bin\vite.js (
 echo.
 echo WOLSKIA se esta iniciando...
 echo Cuando vea "ready", abra: http://127.0.0.1:8080
-echo Acceso directo: no requiere login
+echo Direccion: admin / admin123
+echo Operaciones: trabajador / trab123
 echo.
 timeout /t 2 >nul
 start "" http://127.0.0.1:8080

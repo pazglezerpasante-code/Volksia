@@ -8,5 +8,5 @@ backend/.venv/bin/pip install -q -r backend/requirements.txt
 BACK=$!
 trap 'kill $BACK 2>/dev/null' EXIT INT TERM
 sleep 2
-echo "Abra http://127.0.0.1:8080  (sin login)"
+echo "Abra http://127.0.0.1:8080  (admin / admin123)"
 cd frontend && npm run dev

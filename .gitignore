@@ -1,0 +1,9 @@
+node_modules/
+.env
+*.env.local
+__pycache__/
+*.pyc
+.vercel/
+.output/
+dist/
+WOLSKIA_Integrado/backend/data/*.json
