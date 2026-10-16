@@ -1,38 +1,55 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { proxyApi, isApiPath, clientIp } from "./api-proxy-shared.mjs";
+import {
+  buildUpstreamHeaders,
+  clientIp,
+  filterResponseHeaders,
+  isProxiedPath,
+  normalizeUpstream,
+} from "./api-proxy-shared.mjs";
 
-const mk = (path, init = {}) => new Request("https://sitio.vercel.app" + path, init);
-
-test("sin configurar -> 503 y no reenvia", async () => {
-  let called = false;
-  const r = await proxyApi(mk("/api/space"), { target: "", secret: "", fetchImpl: () => (called = true) });
-  assert.equal(r.status, 503);
-  assert.equal(called, false);
+test("solo se reenvían las rutas del backend", () => {
+  for (const p of ["/api/ai/chat", "/api/ai/status", "/api/space", "/api/space/tasks/t_1", "/api/health", "/api/tools"]) {
+    assert.equal(isProxiedPath(p), true, p);
+  }
+  for (const p of ["/api/auth/sign-in", "/api/rtc", "/api/aimeta", "/", "/api", "/apix/ai/chat"]) {
+    assert.equal(isProxiedPath(p), false, p);
+  }
 });
 
-test("agrega secreto e IP, y pisa los que mande el navegador", async () => {
-  let seen;
-  const fetchImpl = async (url, init) => { seen = { url, init }; return new Response('{"ok":true}', { status: 200, headers: { "content-type": "application/json" } }); };
-  const r = await proxyApi(
-    mk("/api/ai/chat?x=1", { method: "POST", body: '{"a":1}', headers: { "x-wolskia-secret": "falso", "x-wolskia-client-ip": "6.6.6.6", "x-real-ip": "9.9.9.9", cookie: "a=b", "content-type": "application/json" } }),
-    { target: "https://api.onrender.com/", secret: "S", fetchImpl },
+test("normalizeUpstream agrega esquema y quita la barra final", () => {
+  assert.equal(normalizeUpstream("wolskia-api.onrender.com"), "https://wolskia-api.onrender.com");
+  assert.equal(normalizeUpstream("https://x.onrender.com/"), "https://x.onrender.com");
+  assert.equal(normalizeUpstream("127.0.0.1:5050"), "http://127.0.0.1:5050");
+  assert.equal(normalizeUpstream(""), null);
+  assert.equal(normalizeUpstream(undefined), null);
+});
+
+test("clientIp prefiere x-real-ip y cae a la primera de x-forwarded-for", () => {
+  assert.equal(clientIp(new Headers({ "x-real-ip": "1.2.3.4", "x-forwarded-for": "9.9.9.9" })), "1.2.3.4");
+  assert.equal(clientIp(new Headers({ "x-forwarded-for": "5.6.7.8, 10.0.0.1" })), "5.6.7.8");
+  assert.equal(clientIp(new Headers()), "");
+});
+
+test("las cabeceras al backend llevan la clave y NO las cookies del visitante", () => {
+  const h = buildUpstreamHeaders(
+    new Headers({ "content-type": "application/json", cookie: "sesion=1", authorization: "Bearer x", "x-wolskia-proxy-key": "falsa" }),
+    { secret: "s3", ip: "1.2.3.4" },
   );
-  assert.equal(r.status, 200);
-  assert.equal(seen.url, "https://api.onrender.com/api/ai/chat?x=1");
-  assert.equal(seen.init.headers.get("x-wolskia-secret"), "S");
-  assert.equal(seen.init.headers.get("x-wolskia-client-ip"), "9.9.9.9");
-  assert.equal(seen.init.headers.get("cookie"), null);
-  assert.equal(seen.init.body, '{"a":1}');
+  assert.equal(h.get("x-wolskia-proxy-key"), "s3");
+  assert.equal(h.get("x-wolskia-client-ip"), "1.2.3.4");
+  assert.equal(h.get("content-type"), "application/json");
+  assert.equal(h.get("cookie"), null);
+  assert.equal(h.get("authorization"), null);
 });
 
-test("backend caido -> 502 JSON", async () => {
-  const r = await proxyApi(mk("/api/space"), { target: "https://x", secret: "S", fetchImpl: async () => { throw new Error("x"); } });
-  assert.equal(r.status, 502);
-  assert.equal((await r.json()).error, "backend_down");
-});
-
-test("helpers", () => {
-  assert.ok(isApiPath("/api/space") && !isApiPath("/apix") && !isApiPath("/"));
-  assert.equal(clientIp(new Headers({ "x-forwarded-for": "1.1.1.1, 2.2.2.2" })), "1.1.1.1");
+test("la respuesta se limpia de cabeceras que rompen el streaming", () => {
+  const h = filterResponseHeaders(
+    new Headers({ "content-type": "application/json", "content-encoding": "gzip", "content-length": "12", "set-cookie": "a=b" }),
+  );
+  assert.equal(h.get("content-type"), "application/json");
+  assert.equal(h.get("content-encoding"), null);
+  assert.equal(h.get("content-length"), null);
+  assert.equal(h.get("set-cookie"), null);
+  assert.equal(h.get("cache-control"), "no-store");
 });

@@ -167,8 +167,17 @@ def _clean_bucket(bucket: list[float], window_sec: float) -> list[float]:
     return [t for t in bucket if now - t < window_sec]
 
 
+_global_day: list[float] = []
+GLOBAL_RPD = int(os.getenv("WOLSKIA_GLOBAL_DAILY_LIMIT", "0") or 0)  # 0 = sin tope global
+
+
 def check_local_rate_limit(client_ip: str) -> tuple[bool, str]:
     now = time.time()
+    if GLOBAL_RPD > 0:
+        # Tope global diario: protege tus claves/cuota de IA aunque alguien rote de IP.
+        _global_day[:] = _clean_bucket(_global_day, 86400.0)
+        if len(_global_day) >= GLOBAL_RPD:
+            return False, "Wolskia alcanzó su límite diario de consultas. Volvé a intentar mañana."
     times = _clean_bucket(_rpm_bucket[client_ip], 60.0)
     if len(times) >= LOCAL_RPM_PER_IP:
         return False, "Límite local por minuto alcanzado. Esperá un momento e intentá de nuevo."
@@ -177,6 +186,8 @@ def check_local_rate_limit(client_ip: str) -> tuple[bool, str]:
         return False, "Límite diario de esta instancia alcanzado. El catálogo de Herramientas sigue disponible."
     times.append(now)
     day.append(now)
+    if GLOBAL_RPD > 0:
+        _global_day.append(now)
     _rpm_bucket[client_ip] = times
     _rpd_bucket[client_ip] = day
     return True, ""
@@ -642,7 +653,10 @@ def get_adapter(provider: BaseProvider):
 
 
 def _can_write_files(role: str) -> bool:
-    """Solo administración escribe archivos (WOLSKIA_WORKERS_CAN_WRITE=1 lo abre a todos)."""
+    """Solo administración escribe archivos (WOLSKIA_WORKERS_CAN_WRITE=1 lo abre a todos).
+    En modo público (WOLSKIA_PUBLIC_MODE=1) nadie puede escribir archivos en el servidor."""
+    if os.getenv("WOLSKIA_PUBLIC_MODE") == "1":
+        return False
     return role == "admin" or os.getenv("WOLSKIA_WORKERS_CAN_WRITE") == "1"
 
 

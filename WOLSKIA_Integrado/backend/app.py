@@ -1,4 +1,4 @@
-import os, json, re, zipfile, mimetypes, logging
+import os, json, re, hmac, zipfile, mimetypes, logging
 from pathlib import Path
 from io import BytesIO
 from functools import wraps
@@ -22,6 +22,36 @@ EXTRA_ORIGINS = [o.strip() for o in os.getenv("WOLSKIA_CORS_ORIGINS", "").split(
 CORS(app, resources={r"/api/*": {"origins": DEFAULT_ORIGINS + EXTRA_ORIGINS}})
 
 CONFIG_FILE = BASE / "config.json"
+
+# ─── Modo público (sitio online SIN login) ─────────────────────────────────
+# WOLSKIA_PUBLIC_MODE=1 es para el despliegue online. Sin login, la defensa es:
+#  1) Candado de proxy: el backend solo atiende pedidos que traen la clave
+#     secreta WOLSKIA_PROXY_SECRET, que solo conoce el frontend (servidor a servidor).
+#     Si alguien entra directo a la URL del backend, recibe 403.
+#  2) Sin escritura de archivos y sin rol "admin" elegido por el navegador.
+#  3) Límites por IP y tope global diario (WOLSKIA_GLOBAL_DAILY_LIMIT).
+#  4) El identificador de «Tu espacio» debe ser largo (los nombres cortos como
+#     "default" o "admin" quedan bloqueados).
+PUBLIC_MODE = os.getenv("WOLSKIA_PUBLIC_MODE") == "1"
+PROXY_SECRET = os.getenv("WOLSKIA_PROXY_SECRET", "")
+MIN_PUBLIC_USER_LEN = 12
+GATED_PREFIXES = ("/api/ai/", "/api/space", "/api/chat", "/api/tools", "/api/search", "/api/project")
+
+
+@app.before_request
+def public_gate():
+    if not PUBLIC_MODE:
+        return None
+    path = request.path
+    if path == "/api/health":
+        return None
+    if not PROXY_SECRET:
+        return jsonify({"error": "misconfigured", "message": "Falta WOLSKIA_PROXY_SECRET en el servidor."}), 503
+    if path.startswith(GATED_PREFIXES):
+        sent = request.headers.get("X-Wolskia-Proxy-Key", "")
+        if not hmac.compare_digest(sent.encode(), PROXY_SECRET.encode()):
+            return jsonify({"error": "forbidden", "message": "Acceso directo no permitido."}), 403
+    return None
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("wolskia")
@@ -151,83 +181,13 @@ def get_project(pid):
         abort(404)
     return ps[i]
 
-LOOPBACK = {"127.0.0.1", "::1", "::ffff:127.0.0.1", "localhost"}
-
-# Modo ONLINE (WOLSKIA_ALLOW_REMOTE=1): solo atiende pedidos que traen el secreto
-# compartido con el sitio (Vercel). Quien entre directo a Render recibe 403.
-import hmac, time, threading
-from collections import defaultdict, deque
-
-RATE_PER_MIN = int(os.getenv("WOLSKIA_RATE_PER_MIN", "20"))
-DAILY_CAP = int(os.getenv("WOLSKIA_DAILY_CAP", "300"))
-_hits = defaultdict(deque)
-_day = {"d": "", "n": 0}
-_lock = threading.Lock()
-
-
-def online() -> bool:
-    return os.getenv("WOLSKIA_ALLOW_REMOTE") == "1"
-
-
-def client_ip() -> str:
-    """Local: IP del socket (o XFF si viene de un proxy local).
-    Online: IP que el proxy del sitio reenvia, ya autenticado con el secreto."""
-    if online():
-        return (request.headers.get("X-Wolskia-Client-IP") or request.remote_addr or "0.0.0.0").strip()[:64]
-    xff = request.headers.get("X-Forwarded-For", "")
-    if xff and request.remote_addr in LOOPBACK:
-        return xff.split(",")[-1].strip()
-    return request.remote_addr or "127.0.0.1"
-
-
-def _secret_ok() -> bool:
-    secret = os.getenv("WOLSKIA_PROXY_SECRET", "")
-    got = request.headers.get("X-Wolskia-Secret", "")
-    return bool(secret) and hmac.compare_digest(secret.encode(), got.encode())
-
-
-def _limited(ip: str, expensive: bool) -> str | None:
-    now = time.time()
-    with _lock:
-        q = _hits[ip]
-        while q and now - q[0] > 60:
-            q.popleft()
-        if len(q) >= RATE_PER_MIN:
-            return "Demasiados pedidos. Esperá un minuto."
-        q.append(now)
-        if expensive:
-            today = time.strftime("%Y-%m-%d")
-            if _day["d"] != today:
-                _day.update(d=today, n=0)
-            if _day["n"] >= DAILY_CAP:
-                return "Se alcanzó el tope diario de consultas del sitio. Probá mañana."
-            _day["n"] += 1
-    return None
-
-
-def local_only(fn):
-    """Local: solo esta computadora. Online: solo con el secreto del proxy + limites."""
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        if online():
-            if not _secret_ok():
-                return jsonify({"error": "forbidden", "message": "Acceso directo no permitido."}), 403
-            msg = _limited(client_ip(), expensive=request.path == "/api/ai/chat")
-            if msg:
-                return jsonify({"error": "rate_limited", "message": msg, "status": "rate_limit"}), 429
-        elif client_ip() not in LOOPBACK:
-            return jsonify({"error": "forbidden", "message": "Solo se permite acceso desde esta computadora."}), 403
-        return fn(*args, **kwargs)
-    return wrapper
-
-
 @app.get("/")
-@local_only
 def home():
+    if PUBLIC_MODE:
+        return jsonify({"service": "wolskia-api", "ok": True})
     return render_template("index.html")
 
 @app.get("/api/tools")
-@local_only
 def tools():
     ps = scan()
     return jsonify({
@@ -236,7 +196,6 @@ def tools():
     })
 
 @app.post("/api/search")
-@local_only
 def search():
     q = str((request.json or {}).get("query", "")).strip()
     if not q:
@@ -254,7 +213,6 @@ def search():
     })
 
 @app.get("/api/project/<pid>/download")
-@local_only
 def download(pid):
     p = get_project(pid)
     folder = Path(p["path"])
@@ -280,9 +238,10 @@ def download(pid):
     return send_file(mem, mimetype="application/zip", as_attachment=True, download_name=f"{safe}.zip")
 
 @app.post("/api/chat")
-@local_only
 def chat():
     """Endpoint de chat: delega al servicio modular de IA."""
+    if PUBLIC_MODE:
+        abort(404)  # endpoint legacy de la UI vieja; online solo se usa /api/ai/chat
     from services.ai_service import chat as ai_chat
 
     data = request.get_json(silent=True) or {}
@@ -294,6 +253,33 @@ def chat():
     return jsonify(result)
 
 # ─── API de IA (consumida por WOLSKIA Studio) ──────────────────────────────
+
+LOOPBACK = {"127.0.0.1", "::1", "::ffff:127.0.0.1", "localhost"}
+
+
+def client_ip() -> str:
+    """IP real del cliente. Detrás del proxy de Vite (xfwd) se toma la ÚLTIMA
+    entrada de X-Forwarded-For, la que agregó el proxy y no se puede falsear."""
+    if PUBLIC_MODE:
+        # Ya validamos la clave de proxy: el frontend manda la IP real del visitante.
+        real = request.headers.get("X-Wolskia-Client-IP", "").strip()
+        return real[:64] or "unknown"
+    xff = request.headers.get("X-Forwarded-For", "")
+    if xff and request.remote_addr in LOOPBACK:
+        return xff.split(",")[-1].strip()
+    return request.remote_addr or "127.0.0.1"
+
+
+def local_only(fn):
+    """Los endpoints /api/ai/* gastan tu cuota y manejan tus claves:
+    solo se atienden desde esta misma máquina (WOLSKIA_ALLOW_REMOTE=1 lo desactiva)."""
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        if not PUBLIC_MODE and os.getenv("WOLSKIA_ALLOW_REMOTE") != "1" and client_ip() not in LOOPBACK:
+            return jsonify({"error": "forbidden", "message": "Solo se permite acceso desde esta computadora."}), 403
+        return fn(*args, **kwargs)
+    return wrapper
+
 
 @app.get("/api/ai/status")
 @local_only
@@ -338,8 +324,8 @@ def ai_chat_endpoint():
         projects=scan(),
         client_ip=client_ip(),
         prefer=str(data.get("provider", "auto")),
-        user=str(data.get("user", "default")),
-        role="worker" if online() else str(data.get("role", "worker")),
+        user=_public_user(str(data.get("user", "default"))),
+        role="worker" if PUBLIC_MODE else str(data.get("role", "worker")),
         workspace=workspace(),
     )
     return jsonify(result)
@@ -350,8 +336,19 @@ def ai_chat_endpoint():
 SPACE_KINDS = {"tasks": "task", "notes": "note", "events": "event"}
 
 
+def _public_user(user: str) -> str:
+    """En modo público exige un identificador largo; si no, aborta con 400."""
+    if PUBLIC_MODE:
+        from services import space_store as st
+        if len(st.clean_user(user)) < MIN_PUBLIC_USER_LEN or st.clean_user(user) == "default":
+            resp = jsonify({"ok": False, "error": "bad_user", "message": "Identificador de usuario inválido."})
+            resp.status_code = 400
+            abort(resp)
+    return user
+
+
 def _space_user():
-    return request.args.get("user") or (request.get_json(silent=True) or {}).get("user") or "default"
+    return _public_user(request.args.get("user") or (request.get_json(silent=True) or {}).get("user") or "default")
 
 
 def _space_err(exc):
@@ -428,4 +425,5 @@ def health():
     })
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0" if online() else "127.0.0.1", port=int(os.getenv("PORT", "5050")), debug=False)
+    # En local escucha solo en 127.0.0.1. Online se usa gunicorn (ver render.yaml).
+    app.run(host=os.getenv("HOST", "127.0.0.1"), port=int(os.getenv("PORT", "5050")), debug=False)

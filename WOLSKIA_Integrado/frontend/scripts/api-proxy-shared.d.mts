@@ -1,6 +1,8 @@
+export function isProxiedPath(pathname: string): boolean;
+export function normalizeUpstream(raw: unknown): string | null;
 export function clientIp(headers: Headers): string;
-export function isApiPath(pathname: string): boolean;
-export function proxyApi(
-  request: Request,
-  opts: { target?: string; secret?: string; fetchImpl?: typeof fetch; timeoutMs?: number },
-): Promise<Response>;
+export function buildUpstreamHeaders(
+  incoming: Headers,
+  opts: { secret?: string; ip?: string },
+): Headers;
+export function filterResponseHeaders(upstream: Headers): Headers;

@@ -53,7 +53,35 @@ def _empty() -> dict[str, list]:
     return {"tasks": [], "notes": [], "events": []}
 
 
-def _load() -> dict[str, Any]:
+SUPABASE_URL = os.getenv("SUPABASE_URL", "").rstrip("/")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "")
+SUPABASE_TABLE = os.getenv("SUPABASE_SPACE_TABLE", "wolskia_space")
+
+
+def _use_supabase() -> bool:
+    """Con SUPABASE_URL + SUPABASE_SERVICE_KEY, «Tu espacio» se guarda en Supabase
+    (sobrevive a reinicios del hosting). Sin ellas, se usa el archivo JSON local."""
+    return bool(SUPABASE_URL and SUPABASE_KEY)
+
+
+def _sb_headers(extra: dict[str, str] | None = None) -> dict[str, str]:
+    h = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}", "Content-Type": "application/json"}
+    h.update(extra or {})
+    return h
+
+
+def _load(user: str | None = None) -> dict[str, Any]:
+    if _use_supabase() and user:
+        import requests
+        r = requests.get(
+            f"{SUPABASE_URL}/rest/v1/{SUPABASE_TABLE}",
+            params={"user_id": f"eq.{user}", "select": "data"},
+            headers=_sb_headers(), timeout=10,
+        )
+        r.raise_for_status()
+        rows = r.json()
+        bucket = rows[0].get("data") if rows else None
+        return {"users": {user: bucket} if isinstance(bucket, dict) else {}}
     try:
         data = json.loads(DATA_FILE.read_text(encoding="utf-8"))
         if isinstance(data, dict) and isinstance(data.get("users"), dict):
@@ -63,7 +91,18 @@ def _load() -> dict[str, Any]:
     return {"users": {}}
 
 
-def _save(data: dict[str, Any]) -> None:
+def _save(data: dict[str, Any], user: str | None = None) -> None:
+    if _use_supabase() and user:
+        import requests
+        r = requests.post(
+            f"{SUPABASE_URL}/rest/v1/{SUPABASE_TABLE}",
+            params={"on_conflict": "user_id"},
+            json={"user_id": user, "data": data["users"].get(user, _empty()), "updated_at": _now()},
+            headers=_sb_headers({"Prefer": "resolution=merge-duplicates,return=minimal"}),
+            timeout=10,
+        )
+        r.raise_for_status()
+        return
     DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
     tmp = DATA_FILE.with_suffix(".tmp")
     tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -167,7 +206,7 @@ def _defaults(kind: str) -> dict[str, Any]:
 
 def list_all(user: str) -> dict[str, list]:
     with _LOCK:
-        return json.loads(json.dumps(_bucket(_load(), clean_user(user))))
+        return json.loads(json.dumps(_bucket(_load(clean_user(user)), clean_user(user))))
 
 
 def list_kind(user: str, kind: str) -> list[dict]:
@@ -177,14 +216,14 @@ def list_kind(user: str, kind: str) -> list[dict]:
 def add(user: str, kind: str, fields: dict[str, Any]) -> dict[str, Any]:
     clean = _normalize(kind, fields, partial=False)
     with _LOCK:
-        data = _load()
+        data = _load(clean_user(user))
         items = _bucket(data, clean_user(user))[COLLECTION[kind]]
         if len(items) >= MAX_ITEMS_PER_KIND:
             raise SpaceError("Se alcanzó el máximo de elementos permitido.")
         item = {"id": f"{PREFIX[kind]}_{secrets.token_hex(3)}", **_defaults(kind), **clean,
                 "created": _now(), "updated": _now()}
         items.insert(0, item)
-        _save(data)
+        _save(data, clean_user(user))
         return dict(item)
 
 
@@ -200,25 +239,25 @@ def update(user: str, kind: str, item_id: str, fields: dict[str, Any]) -> dict[s
     if not clean:
         raise SpaceError("No indicaste ningún campo para modificar.")
     with _LOCK:
-        data = _load()
+        data = _load(clean_user(user))
         items = _bucket(data, clean_user(user))[COLLECTION[kind]]
         for it in items:
             if it["id"] == item_id:
                 it.update(clean)
                 it["updated"] = _now()
-                _save(data)
+                _save(data, clean_user(user))
                 return dict(it)
     raise SpaceError(f"No existe {KIND_LABEL[kind].lower()} con id «{item_id}».")
 
 
 def delete(user: str, kind: str, item_id: str) -> dict[str, Any]:
     with _LOCK:
-        data = _load()
+        data = _load(clean_user(user))
         items = _bucket(data, clean_user(user))[COLLECTION[kind]]
         for i, it in enumerate(items):
             if it["id"] == item_id:
                 removed = items.pop(i)
-                _save(data)
+                _save(data, clean_user(user))
                 return removed
     raise SpaceError(f"No existe {KIND_LABEL[kind].lower()} con id «{item_id}».")
 
@@ -227,7 +266,7 @@ def import_legacy(user: str, tasks: list, notes: list, events: list) -> dict[str
     """Migra los datos que antes vivían en localStorage (listas de strings).
     Solo importa si el usuario no tiene nada en el servidor (idempotente)."""
     with _LOCK:
-        data = _load()
+        data = _load(clean_user(user))
         b = _bucket(data, clean_user(user))
         if any(b[c] for c in COLLECTION.values()):
             return {"tasks": 0, "notes": 0, "events": 0}
@@ -251,7 +290,7 @@ def import_legacy(user: str, tasks: list, notes: list, events: list) -> dict[str
             b["events"].append({"id": f"e_{secrets.token_hex(3)}", **_defaults("event"),
                                 "title": title, "date": date, "created": _now(), "updated": _now()})
             counts["events"] += 1
-        _save(data)
+        _save(data, clean_user(user))
         return counts
 
 
