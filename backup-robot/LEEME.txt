@@ -1,0 +1,4 @@
+Copia de seguridad de las imagenes y archivos del robot ANTERIOR.
+Para volver atras: copia robot/*.jpg a frontend/public/robot/, favicon.svg a frontend/public/,
+__grok/icon-180.png a frontend/public/__grok/, y restaura los *.old sobre los archivos de frontend/src
+(robot.tsx, index.tsx, __root.tsx, styles.css) y frontend/scripts/grok-pwa-shared.mjs.

@@ -15,7 +15,7 @@ import {
   SquareCheckBig,
   Wrench,
 } from "lucide-react";
-import { Robot, type RobotMood } from "@/components/robot";
+import { Robot, RobotAvatar, RobotThinking, type RobotMood } from "@/components/robot";
 import { IconBar, type IconBarItem } from "@/components/icon-bar";
 import { Markdown } from "@/components/markdown";
 import {
@@ -53,9 +53,9 @@ function Home() {
       }
       localStorage.setItem("wolskia-profile-id", user);
       localStorage.removeItem("wolskia-session");
-      setProfile({ user, role: "admin", name: "Mi espacio" });
+      setProfile({ user, role: "admin", name: "Wolskia" });
     } catch {
-      setProfile({ user: "perfil-local", role: "admin", name: "Mi espacio" });
+      setProfile({ user: "perfil-local", role: "admin", name: "Wolskia" });
     }
   }, []);
   if (!profile) return <main className="min-h-screen bg-bg" aria-label="Cargando WOLSKIA" />;
@@ -87,9 +87,14 @@ function Studio({ session }: { session: { user: string; role: Role; name: string
       {/* Escritorio: riel vertical con el Icon bar */}
       <aside className="relative hidden w-24 shrink-0 md:block">
         <img
-          src="/robot/wolskia-avatar.jpg"
-          alt="WOLSKIA"
-          className="absolute left-1/2 top-6 h-12 w-12 -translate-x-1/2 rounded-full object-cover ring-2 ring-accent-2/40 shadow-[0_0_24px_rgba(106,212,255,0.35)]"
+          src="/robot/wolskia-avatar.webp"
+          srcSet="/robot/wolskia-avatar-96.webp 96w, /robot/wolskia-avatar.webp 192w"
+          sizes="48px"
+          width={48}
+          height={48}
+          alt="Wolskia, el robot asistente de planta"
+          decoding="async"
+          className="absolute left-1/2 top-6 h-12 w-12 -translate-x-1/2 rounded-full bg-[#0d1c2c] object-cover ring-2 ring-accent-2/40 shadow-[0_0_24px_rgba(106,212,255,0.35)]"
         />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <IconBar items={NAV} value={page} onChange={go} axis="column" />
@@ -98,7 +103,7 @@ function Studio({ session }: { session: { user: string; role: Role; name: string
       <section className="flex min-w-0 flex-1 flex-col">
         <header className="flex shrink-0 items-center justify-between gap-3 px-4 py-4 md:px-6 md:pl-0">
           <div className="flex min-w-0 items-center gap-3">
-            <img src="/robot/wolskia-avatar.jpg" alt="" className="h-9 w-9 rounded-full object-cover ring-1 ring-accent-2/40 md:hidden" />
+            <img src="/robot/wolskia-avatar.webp" srcSet="/robot/wolskia-avatar-96.webp 96w, /robot/wolskia-avatar.webp 192w" sizes="36px" width={36} height={36} alt="Wolskia, el robot asistente de planta" decoding="async" className="h-9 w-9 shrink-0 rounded-full bg-[#0d1c2c] object-cover ring-1 ring-accent-2/40 md:hidden" />
             <div className="min-w-0">
               <div className="truncate font-display text-base font-semibold leading-tight">Wolskia</div>
               <div className="truncate text-xs text-muted">Asistente de planta</div>
@@ -113,7 +118,7 @@ function Studio({ session }: { session: { user: string; role: Role; name: string
           </div>
         </header>
         <div
-          className={`min-h-0 flex-1 px-4 pb-24 md:px-6 md:pb-6 md:pl-0 ${
+          className={`min-h-0 flex-1 px-4 pb-20 md:px-6 md:pb-6 md:pl-0 ${
             page === "chat" || page === "tools" ? "overflow-hidden" : "overflow-y-auto"
           }`}
         >
@@ -214,22 +219,22 @@ function Chat({
     <div className="mx-auto grid h-full w-full max-w-6xl grid-cols-1 grid-rows-[minmax(0,1fr)] gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
       <div className="glass relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-[2rem] px-4 py-5 md:px-8">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(47,141,255,0.16),transparent_46%)]" />
-        <h1 className="relative shrink-0 truncate text-center text-3xl font-bold tracking-tight md:text-4xl">
-          Hola, {name}.
+        <h1 className={`relative shrink-0 text-center text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl ${lines.length ? "max-md:hidden" : ""}`}>
+          Hola, soy Wolskia.
         </h1>
-        <p className="relative mt-1 shrink-0 truncate text-center text-muted">En que puedo ayudar.</p>
-        <div className="relative mt-3 flex min-h-0 flex-1 flex-col items-center justify-center">
+        <p className={`wol-lead relative mx-auto mt-2 w-full max-w-2xl shrink-0 text-center text-sm leading-5 text-muted sm:text-base ${lines.length ? "max-md:hidden" : ""}`}>Tu asistente inteligente para organizar ideas, consultar información y trabajar con las herramientas de esta página. ¿Por dónde empezamos?</p>
+        <div className="wol-stage relative mt-3 flex min-h-0 flex-1 flex-col items-center justify-center">
           {lines.length === 0 ? (
             <div className="grid w-full max-w-3xl grid-cols-1 items-center gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
-              <div className="grid gap-3">
+              <div className="hidden gap-3 md:grid">
                 {prompts.slice(0, 2).map((p) => (
                   <button key={p} title={p} className="wol-suggest truncate rounded-2xl border border-line bg-bg/60 px-4 py-4 text-left text-sm" onClick={() => send(p)}>
                     {p}
                   </button>
                 ))}
               </div>
-              <Robot mood={mood} />
-              <div className="grid gap-3">
+              <div><Robot mood={mood} size="fit" /></div>
+              <div className="hidden gap-3 md:grid">
                 {prompts.slice(2).map((p) => (
                   <button key={p} title={p} className="wol-suggest truncate rounded-2xl border border-line bg-bg/60 px-4 py-4 text-left text-sm" onClick={() => send(p)}>
                     {p}
@@ -252,7 +257,8 @@ function Chat({
                         : "border-line bg-bg/80"
                     }`}
                   >
-                    <div className="mb-1 text-xs font-semibold text-accent-2">
+                    <div className="mb-1 flex items-center gap-2 text-xs font-semibold text-accent-2">
+                      {line.who === "vos" ? null : <RobotAvatar px={24} />}
                       {line.who === "vos" ? "Usted" : "Wolskia"}
                     </div>
                     {line.who === "vos" ? (
@@ -266,17 +272,7 @@ function Chat({
                     {line.meta ? <div className="mt-2 truncate text-[11px] text-muted">vía {line.meta}</div> : null}
                   </div>
                 ))}
-                {busy ? (
-                  <div className="flex w-fit shrink-0 items-center gap-1.5 rounded-2xl border border-line bg-bg/80 px-4 py-3">
-                    {[0, 150, 300].map((d) => (
-                      <span
-                        key={d}
-                        className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent-2"
-                        style={{ animationDelay: `${d}ms` }}
-                      />
-                    ))}
-                  </div>
-                ) : null}
+                {busy ? <RobotThinking /> : null}
               </div>
               <div className="hidden justify-center md:flex">
                 <Robot mood={mood} size="md" />
@@ -284,7 +280,7 @@ function Chat({
             </div>
           )}
         </div>
-        <div className="relative mx-auto mt-3 w-full max-w-2xl shrink-0">
+        <div data-chat-composer className="relative mx-auto mt-3 w-full max-w-2xl shrink-0">
           {attachments.length ? (
             <div className="mb-2 flex flex-wrap gap-2" aria-label="Archivos adjuntos seleccionados">
               {attachments.map((file) => (
@@ -298,7 +294,7 @@ function Chat({
             </div>
           ) : null}
           <form
-            className="flex w-full items-center gap-2 rounded-2xl border border-line bg-bg/80 p-2 transition focus-within:border-accent/70 focus-within:shadow-[0_0_0_4px_rgba(47,141,255,0.12)]"
+            className="flex w-full min-w-0 items-center gap-1.5 rounded-2xl border border-line bg-bg/80 p-1.5 transition focus-within:border-accent/70 focus-within:shadow-[0_0_0_4px_rgba(47,141,255,0.12)] sm:gap-2 sm:p-2"
             onSubmit={(e) => { e.preventDefault(); void send(); }}
           >
             <input ref={fileInputRef} type="file" multiple className="hidden" aria-label="Seleccionar archivos" accept=".txt,.md,.csv,.json,.log,.xml,.yaml,.yml,.html,.css,.ts,.tsx,.js,.jsx,.py,.sql" onChange={async (e) => {
@@ -323,15 +319,15 @@ function Chat({
               onFocus={() => setMood("listen")}
               aria-label="Mensaje para WOLSKIA"
             />
-            <button className="wol-btn rounded-xl px-5 py-2.5 disabled:cursor-not-allowed disabled:opacity-50" type="submit" disabled={busy || (!text.trim() && attachments.length === 0)}>
+            <button className="wol-btn shrink-0 rounded-xl px-3 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50 sm:px-5" type="submit" disabled={busy || (!text.trim() && attachments.length === 0)}>
               {busy ? "Analizando…" : "Enviar"}
             </button>
           </form>
-          <p className="mt-2 truncate px-2 text-[11px] text-muted" title="Hasta 5 archivos de texto o código, de hasta 2 MB cada uno.">
+          <p className="mt-2 truncate px-2 text-[11px] text-muted max-md:hidden" title="Hasta 5 archivos de texto o código, de hasta 2 MB cada uno.">
             Hasta 5 archivos de texto o código, de hasta 2 MB cada uno.
           </p>
         </div>
-        <div className="relative mx-auto mt-3 hidden shrink-0 flex-wrap justify-center gap-2 [@media(min-height:700px)]:flex">
+        <div data-chat-chips className="relative mx-auto mt-3 hidden shrink-0 flex-wrap justify-center gap-2 [@media(min-height:700px)]:flex">
           {["Buscar modulo", "Abrir turnero", "Agregar una tarea", "Agendar un evento", "Crear una nota", "Ver mis archivos"].map((chip) => (
             <button key={chip} className="wol-suggest rounded-full border border-line bg-bg/40 px-4 py-2 text-xs text-muted hover:text-fg" onClick={() => send(chip)}>
               {chip}
