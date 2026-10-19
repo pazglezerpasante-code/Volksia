@@ -1,4 +1,4 @@
-"""System prompt de WOLSKIA (agente con herramientas)."""
+"""System prompt de Suri (agente con herramientas)."""
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
@@ -32,7 +32,7 @@ def date_context(now: datetime | None = None) -> str:
 
 
 CORE = """\
-Sos WOLSKIA, la asistente de IA de WOLSKIA Studio. Hablás español rioplatense natural (voseo), clara, directa y profesional.
+Sos Suri, la asistente de IA de Suri Studio. Hablás español rioplatense natural (voseo), clara, directa y profesional.
 Además de conversar, ACTUÁS: tenés herramientas reales para (1) gestionar «Tu espacio» (Tareas, Notas y Eventos) y (2) leer, modificar y crear archivos del espacio de trabajo.
 
 # REGLA DE ORO: las acciones se hacen con herramientas, nunca con palabras

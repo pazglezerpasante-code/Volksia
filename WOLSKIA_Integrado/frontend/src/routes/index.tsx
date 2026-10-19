@@ -53,12 +53,12 @@ function Home() {
       }
       localStorage.setItem("wolskia-profile-id", user);
       localStorage.removeItem("wolskia-session");
-      setProfile({ user, role: "admin", name: "Wolskia" });
+      setProfile({ user, role: "admin", name: "Suri" });
     } catch {
-      setProfile({ user: "perfil-local", role: "admin", name: "Wolskia" });
+      setProfile({ user: "perfil-local", role: "admin", name: "Suri" });
     }
   }, []);
-  if (!profile) return <main className="min-h-screen bg-bg" aria-label="Cargando WOLSKIA" />;
+  if (!profile) return <main className="min-h-screen bg-bg" aria-label="Cargando Suri" />;
   return <Studio session={profile} />;
 }
 
@@ -92,7 +92,7 @@ function Studio({ session }: { session: { user: string; role: Role; name: string
           sizes="48px"
           width={48}
           height={48}
-          alt="Wolskia, el robot asistente de planta"
+          alt="Suri, el robot asistente de planta"
           decoding="async"
           className="absolute left-1/2 top-6 h-12 w-12 -translate-x-1/2 rounded-full bg-[#0d1c2c] object-cover ring-2 ring-accent-2/40 shadow-[0_0_24px_rgba(106,212,255,0.35)]"
         />
@@ -103,9 +103,9 @@ function Studio({ session }: { session: { user: string; role: Role; name: string
       <section className="flex min-w-0 flex-1 flex-col">
         <header className="flex shrink-0 items-center justify-between gap-3 px-4 py-4 md:px-6 md:pl-0">
           <div className="flex min-w-0 items-center gap-3">
-            <img src="/robot/wolskia-avatar.webp" srcSet="/robot/wolskia-avatar-96.webp 96w, /robot/wolskia-avatar.webp 192w" sizes="36px" width={36} height={36} alt="Wolskia, el robot asistente de planta" decoding="async" className="h-9 w-9 shrink-0 rounded-full bg-[#0d1c2c] object-cover ring-1 ring-accent-2/40 md:hidden" />
+            <img src="/robot/wolskia-avatar.webp" srcSet="/robot/wolskia-avatar-96.webp 96w, /robot/wolskia-avatar.webp 192w" sizes="36px" width={36} height={36} alt="Suri, el robot asistente de planta" decoding="async" className="h-9 w-9 shrink-0 rounded-full bg-[#0d1c2c] object-cover ring-1 ring-accent-2/40 md:hidden" />
             <div className="min-w-0">
-              <div className="truncate font-display text-base font-semibold leading-tight">Wolskia</div>
+              <div className="truncate font-display text-base font-semibold leading-tight">Suri</div>
               <div className="truncate text-xs text-muted">Asistente de planta</div>
             </div>
           </div>
@@ -170,7 +170,7 @@ function Chat({
     if ((!userText && attachments.length === 0) || busy) return;
     const attachmentContext = attachments.map((file) => file.readable
       ? `\n\n--- Archivo adjunto: ${file.name} ---\n${file.content.slice(0, 24000)}`
-      : `\n\n[Archivo adjunto: ${file.name}. El contenido binario no se pudo leer desde esta versión de WOLSKIA.]`).join("");
+      : `\n\n[Archivo adjunto: ${file.name}. El contenido binario no se pudo leer desde esta versión de Suri.]`).join("");
     const q = `${userText || "Analizá los archivos adjuntos y ayudame con su contenido."}${attachmentContext}`;
     const attachedForDisplay = attachments.map((file) => file.name);
     setText("");
@@ -220,7 +220,7 @@ function Chat({
       <div className="glass relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-[2rem] px-4 py-5 md:px-8">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(47,141,255,0.16),transparent_46%)]" />
         <h1 className={`relative shrink-0 text-center text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl ${lines.length ? "max-md:hidden" : ""}`}>
-          Hola, soy Wolskia.
+          Hola, soy Suri.
         </h1>
         <p className={`wol-lead relative mx-auto mt-2 w-full max-w-2xl shrink-0 text-center text-sm leading-5 text-muted sm:text-base ${lines.length ? "max-md:hidden" : ""}`}>Tu asistente inteligente para organizar ideas, consultar información y trabajar con las herramientas de esta página. ¿Por dónde empezamos?</p>
         <div className="wol-stage relative mt-3 flex min-h-0 flex-1 flex-col items-center justify-center">
@@ -259,7 +259,7 @@ function Chat({
                   >
                     <div className="mb-1 flex items-center gap-2 text-xs font-semibold text-accent-2">
                       {line.who === "vos" ? null : <RobotAvatar px={24} />}
-                      {line.who === "vos" ? "Usted" : "Wolskia"}
+                      {line.who === "vos" ? "Usted" : "Suri"}
                     </div>
                     {line.who === "vos" ? (
                       <div title={line.text} className="line-clamp-6 whitespace-pre-wrap leading-6 [overflow-wrap:anywhere]">{line.text}</div>
@@ -313,11 +313,11 @@ function Chat({
             <button type="button" className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-line text-muted transition hover:border-accent hover:text-accent-2" aria-label="Adjuntar archivos" title="Adjuntar archivos de texto, código o datos" onClick={() => fileInputRef.current?.click()}><Paperclip size={18} /></button>
             <input
               className="min-w-0 flex-1 bg-transparent px-2 py-2 outline-none placeholder:text-muted/80"
-              placeholder={attachments.length ? "Preguntá sobre los archivos…" : "Escribí un mensaje para WOLSKIA…"}
+              placeholder={attachments.length ? "Preguntá sobre los archivos…" : "Escribí un mensaje para Suri…"}
               value={text}
               onChange={(e) => setText(e.target.value)}
               onFocus={() => setMood("listen")}
-              aria-label="Mensaje para WOLSKIA"
+              aria-label="Mensaje para Suri"
             />
             <button className="wol-btn shrink-0 rounded-xl px-3 py-2.5 text-sm disabled:cursor-not-allowed disabled:opacity-50 sm:px-5" type="submit" disabled={busy || (!text.trim() && attachments.length === 0)}>
               {busy ? "Analizando…" : "Enviar"}
@@ -573,7 +573,7 @@ function WorkspaceOverview() {
             </div>
             <h3 className="mt-4 text-sm font-semibold">Todavía no hay {where}</h3>
             <p className="mt-1.5 max-w-[230px] text-xs leading-5 text-muted">
-              Agregalos desde su sección o pedíselo a Wolskia en el chat.
+              Agregalos desde su sección o pedíselo a Suri en el chat.
             </p>
             <div className="mt-4 hidden max-w-full items-center gap-2 rounded-full border border-line/70 bg-white/[0.03] px-3.5 py-1.5 text-[11px] text-muted [@media(min-height:760px)]:flex">
               <span className="shrink-0 font-medium text-fg">Probá:</span>
@@ -738,7 +738,7 @@ function TasksPage() {
   const [due, setDue] = useState("");
   const pending = data.tasks.filter((t) => !t.done).length;
   return (
-    <PageShell title="Tareas" hint={`${pending} pendiente(s) · También podés pedirle a Wolskia en el chat: «agregá una tarea…»`}>
+    <PageShell title="Tareas" hint={`${pending} pendiente(s) · También podés pedirle a Suri en el chat: «agregá una tarea…»`}>
       <form
         className="mt-6 flex flex-col gap-2 sm:flex-row"
         onSubmit={async (e) => {
@@ -780,7 +780,7 @@ function NotesPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   return (
-    <PageShell title="Notas" hint="Apuntes e ideas · También podés pedirle a Wolskia en el chat: «anotá que…»">
+    <PageShell title="Notas" hint="Apuntes e ideas · También podés pedirle a Suri en el chat: «anotá que…»">
       <form
         className="mt-6 grid gap-2"
         onSubmit={async (e) => {
@@ -817,7 +817,7 @@ function CalendarView() {
   const [time, setTime] = useState("");
   const [text, setText] = useState("");
   return (
-    <PageShell title="Calendario" hint="Eventos con fecha · También podés pedirle a Wolskia en el chat: «agendá una reunión…»">
+    <PageShell title="Calendario" hint="Eventos con fecha · También podés pedirle a Suri en el chat: «agendá una reunión…»">
       <form
         className="mt-6 flex flex-col gap-2 sm:flex-row"
         onSubmit={async (e) => {

@@ -25,12 +25,12 @@ const poseSrc = (pose: string, small = false) => `/robot/wolskia-${pose}${small 
 
 // Texto alternativo descriptivo, segun el estado.
 const ALT: Record<RobotMood, string> = {
-  idle: "Wolskia, el robot asistente, sonriendo y en espera",
-  listen: "Wolskia, el robot asistente, con una mano en la cabeza, escuchando",
-  think: "Wolskia, el robot asistente, pensativo con una burbuja de pregunta, analizando",
-  speak: "Wolskia, el robot asistente, saludando mientras responde",
-  ok: "Wolskia, el robot asistente, con los brazos en alto: trabajo listo",
-  alert: "Wolskia, el robot asistente, con una burbuja de pregunta: requiere revisión",
+  idle: "Suri, el robot asistente, sonriendo y en espera",
+  listen: "Suri, el robot asistente, con una mano en la cabeza, escuchando",
+  think: "Suri, el robot asistente, pensativo con una burbuja de pregunta, analizando",
+  speak: "Suri, el robot asistente, saludando mientras responde",
+  ok: "Suri, el robot asistente, con los brazos en alto: trabajo listo",
+  alert: "Suri, el robot asistente, con una burbuja de pregunta: requiere revisión",
 };
 
 const DOT: Record<RobotMood, string> = {
@@ -66,7 +66,7 @@ export function RobotAvatar({ px = 24, className = "" }: { px?: number; classNam
       sizes={`${px}px`}
       width={px}
       height={px}
-      alt="Wolskia, el robot asistente"
+      alt="Suri, el robot asistente"
       loading="lazy"
       decoding="async"
       className={`shrink-0 rounded-full bg-[#0d1c2c] object-cover ring-1 ring-accent-2/40 ${className}`}

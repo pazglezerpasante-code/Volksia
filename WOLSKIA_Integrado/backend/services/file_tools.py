@@ -93,7 +93,7 @@ def resolve(ctx: FileContext, virtual_path: str, *, must_exist: bool, for_write:
     if rel.parts and DENY_NAME.search(rel.parts[-1]):
         raise FileToolError("Archivo protegido (posibles credenciales): acceso denegado.")
     if _is_protected(target, ctx):
-        raise FileToolError("Archivo del sistema de WOLSKIA: acceso denegado.")
+        raise FileToolError("Archivo del sistema de Suri: acceso denegado.")
     if must_exist and not target.exists():
         raise FileToolError(f"No existe: {label}/{rel.as_posix()}. Usá files_list para ver qué hay.")
     return target, root, f"{label}/{rel.as_posix()}" if rel.parts else label

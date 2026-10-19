@@ -177,7 +177,7 @@ def check_local_rate_limit(client_ip: str) -> tuple[bool, str]:
         # Tope global diario: protege tus claves/cuota de IA aunque alguien rote de IP.
         _global_day[:] = _clean_bucket(_global_day, 86400.0)
         if len(_global_day) >= GLOBAL_RPD:
-            return False, "Wolskia alcanzó su límite diario de consultas. Volvé a intentar mañana."
+            return False, "Suri alcanzó su límite diario de consultas. Volvé a intentar mañana."
     times = _clean_bucket(_rpm_bucket[client_ip], 60.0)
     if len(times) >= LOCAL_RPM_PER_IP:
         return False, "Límite local por minuto alcanzado. Esperá un momento e intentá de nuevo."
@@ -414,7 +414,7 @@ def build_tools_knowledge(projects: list[dict], focus_query: str = "") -> str:
     else:
         ranked = projects[:20]
 
-    lines = [f"Catálogo WOLSKIA ({len(projects)} herramienta(s)). Resumen relevante:", ""]
+    lines = [f"Catálogo Suri ({len(projects)} herramienta(s)). Resumen relevante:", ""]
     for p in ranked[:12]:
         title = p.get("title", "Sin título")
         folder = p.get("folder", "")
@@ -442,7 +442,7 @@ def summarize_history(history: list[dict], max_chars: int = 900) -> str:
     old = history[:-6]
     bits = []
     for item in old:
-        role = "Usuario" if item.get("role") == "user" else "WOLSKIA"
+        role = "Usuario" if item.get("role") == "user" else "Suri"
         content = str(item.get("content", ""))[:180].replace("\n", " ")
         if content:
             bits.append(f"{role}: {content}")

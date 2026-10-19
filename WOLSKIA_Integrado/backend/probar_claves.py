@@ -18,7 +18,7 @@ except ImportError:
 
 print()
 print("=" * 50)
-print("  PRUEBA DE CLAVES WOLSKIA")
+print("  PRUEBA DE CLAVES SURI")
 print("=" * 50)
 print()
 
