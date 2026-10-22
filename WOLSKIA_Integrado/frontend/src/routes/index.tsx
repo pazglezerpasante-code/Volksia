@@ -212,11 +212,11 @@ function Chat({
     const attachedExcel = attachments.find((a) => /\.(xls|xlsx)$/i.test(a.name))?.file;
     const directlyRequested = selectSuriOperation(userText);
     const operation = resolveSuriOperation(userText, pendingTool.current, Boolean(attachedExcel));
-    if (directlyRequested && directlyRequested !== pendingTool.current) {
+    if (directlyRequested && pendingTool.current && directlyRequested !== pendingTool.current) {
       pendingText.current = "";
       pendingExcel.current = null;
     }
-    const binaryExcel = attachedExcel || (operation && operation === pendingTool.current ? pendingExcel.current : null);
+    const binaryExcel = attachedExcel || (operation && (!pendingTool.current || operation === pendingTool.current) ? pendingExcel.current : null);
     if (operation && operation !== "certificados") pendingTool.current = operation;
     const context = attachments.filter((a) => a.readable).map((file) =>
       "\n\n--- Archivo adjunto: " + file.name + " ---\n" + file.content.slice(0, 24000)).join("");
