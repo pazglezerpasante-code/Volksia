@@ -16,6 +16,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { clearWorkerMemory, emptyWorkerMemory, learnPreference, readWorkerMemory, sanitizeChatLines, workerMemoryContext, writeWorkerMemory } from "@/lib/worker-memory";
+import { combineAttendanceMessages, parseAbsenceReasons, parseHolidayDates, resolveSuriOperation, runWorkspaceTool, selectSuriOperation, type LocalDownload } from "@/lib/workspace-runner";
 import { Robot, RobotAvatar, RobotThinking, type RobotMood } from "@/components/robot";
 import { IconBar, type IconBarItem } from "@/components/icon-bar";
 import { Markdown } from "@/components/markdown";
@@ -155,12 +156,15 @@ function Chat({
   const [text, setText] = useState("");
   const [memory, setMemory] = useState(() => readWorkerMemory(user));
   const [showMemory, setShowMemory] = useState(false);
-  const [lines, setLines] = useState<{ who: "vos" | "wolskia"; text: string; meta?: string; actions?: ToolAction[] }[]>(() => {
+  const [lines, setLines] = useState<{ who: "vos" | "wolskia"; text: string; meta?: string; kind?: "chat" | "tool"; actions?: ToolAction[]; downloads?: LocalDownload[] }[]>(() => {
     const saved = readWorkerMemory(user);
     return saved.enabled ? saved.messages.map((message) => ({ ...message })) : [];
   });
   const [busy, setBusy] = useState(false);
-  const [attachments, setAttachments] = useState<{ id: string; name: string; size: number; content: string; readable: boolean }[]>([]);
+  const [attachments, setAttachments] = useState<{ id: string; name: string; size: number; content: string; readable: boolean; file: File }[]>([]);
+  const pendingTool = useRef<ReturnType<typeof selectSuriOperation>>(null);
+  const pendingText = useRef("");
+  const pendingExcel = useRef<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const { refresh } = useSpace();
@@ -190,6 +194,10 @@ function Chat({
     setMemory(emptyWorkerMemory());
     setLines([]);
     setShowMemory(false);
+    pendingTool.current = null;
+    pendingText.current = "";
+    pendingExcel.current = null;
+    setAttachments([]);
   }
 
   // Siempre mostrar el último mensaje (la barra de scroll está oculta)
@@ -201,45 +209,87 @@ function Chat({
   async function send(raw?: string) {
     const userText = (raw ?? text).trim();
     if ((!userText && attachments.length === 0) || busy) return;
-    const attachmentContext = attachments.map((file) => file.readable
-      ? `\n\n--- Archivo adjunto: ${file.name} ---\n${file.content.slice(0, 24000)}`
-      : `\n\n[Archivo adjunto: ${file.name}. El contenido binario no se pudo leer desde esta versión de Suri.]`).join("");
-    const q = `${userText || "Analizá los archivos adjuntos y ayudame con su contenido."}${attachmentContext}`;
+    const attachedExcel = attachments.find((a) => /\.(xls|xlsx)$/i.test(a.name))?.file;
+    const directlyRequested = selectSuriOperation(userText);
+    const operation = resolveSuriOperation(userText, pendingTool.current, Boolean(attachedExcel));
+    if (directlyRequested && pendingTool.current && directlyRequested !== pendingTool.current) {
+      pendingText.current = "";
+      pendingExcel.current = null;
+    }
+    const binaryExcel = attachedExcel || (operation && (!pendingTool.current || operation === pendingTool.current) ? pendingExcel.current : null);
+    if (operation && operation !== "certificados") pendingTool.current = operation;
+    const context = attachments.filter((a) => a.readable).map((file) =>
+      "\n\n--- Archivo adjunto: " + file.name + " ---\n" + file.content.slice(0, 24000)).join("");
+    const query = (userText || "Analizá los archivos adjuntos.") + context;
     const attachedForDisplay = attachments.map((file) => file.name);
     setText("");
     setAttachments([]);
-    const history: ChatMessage[] = lines
-      .filter((l) => l.who === "vos" || l.meta)
+    const history: ChatMessage[] = lines.filter((line) => line.kind !== "tool" && (line.who === "vos" || line.meta))
       .slice(-13)
-      .map((l) => ({
-        role: l.who === "vos" ? ("user" as const) : ("assistant" as const),
-        content: l.text,
-      }));
-    const rememberedContext = workerMemoryContext(memory);
-    if (rememberedContext) history.unshift({ role: "user", content: rememberedContext });
-    if (memory.enabled && userText && attachments.length === 0) {
+      .map((line) => ({ role: line.who === "vos" ? ("user" as const) : ("assistant" as const), content: line.text }));
+    const remembered = workerMemoryContext(memory);
+    if (remembered) history.unshift({ role: "user", content: remembered });
+    if (memory.enabled && userText && !attachedExcel && !operation) {
       setMemory((prev) => learnPreference(prev, userText));
     }
-    setLines((prev) => [...prev, { who: "vos", text: `${userText || "Revisá los archivos adjuntos."}${attachedForDisplay.length ? `\n\n📎 ${attachedForDisplay.join(" · ")}` : ""}` }]);
+    setLines((prev) => [...prev, { who: "vos", kind: operation || binaryExcel ? "tool" : "chat",
+      text: (userText || "Revisá los archivos adjuntos.") +
+        (attachedForDisplay.length ? "\n\n📎 " + attachedForDisplay.join(" · ") : "") }]);
     setMood("think");
     setBusy(true);
     let failed = false;
     try {
-      const r = await aiApi.chat({ message: q, history, provider: "auto", user, role });
-      failed = r.status !== "ok";
-      if (r.space_changed) void refresh(); // la IA tocó Tu espacio: sincronizar el panel
-      setMood(failed ? "alert" : "speak");
-      setLines((prev) => [
-        ...prev,
-        { who: "wolskia", text: r.reply, meta: r.status === "ok" ? r.provider : undefined, actions: r.actions },
-      ]);
-    } catch (e) {
+      if (operation === "certificados") {
+        setLines((prev) => [...prev, { who: "wolskia", kind: "tool",
+          text: "Para usar el gestor de certificados, abrí su página: [Gestor de certificados](https://gestor-certificados-06pf.onrender.com/). SURI no emite ni aprueba certificados." }]);
+        pendingTool.current = null;
+        pendingExcel.current = null;
+        pendingText.current = "";
+        setMood("speak");
+      } else if (operation) {
+        if (!binaryExcel) {
+          pendingText.current = combineAttendanceMessages(pendingText.current, userText);
+          setLines((prev) => [...prev, { who: "wolskia", kind: "tool",
+            text: "Adjuntá el Excel .xls o .xlsx. Voy a reconocer el formato del contenido, no por el nombre." }]);
+        } else {
+          pendingExcel.current = binaryExcel;
+          const instructions = combineAttendanceMessages(pendingText.current, userText);
+          const holidays = operation === "asistencia" ? parseHolidayDates(instructions) : [];
+          const reasons = operation === "asistencia" ? parseAbsenceReasons(instructions) : {};
+          const period = operation === "encuesta2" && /todos? los dias|todo el periodo|todas las fechas/i.test(userText)
+            ? ("todo" as const) : undefined;
+          const response = await runWorkspaceTool(operation, binaryExcel, { holidays, reasons, period });
+          setLines((prev) => [...prev, { who: "wolskia", kind: "tool",
+            text: response.summary, downloads: response.downloads }]);
+          pendingTool.current = null;
+          pendingText.current = "";
+          pendingExcel.current = null;
+        }
+        setMood("speak");
+      } else if (attachedExcel) {
+        pendingExcel.current = attachedExcel;
+        setLines((prev) => [...prev, { who: "wolskia", kind: "tool",
+          text: "Recibí tu Excel. ¿Querés hacer control de fichadas, turnero o encuestas? No necesitás convertirlo en CSV." }]);
+        setMood("speak");
+      } else {
+        const response = await aiApi.chat({ message: query, history, provider: "auto", user, role });
+        failed = response.status !== "ok";
+        if (response.space_changed) void refresh();
+        setMood(failed ? "alert" : "speak");
+        setLines((prev) => [...prev, { who: "wolskia", kind: "chat",
+          text: response.reply, meta: response.status === "ok" ? response.provider : undefined, actions: response.actions }]);
+      }
+    } catch (error) {
       failed = true;
+      if (operation === "asistencia") {
+        pendingText.current = combineAttendanceMessages(pendingText.current, userText);
+        if (binaryExcel) pendingExcel.current = binaryExcel;
+      }
+      const detail = error instanceof Error ? error.message : "Error inesperado.";
+      const missing = operation === "asistencia" && /Falta confirmar los motivos de ausencias prolongadas/i.test(detail);
       setMood("alert");
-      setLines((prev) => [
-        ...prev,
-        { who: "wolskia", text: e instanceof Error ? e.message : "Error inesperado." },
-      ]);
+      setLines((prev) => [...prev, { who: "wolskia", kind: operation || binaryExcel ? "tool" : "chat",
+        text: missing ? detail + "\n\nEl Excel sigue guardado. Si todos estaban de vacaciones, respondé «todos vacaciones» sin adjuntar el Excel otra vez." : detail }]);
     } finally {
       setBusy(false);
       if (!failed) window.setTimeout(() => setMood("ok"), 700);
@@ -325,6 +375,9 @@ function Chat({
                       </div>
                     )}
                     <ActionChips actions={line.actions} />
+                    {line.downloads?.map((download, i) => (
+                      <a key={i} href={download.url} download={download.name} className="mt-2 mr-2 inline-flex rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-xs font-semibold text-accent-2 hover:bg-accent/20">Descargar {download.name}</a>
+                    ))}
                     {line.meta ? <div className="mt-2 truncate text-[11px] text-muted">vía {line.meta}</div> : null}
                   </div>
                 ))}
@@ -343,7 +396,7 @@ function Chat({
                 <div key={file.id} className="flex max-w-full items-center gap-2 rounded-xl border border-line bg-panel-2 px-3 py-2 text-xs">
                   <FileText size={15} className="shrink-0 text-accent-2" />
                   <span className="max-w-[220px] truncate">{file.name}</span>
-                  <span className="shrink-0 text-muted">{file.readable ? "Listo para analizar" : "Solo referencia"}</span>
+                  <span className="shrink-0 text-muted">{file.readable ? "Listo para analizar" : /\.(xls|xlsx)$/i.test(file.name) ? "Excel listo para procesar" : "Solo referencia"}</span>
                   <button type="button" className="rounded-md p-1 text-muted hover:text-fg" aria-label={`Quitar ${file.name}`} onClick={() => setAttachments((prev) => prev.filter((f) => f.id !== file.id))}><X size={14} /></button>
                 </div>
               ))}
@@ -353,7 +406,7 @@ function Chat({
             className="flex w-full min-w-0 items-center gap-1.5 rounded-2xl border border-line bg-bg/80 p-1.5 transition focus-within:border-accent/70 focus-within:shadow-[0_0_0_4px_rgba(47,141,255,0.12)] sm:gap-2 sm:p-2"
             onSubmit={(e) => { e.preventDefault(); void send(); }}
           >
-            <input ref={fileInputRef} type="file" multiple className="hidden" aria-label="Seleccionar archivos" accept=".txt,.md,.csv,.json,.log,.xml,.yaml,.yml,.html,.css,.ts,.tsx,.js,.jsx,.py,.sql" onChange={async (e) => {
+            <input ref={fileInputRef} type="file" multiple className="hidden" aria-label="Seleccionar archivos" accept=".xls,.xlsx,.txt,.md,.csv,.json,.log,.xml,.yaml,.yml,.html,.css,.ts,.tsx,.js,.jsx,.py,.sql" onChange={async (e) => {
               const input = e.currentTarget;
               const files = Array.from(input.files ?? []);
               const parsed = await Promise.all(files.map(async (file) => {
@@ -361,12 +414,12 @@ function Chat({
                 const readable = ["txt", "md", "csv", "json", "log", "xml", "yaml", "yml", "html", "css", "ts", "tsx", "js", "jsx", "py", "sql"].includes(ext) && file.size <= 2 * 1024 * 1024;
                 let content = "";
                 if (readable) { try { content = await file.text(); } catch { /* no se pudo leer */ } }
-                return { id: `${file.name}-${file.lastModified}-${Math.random().toString(36).slice(2, 8)}`, name: file.name, size: file.size, content, readable: readable && Boolean(content) };
+                return { id: `${file.name}-${file.lastModified}-${Math.random().toString(36).slice(2, 8)}`, name: file.name, size: file.size, content, readable: readable && Boolean(content), file };
               }));
               setAttachments((prev) => [...prev, ...parsed].slice(0, 5));
               input.value = "";
             }} />
-            <button type="button" className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-line text-muted transition hover:border-accent hover:text-accent-2" aria-label="Adjuntar archivos" title="Adjuntar archivos de texto, código o datos" onClick={() => fileInputRef.current?.click()}><Paperclip size={18} /></button>
+            <button type="button" className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-line text-muted transition hover:border-accent hover:text-accent-2" aria-label="Adjuntar archivos" title="Adjuntar Excel, texto, código o datos" onClick={() => fileInputRef.current?.click()}><Paperclip size={18} /></button>
             <input
               className="min-w-0 flex-1 bg-transparent px-2 py-2 outline-none placeholder:text-muted/80"
               placeholder={attachments.length ? "Preguntá sobre los archivos…" : "Escribí un mensaje para Suri…"}
@@ -379,8 +432,8 @@ function Chat({
               {busy ? "Analizando…" : "Enviar"}
             </button>
           </form>
-          <p className="mt-2 truncate px-2 text-[11px] text-muted max-md:hidden" title="Hasta 5 archivos de texto o código, de hasta 2 MB cada uno.">
-            Hasta 5 archivos de texto o código, de hasta 2 MB cada uno.
+          <p className="mt-2 truncate px-2 text-[11px] text-muted max-md:hidden" title="Hasta 5 adjuntos; Excel hasta 8 MB, archivos de texto hasta 2 MB.">
+            Hasta 5 adjuntos; Excel hasta 8 MB y archivos de texto hasta 2 MB.
           </p>
         </div>
         <div data-chat-chips className="relative mx-auto mt-3 hidden shrink-0 flex-wrap justify-center gap-2 [@media(min-height:700px)]:flex">
