@@ -15,6 +15,7 @@ import {
   SquareCheckBig,
   Wrench,
 } from "lucide-react";
+import { clearWorkerMemory, emptyWorkerMemory, learnPreference, readWorkerMemory, sanitizeChatLines, workerMemoryContext, writeWorkerMemory } from "@/lib/worker-memory";
 import { Robot, RobotAvatar, RobotThinking, type RobotMood } from "@/components/robot";
 import { IconBar, type IconBarItem } from "@/components/icon-bar";
 import { Markdown } from "@/components/markdown";
@@ -152,12 +153,44 @@ function Chat({
   role: Role;
 }) {
   const [text, setText] = useState("");
-  const [lines, setLines] = useState<{ who: "vos" | "wolskia"; text: string; meta?: string; actions?: ToolAction[] }[]>([]);
+  const [memory, setMemory] = useState(() => readWorkerMemory(user));
+  const [showMemory, setShowMemory] = useState(false);
+  const [lines, setLines] = useState<{ who: "vos" | "wolskia"; text: string; meta?: string; actions?: ToolAction[] }[]>(() => {
+    const saved = readWorkerMemory(user);
+    return saved.enabled ? saved.messages.map((message) => ({ ...message })) : [];
+  });
   const [busy, setBusy] = useState(false);
   const [attachments, setAttachments] = useState<{ id: string; name: string; size: number; content: string; readable: boolean }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const { refresh } = useSpace();
+
+  // La memoria es opcional, local y nunca contiene adjuntos ni datos laborales.
+  useEffect(() => {
+    if (!memory.enabled) return;
+    writeWorkerMemory(user, { ...memory, messages: sanitizeChatLines(lines) });
+  }, [user, lines, memory]);
+
+  function toggleMemory() {
+    const next = {
+      ...memory,
+      enabled: !memory.enabled,
+      messages: memory.enabled ? memory.messages : sanitizeChatLines(lines),
+    };
+    writeWorkerMemory(user, next);
+    setMemory(next);
+    if (next.enabled && !lines.length && next.messages.length) {
+      setLines(next.messages.map((message) => ({ ...message })));
+    }
+  }
+
+  function forgetMemory() {
+    if (!window.confirm("¿Borrar la memoria personal guardada en este navegador?")) return;
+    clearWorkerMemory(user);
+    setMemory(emptyWorkerMemory());
+    setLines([]);
+    setShowMemory(false);
+  }
 
   // Siempre mostrar el último mensaje (la barra de scroll está oculta)
   useEffect(() => {
@@ -176,11 +209,17 @@ function Chat({
     setText("");
     setAttachments([]);
     const history: ChatMessage[] = lines
-      .filter((l) => l.who === "vos" || l.meta) // omite mensajes de error
+      .filter((l) => l.who === "vos" || l.meta)
+      .slice(-13)
       .map((l) => ({
         role: l.who === "vos" ? ("user" as const) : ("assistant" as const),
         content: l.text,
       }));
+    const rememberedContext = workerMemoryContext(memory);
+    if (rememberedContext) history.unshift({ role: "user", content: rememberedContext });
+    if (memory.enabled && userText && attachments.length === 0) {
+      setMemory((prev) => learnPreference(prev, userText));
+    }
     setLines((prev) => [...prev, { who: "vos", text: `${userText || "Revisá los archivos adjuntos."}${attachedForDisplay.length ? `\n\n📎 ${attachedForDisplay.join(" · ")}` : ""}` }]);
     setMood("think");
     setBusy(true);
@@ -223,6 +262,23 @@ function Chat({
           Hola, soy Suri.
         </h1>
         <p className={`wol-lead relative mx-auto mt-2 w-full max-w-2xl shrink-0 text-center text-sm leading-5 text-muted sm:text-base ${lines.length ? "max-md:hidden" : ""}`}>Tu asistente inteligente para organizar ideas, consultar información y trabajar con las herramientas de esta página. ¿Por dónde empezamos?</p>
+        <div className="relative mx-auto mt-2 flex max-w-2xl shrink-0 flex-wrap items-center justify-center gap-2 text-[11px] text-muted" aria-label="Memoria personal de Suri">
+          <span>{memory.enabled ? "Memoria local activa" : "Memoria local apagada"}</span>
+          <button type="button" className="rounded-lg border border-line px-2 py-1 hover:text-fg" onClick={toggleMemory}>
+            {memory.enabled ? "Pausar memoria" : "Activar memoria"}
+          </button>
+          {(memory.enabled || memory.messages.length > 0 || memory.preferences.length > 0) && <>
+            <button type="button" className="rounded-lg border border-line px-2 py-1 hover:text-fg" onClick={() => setShowMemory((v) => !v)}>{showMemory ? "Ocultar" : "Ver memoria"}</button>
+            <button type="button" className="rounded-lg border border-line px-2 py-1 hover:text-fg" onClick={forgetMemory}>Borrar memoria</button>
+          </>}
+          <span className="max-md:hidden">Solo este navegador · no guarda planillas</span>
+        </div>
+        {showMemory && (
+          <div className="relative mx-auto mt-2 max-h-24 w-full max-w-2xl overflow-auto rounded-lg border border-line bg-bg/90 p-2 text-xs text-muted" aria-live="polite">
+            <p>{memory.messages.length} mensajes guardados.</p>
+            {memory.preferences.length ? <p className="mt-1">Preferencias: {memory.preferences.join(" · ")}</p> : <p className="mt-1">Todavía no hay preferencias aprendidas. Podés decir «prefiero respuestas breves».</p>}
+          </div>
+        )
         <div className="wol-stage relative mt-3 flex min-h-0 flex-1 flex-col items-center justify-center">
           {lines.length === 0 ? (
             <div className="grid w-full max-w-3xl grid-cols-1 items-center gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
