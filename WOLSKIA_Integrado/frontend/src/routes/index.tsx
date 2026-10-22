@@ -84,7 +84,7 @@ function Studio({ session }: { session: { user: string; role: Role; name: string
      entra se corta con "…" o scrollea dentro de su propio recuadro. */
   return (
     <SpaceProvider user={session.user}>
-    <div className="wol-aurora flex h-dvh overflow-hidden">
+    <div className="wol-aurora suri-app flex h-dvh overflow-hidden">
       {/* Escritorio: riel vertical con el Icon bar */}
       <aside className="relative hidden w-24 shrink-0 md:block">
         <img
@@ -101,17 +101,17 @@ function Studio({ session }: { session: { user: string; role: Role; name: string
           <IconBar items={NAV} value={page} onChange={go} axis="column" />
         </div>
       </aside>
-      <section className="flex min-w-0 flex-1 flex-col">
-        <header className="flex shrink-0 items-center justify-between gap-3 px-4 py-4 md:px-6 md:pl-0">
+      <section className="suri-main flex min-w-0 flex-1 flex-col">
+        <header className="suri-topbar flex shrink-0 items-center justify-between gap-3 px-4 py-4 md:px-6 md:pl-0">
           <div className="flex min-w-0 items-center gap-3">
             <img src="/robot/wolskia-avatar.webp" srcSet="/robot/wolskia-avatar-96.webp 96w, /robot/wolskia-avatar.webp 192w" sizes="36px" width={36} height={36} alt="Suri, el robot asistente de planta" decoding="async" className="h-9 w-9 shrink-0 rounded-full bg-[#0d1c2c] object-cover ring-1 ring-accent-2/40 md:hidden" />
             <div className="min-w-0">
-              <div className="truncate font-display text-base font-semibold leading-tight">Suri</div>
-              <div className="truncate text-xs text-muted">Asistente de planta</div>
+              <div className="flex items-center gap-2"><div className="truncate font-display text-base font-semibold leading-tight">Suri</div><span className="suri-live-dot" aria-label="Interfaz activa" /></div>
+              <div className="truncate text-xs text-muted">Asistente inteligente de planta</div>
             </div>
           </div>
           <div className="flex min-w-0 items-center gap-3">
-            <div className="min-w-0 text-right leading-tight">
+            <div className="suri-session-pill min-w-0 text-right leading-tight">
               <div className="truncate text-sm font-medium">{session.name}</div>
               <div className="truncate text-xs text-muted">{roleLabel}</div>
             </div>
@@ -255,8 +255,8 @@ function Chat({
   ];
 
   return (
-    <div className="mx-auto grid h-full w-full max-w-6xl grid-cols-1 grid-rows-[minmax(0,1fr)] gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
-      <div className="glass relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-[2rem] px-4 py-5 md:px-8">
+    <div className="suri-chat-layout mx-auto grid h-full w-full max-w-[1480px] grid-cols-1 grid-rows-[minmax(0,1fr)] gap-4 xl:grid-cols-[minmax(0,1fr)_340px] 2xl:gap-5">
+      <div className="glass suri-chat-panel relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-[2rem] px-4 py-5 md:px-8">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(47,141,255,0.16),transparent_46%)]" />
         <h1 className={`relative shrink-0 text-center text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl ${lines.length ? "max-md:hidden" : ""}`}>
           Hola, soy Suri.
@@ -544,7 +544,7 @@ function WorkspaceOverview() {
   const st = SECTION_STYLE[section];
   const rgb = st.rgb;
   return (
-    <section className="glass relative flex h-full min-h-0 flex-col overflow-hidden rounded-[1.75rem] p-5">
+    <section className="glass suri-workspace-panel relative flex h-full min-h-0 flex-col overflow-hidden rounded-[1.75rem] p-5">
       <div className="pointer-events-none absolute -right-14 -top-20 h-48 w-48 rounded-full blur-3xl transition-colors duration-500" style={{ background: `rgba(${rgb},0.16)` }} />
       <div className="pointer-events-none absolute -bottom-24 -left-16 h-48 w-48 rounded-full bg-accent-2/5 blur-3xl" />
 
