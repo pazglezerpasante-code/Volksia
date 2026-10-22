@@ -278,7 +278,7 @@ function Chat({
             <p>{memory.messages.length} mensajes guardados.</p>
             {memory.preferences.length ? <p className="mt-1">Preferencias: {memory.preferences.join(" · ")}</p> : <p className="mt-1">Todavía no hay preferencias aprendidas. Podés decir «prefiero respuestas breves».</p>}
           </div>
-        )
+        )}
         <div className="wol-stage relative mt-3 flex min-h-0 flex-1 flex-col items-center justify-center">
           {lines.length === 0 ? (
             <div className="grid w-full max-w-3xl grid-cols-1 items-center gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
