@@ -1,0 +1,3 @@
+El archivo HTML de ejemplo que enviaste no se ha modificado ni incorporado automáticamente al catálogo.
+Para catalogarlo, ponelo dentro de una carpeta de proyecto y agrega la carpeta padre en config.json.
+No cargues información confidencial o de la empresa sin autorización.

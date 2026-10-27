@@ -1,0 +1,17 @@
+# Ejemplo documental; no contiene credenciales. Configurar en el servidor.
+# Backend
+GEMINI_API_KEY=
+GROQ_API_KEY=
+XAI_API_KEY=
+WOLSKIA_PUBLIC_MODE=1
+WOLSKIA_PROXY_SECRET=
+WOLSKIA_GLOBAL_DAILY_LIMIT=300
+SUPABASE_URL=
+SUPABASE_SERVICE_KEY=
+
+# Frontend, variables exclusivas del servidor
+WOLSKIA_API=https://URL-DE-TU-BACKEND
+# WOLSKIA_PROXY_SECRET debe coincidir con el backend.
+
+# Única URL pública de este ejemplo
+VITE_WORKSPACE_URL=https://pazglezerpasante-code.github.io/volksia-workspace/

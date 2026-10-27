@@ -1,0 +1,13 @@
+from pathlib import Path
+p=Path('WOLSKIA_Integrado/frontend/src/routes/index.tsx');s=p.read_text(encoding='utf-8')
+s=s.replace('  const ready = useRef(false);\n','').replace('        ready.current = true;\n','')
+s=s.replace('/* ═══ «Tu espacio»: almacén compartido con la IA (servidor = fuente de verdad) ═══ */','/* Datos del dispositivo: persistencia local y contexto transitorio para la IA. */')
+s=s.replace('  const { data, add, remove } = useSpace();\n  const [title, setTitle]', '  const { data, add, update, remove } = useSpace();\n  const [editing, setEditing] = useState<string | null>(null);\n  const [title, setTitle]',1)
+s=s.replace('if (await add("notes", { title: title.trim(), content: content.trim() })) {','if (await (editing ? update("notes", editing, { title: title.trim(), content: content.trim() }) : add("notes", { title: title.trim(), content: content.trim() }))) {\n            setEditing(null);')
+s=s.replace('<button className="wol-btn rounded-xl px-5 py-3 sm:justify-self-end" type="submit">Agregar</button>','<div className="flex justify-end gap-2">{editing && <button type="button" className="px-4" onClick={() => { setEditing(null); setTitle(""); setContent(""); }}>Cancelar</button>}<button className="wol-btn rounded-xl px-5 py-3" type="submit">{editing ? "Guardar cambios" : "Agregar nota"}</button></div>')
+s=s.replace('<div title={n.title} className="truncate font-medium">','<div title={n.title} className="font-medium [overflow-wrap:anywhere]">')
+s=s.replace('className="mt-1 line-clamp-3 whitespace-pre-wrap text-muted', 'className="mt-1 whitespace-pre-wrap text-muted')
+s=s.replace('<button className="shrink-0 text-muted hover:text-fg" onClick={() => void remove("notes", n.id)}>Quitar</button>', '<div className="flex shrink-0 gap-3"><button aria-label={`Editar nota ${n.title}`} className="text-accent-2" onClick={() => { setEditing(n.id); setTitle(n.title); setContent(n.content); }}><Pencil size={16} /></button><button className="text-muted hover:text-fg" onClick={() => void remove("notes", n.id)}>Quitar</button></div>')
+s=s.replace('<ul className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-2">\n        {data.tasks', '<ul className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-2">\n        {!data.tasks.length && <li className="suri-panel-empty">Tu lista empieza con una tarea. Agregala arriba o pedísela a SURI.</li>}\n        {data.tasks')
+s=s.replace('<ul className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-2">\n        {data.notes', '<ul className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-2">\n        {!data.notes.length && <li className="suri-panel-empty">Guardá acá tu primera idea.</li>}\n        {data.notes')
+p.write_text(s,encoding='utf-8')

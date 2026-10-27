@@ -1,0 +1,389 @@
+{
+  "_info": "Definición neutra (JSON Schema). services/agent_tools.py la convierte a Gemini (functionDeclarations) y OpenAI/Groq/xAI (tools).",
+  "tools": [
+    {
+      "name": "task_add",
+      "group": "space",
+      "mutates": true,
+      "description": "Agrega una TAREA (pendiente/to-do) a «Tu espacio». Usala cuando el usuario pida crear, anotar o recordar algo que hay que HACER.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Qué hay que hacer. Breve y accionable."
+          },
+          "due": {
+            "type": "string",
+            "description": "Fecha límite opcional. Fecha AAAA-MM-DD ya resuelta (convertí «mañana», «el viernes», etc. usando la fecha de hoy del contexto)."
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "normal",
+              "high"
+            ],
+            "description": "Prioridad. Por defecto normal."
+          },
+          "detail": {
+            "type": "string",
+            "description": "Detalle opcional."
+          }
+        },
+        "required": [
+          "title"
+        ]
+      }
+    },
+    {
+      "name": "task_update",
+      "group": "space",
+      "mutates": true,
+      "description": "Modifica una TAREA existente: cambiar título, fecha, prioridad o marcarla hecha/pendiente (done). Solo enviá los campos que cambian.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID exacto del elemento (empieza con «t_»), tomado del bloque «Tu espacio» o de space_list."
+          },
+          "title": {
+            "type": "string",
+            "description": "Nuevo título."
+          },
+          "done": {
+            "type": "boolean",
+            "description": "true = completada, false = pendiente."
+          },
+          "due": {
+            "type": "string",
+            "description": "Nueva fecha límite (vacío = quitarla). Fecha AAAA-MM-DD ya resuelta (convertí «mañana», «el viernes», etc. usando la fecha de hoy del contexto)."
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "normal",
+              "high"
+            ],
+            "description": "Nueva prioridad."
+          },
+          "detail": {
+            "type": "string",
+            "description": "Nuevo detalle."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "task_delete",
+      "group": "space",
+      "mutates": true,
+      "description": "Elimina definitivamente una TAREA por su id.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID exacto del elemento (empieza con «t_»), tomado del bloque «Tu espacio» o de space_list."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "note_add",
+      "group": "space",
+      "mutates": true,
+      "description": "Agrega una NOTA a «Tu espacio» (apunte, idea, dato para guardar; no es algo con fecha ni algo que hacer).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Título corto de la nota."
+          },
+          "content": {
+            "type": "string",
+            "description": "Cuerpo de la nota (texto libre)."
+          }
+        },
+        "required": [
+          "title"
+        ]
+      }
+    },
+    {
+      "name": "note_update",
+      "group": "space",
+      "mutates": true,
+      "description": "Modifica una NOTA existente (título y/o contenido). Solo enviá lo que cambia.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID exacto del elemento (empieza con «n_»), tomado del bloque «Tu espacio» o de space_list."
+          },
+          "title": {
+            "type": "string",
+            "description": "Nuevo título."
+          },
+          "content": {
+            "type": "string",
+            "description": "Nuevo contenido completo."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "note_delete",
+      "group": "space",
+      "mutates": true,
+      "description": "Elimina definitivamente una NOTA por su id.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID exacto del elemento (empieza con «n_»), tomado del bloque «Tu espacio» o de space_list."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "event_add",
+      "group": "space",
+      "mutates": true,
+      "description": "Agrega un EVENTO al calendario (reunión, cita, turno, vencimiento: algo que OCURRE en una fecha). La fecha es obligatoria.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Nombre del evento."
+          },
+          "date": {
+            "type": "string",
+            "description": "Fecha AAAA-MM-DD ya resuelta (convertí «mañana», «el viernes», etc. usando la fecha de hoy del contexto)."
+          },
+          "time": {
+            "type": "string",
+            "description": "Hora HH:MM en formato 24 h."
+          },
+          "location": {
+            "type": "string",
+            "description": "Lugar opcional."
+          },
+          "detail": {
+            "type": "string",
+            "description": "Detalle opcional."
+          }
+        },
+        "required": [
+          "title",
+          "date"
+        ]
+      }
+    },
+    {
+      "name": "event_update",
+      "group": "space",
+      "mutates": true,
+      "description": "Modifica un EVENTO existente (título, fecha, hora, lugar). Solo enviá lo que cambia.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID exacto del elemento (empieza con «e_»), tomado del bloque «Tu espacio» o de space_list."
+          },
+          "title": {
+            "type": "string",
+            "description": "Nuevo título."
+          },
+          "date": {
+            "type": "string",
+            "description": "Fecha AAAA-MM-DD ya resuelta (convertí «mañana», «el viernes», etc. usando la fecha de hoy del contexto)."
+          },
+          "time": {
+            "type": "string",
+            "description": "Hora HH:MM en formato 24 h."
+          },
+          "location": {
+            "type": "string",
+            "description": "Nuevo lugar."
+          },
+          "detail": {
+            "type": "string",
+            "description": "Nuevo detalle."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "event_delete",
+      "group": "space",
+      "mutates": true,
+      "description": "Elimina definitivamente un EVENTO por su id.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID exacto del elemento (empieza con «e_»), tomado del bloque «Tu espacio» o de space_list."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "space_list",
+      "group": "space",
+      "mutates": false,
+      "description": "Consulta Tareas, Notas y/o Eventos con todos sus campos (útil si el bloque «Tu espacio» está recortado o necesitás el contenido completo de una nota).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "all",
+              "task",
+              "note",
+              "event"
+            ],
+            "description": "Qué consultar."
+          },
+          "query": {
+            "type": "string",
+            "description": "Texto a buscar (opcional)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "files_list",
+      "group": "files",
+      "mutates": false,
+      "description": "Lista las carpetas/archivos del espacio de trabajo. Sin «path» devuelve las raíces disponibles.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Raíz o subcarpeta, p. ej. «herramientas» o «herramientas/Turnero»."
+          },
+          "pattern": {
+            "type": "string",
+            "description": "Filtro opcional por texto en la ruta (p. ej. «.html»)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "file_read",
+      "group": "files",
+      "mutates": false,
+      "description": "Lee un archivo de texto del espacio de trabajo. SIEMPRE leé antes de modificar. Para archivos largos usá start_line/end_line.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Ruta «raiz/carpeta/archivo.ext»."
+          },
+          "start_line": {
+            "type": "integer",
+            "description": "Primera línea (1 = inicio)."
+          },
+          "end_line": {
+            "type": "integer",
+            "description": "Última línea."
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "file_create",
+      "group": "files",
+      "mutates": true,
+      "description": "Crea un archivo NUEVO de texto con el contenido completo. Falla si ya existe (salvo overwrite=true, que guarda respaldo).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Ruta «raiz/carpeta/archivo.ext»."
+          },
+          "content": {
+            "type": "string",
+            "description": "Contenido COMPLETO y funcional del archivo."
+          },
+          "overwrite": {
+            "type": "boolean",
+            "description": "Solo true si el usuario pidió reemplazar el archivo entero."
+          }
+        },
+        "required": [
+          "path",
+          "content"
+        ]
+      }
+    },
+    {
+      "name": "file_edit",
+      "group": "files",
+      "mutates": true,
+      "description": "Modifica un archivo existente reemplazando un fragmento EXACTO (old_text) por otro (new_text). Cambios mínimos y precisos; no reescribas el archivo completo.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Ruta del archivo."
+          },
+          "old_text": {
+            "type": "string",
+            "description": "Fragmento exacto actual (copiado de file_read), con contexto suficiente para ser único."
+          },
+          "new_text": {
+            "type": "string",
+            "description": "Texto nuevo que lo reemplaza."
+          },
+          "replace_all": {
+            "type": "boolean",
+            "description": "true para reemplazar todas las apariciones."
+          }
+        },
+        "required": [
+          "path",
+          "old_text",
+          "new_text"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+ * Serving Flask app 'app'
+ * Debug mode: off
+2026-10-26 16:34:01,361 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5052
+2026-10-26 16:34:01,361 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-10-26 16:34:01,824 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 16:34:01] "GET /api/health HTTP/1.1" 200 -
+2026-10-26 16:35:35,470 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 16:35:35] "GET /api/health HTTP/1.1" 200 -
+2026-10-26 16:35:46,751 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 16:35:46] "GET /api/health HTTP/1.1" 200 -
+2026-10-26 16:36:02,139 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 16:36:02] "GET /api/health HTTP/1.1" 200 -
+2026-10-26 16:40:10,609 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 16:40:10] "GET /api/space?user=perfil-t3mumpk1qyb3s15 HTTP/1.1" 200 -
+2026-10-26 16:40:10,636 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 16:40:10] "GET /api/space?user=perfil-t3mumpk1qyb3s15 HTTP/1.1" 200 -
+2026-10-26 16:40:29,623 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 16:40:29] "GET /api/health HTTP/1.1" 200 -
+2026-10-26 16:40:30,372 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 16:40:30] "GET /api/health HTTP/1.1" 200 -
+2026-10-26 16:41:46,491 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 16:41:46] "GET /api/space?user=perfil-z7dydeb13za5i2p HTTP/1.1" 200 -
+2026-10-26 16:41:46,506 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 16:41:46] "GET /api/space?user=perfil-z7dydeb13za5i2p HTTP/1.1" 200 -
+2026-10-26 16:42:36,019 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 16:42:36] "POST /api/ai/sheets/chat HTTP/1.1" 200 -
+2026-10-26 16:44:01,929 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 16:44:01] "GET /api/space?user=perfil-z7dydeb13za5i2p HTTP/1.1" 200 -
+2026-10-26 16:44:01,983 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 16:44:01] "GET /api/space?user=perfil-z7dydeb13za5i2p HTTP/1.1" 200 -
+2026-10-26 16:46:00,459 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 16:46:00] "POST /api/ai/sheets/chat HTTP/1.1" 200 -
+2026-10-26 17:10:26,951 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 17:10:26] "GET /api/space?user=perfil-t3mumpk1qyb3s15 HTTP/1.1" 200 -
+2026-10-26 17:10:26,964 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 17:10:26] "GET /api/space?user=perfil-z7dydeb13za5i2p HTTP/1.1" 200 -
+2026-10-26 17:10:27,018 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 17:10:27] "GET /api/space?user=perfil-z7dydeb13za5i2p HTTP/1.1" 200 -
+2026-10-26 17:10:27,026 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 17:10:27] "GET /api/space?user=perfil-t3mumpk1qyb3s15 HTTP/1.1" 200 -
+ * Serving Flask app 'app'
+ * Debug mode: off
+2026-10-26 17:24:10,120 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5052
+2026-10-26 17:24:10,120 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2026-10-26 17:26:28,529 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 17:26:28] "POST /api/ai/chat HTTP/1.1" 200 -
+2026-10-26 17:42:04,632 [INFO] werkzeug: 127.0.0.1 - - [26/Oct/2026 17:42:04] "POST /api/ai/sheets/chat HTTP/1.1" 200 -
+2026-10-27 14:10:21,351 [INFO] werkzeug: 127.0.0.1 - - [27/Oct/2026 14:10:21] "GET /api/space?user=perfil-omxc9p1huqciu9s HTTP/1.1" 200 -
+2026-10-27 14:12:30,085 [INFO] werkzeug: 127.0.0.1 - - [27/Oct/2026 14:12:30] "GET /api/health HTTP/1.1" 200 -
+2026-10-27 14:14:08,081 [INFO] werkzeug: 127.0.0.1 - - [27/Oct/2026 14:14:08] "GET /api/space?user=trabajador HTTP/1.1" 200 -
+2026-10-27 14:14:08,179 [INFO] werkzeug: 127.0.0.1 - - [27/Oct/2026 14:14:08] "GET /api/space?user=trabajador HTTP/1.1" 200 -
+2026-10-27 14:14:30,568 [INFO] werkzeug: 127.0.0.1 - - [27/Oct/2026 14:14:30] "POST /api/ai/chat HTTP/1.1" 200 -
+2026-10-27 14:14:41,388 [INFO] wolskia.ai: Web search (1042 chars) intent=live
+2026-10-27 14:14:45,449 [INFO] werkzeug: 127.0.0.1 - - [27/Oct/2026 14:14:45] "POST /api/ai/chat HTTP/1.1" 200 -
+2026-10-27 14:16:55,677 [INFO] werkzeug: 127.0.0.1 - - [27/Oct/2026 14:16:55] "POST /api/ai/chat HTTP/1.1" 200 -
+2026-10-27 14:17:45,318 [INFO] werkzeug: 127.0.0.1 - - [27/Oct/2026 14:17:45] "POST /api/ai/chat HTTP/1.1" 200 -
+2026-10-27 14:50:13,065 [INFO] werkzeug: 127.0.0.1 - - [27/Oct/2026 14:50:13] "GET /api/space?user=perfil-e280q76m0rzdrrl HTTP/1.1" 200 -
+2026-10-27 14:50:13,112 [INFO] werkzeug: 127.0.0.1 - - [27/Oct/2026 14:50:13] "GET /api/space?user=perfil-e280q76m0rzdrrl HTTP/1.1" 200 -

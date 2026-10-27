@@ -1,0 +1,8 @@
+{
+  "backend_pid": 13944,
+  "backend_port": 5052,
+  "original_backend_pid": 12836,
+  "original_backend_preserved": true,
+  "frontend_8080_pid": 11192,
+  "frontend_8081_pid": 12060
+}

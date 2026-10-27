@@ -1,0 +1,769 @@
+{
+  "source": "C:\\Users\\pasante\\Desktop\\Volksia-main",
+  "files": [
+    {
+      "path": ".gitignore",
+      "sha256": "946fb9ab1368a4e33d4bdb3412a2d5710aed51f9ccf8a75097f4a2630584db4f"
+    },
+    {
+      "path": "DEPLOY.md",
+      "sha256": "9ed29041d44e74619aee8e6ae6a1e3d2e83060283ada986fe92127b66f703b21"
+    },
+    {
+      "path": "README.md",
+      "sha256": "d3ae5f8c04e57510edea28886eb6d8633f2a95903920a929a10c014686e480c8"
+    },
+    {
+      "path": "render.yaml",
+      "sha256": "854c35caf08e512a29bfa3bdfaef6fbbc2137693efcd295bac4bfbec69228bf6"
+    },
+    {
+      "path": "SURI_ENV.example",
+      "sha256": "6427fbcc6265e6fe50082105e4c906fb871a5ef049d26890c0ac978412e606e2"
+    },
+    {
+      "path": "SURI_IMPLEMENTACION.md",
+      "sha256": "a7585e12d93019c79ef47a028c65edd3009e2d1e884f1c6dc0869bfea6f95756"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\DEPLOY_ONLINE.md",
+      "sha256": "a0ed2be3fda22df140a0cfc381a81e3d0878fcebbf189f8eeed0d487aed39f65"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\INICIAR_TODO.bat",
+      "sha256": "5c49d5c7d76500a9ae986abbc33561285ab2043bdba1f0f8b3ff235d2ae12604"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\INICIAR_TODO.sh",
+      "sha256": "a4e5e1707c53ff707f35684b0a5628a04b32d46a9f8dc80fb7737f95aa5b4917"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\LEEME.txt",
+      "sha256": "0ef67938458377e8b0c4b721f2f8cd96e703fcb7a10d439e0bdb2529b5e64a3f"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\LEEME_INTEGRADO.txt",
+      "sha256": "42e6da43cac5f2d3854336bbfeece580193bd7510332c6a817a6cb321e50649a"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\.env.example",
+      "sha256": "603b08f75777a9bac5ba170af06acf81f5c4288ffe096fc431f0af4c95992643"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\app.py",
+      "sha256": "d8a4143ad75f3dd63cb08c37f03d3377659df7eaed312b1bfb44531b93a3a5d1"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\config.json",
+      "sha256": "e00f539406733e3c756368ea4bfd89e1ca1724c02105dc395f9185da5e4fbeea"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\IMPORTAR_TUS_PROYECTOS.txt",
+      "sha256": "f9a07a0da8f8beb3593d4df961b2dfbaf0381f8d05b4c477ed0bc6deba4188b2"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\INICIAR_WOLSKIA.bat",
+      "sha256": "b29ae852b319d0db2656a76a9ff96a2d41e02e5579af0f5ba711fff6581de045"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\PROBAR_CLAVES.bat",
+      "sha256": "ae33f866ce2887480bc55128e326b52573594c8fc5159dae33b775b651e1855a"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\probar_claves.py",
+      "sha256": "44e39d03b0f9543abe336c02e5a9266be65139a817c98dc83cc189be1f6b859f"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\README.md",
+      "sha256": "1aa506c2b62f20e7a3e10967000b111e64baa77ba34d8eecf6aed6abfcc10a84"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\requirements.txt",
+      "sha256": "9e1a68d0a37c18a988076f7e366bb962abb5859c6ebe369cf84366bdc5f00ca7"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\supabase_schema.sql",
+      "sha256": "6debe4529210cfc4ff4f0e936e993ae0ff4082803598fb09f506fac1be2977ba"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\test-planilla.csv",
+      "sha256": "52f662e41281cbefd05f1f4724a77f283f7d6f6fc33b39ee7da1a8d89de8e05e"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\tests_agent.py",
+      "sha256": "91e1d13896eb77f201d4c886db3fce2754cc20ed14a75d358763ec5df7b9889a"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\tests_ai.py",
+      "sha256": "85175a94dec5131498039425906c788aa1047c94e3353d66a49f528f0fbab3a4"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\tests_api.py",
+      "sha256": "4eddff0b7802507f244bb2a78dbadd278f23a1bbdc4ce41dda72988b2306487f"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\tests_online.py",
+      "sha256": "22ecc970a6daa39949c2702b1885609af0c7546728391ec887c4e5a2f1ed5dd5"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\tests_public.py",
+      "sha256": "a3a7019f4b629c59a83a2589ba4013bc5776a60a10bc01d7c471455f0c94a7b9"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\tests_sheets.py",
+      "sha256": "8a8729a004a4475cad6898ec6c0d7a904fa0d106378ea584a58caf0e2fc079a8"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\tests_spreadsheet_chat.py",
+      "sha256": "fd5836c5e0b3e2e8abec1ff09afb0aef6c58b99c97a138a7d9285685694e4efa"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\.env.example",
+      "sha256": "63700b4cf5c8f2d76c508ebab7fa30bb0554af8b17f0d95e972179b3925566ce"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\.node_modules.lock",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\.prettierrc",
+      "sha256": "d5f90f76c5b68ce7be5ba077813f97e1983511b8c314764537345a538c1261f4"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\AGENTS.md",
+      "sha256": "5697d2fefb9bf4dbe5551ac39203e4826547659198a6e80e1041d42b8fc53c8a"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\eslint.config.mjs",
+      "sha256": "9c79df07c33ff6aa13876bdd1e7e6652aa1ecb377c7b7f029f7915d215ee4488"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\INICIAR.bat",
+      "sha256": "07914b782c00cc1c19115d5763ef30ebb14983196882ea2d200a3d8014b221b6"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\LEEME.txt",
+      "sha256": "3406bc4482fd156c0a17d7f4958a35a26d8bd92a7aac145ca1dfd976cfef2b9e"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\package-lock.json",
+      "sha256": "947943603109693d5b305c6065878822ac666a422439ff11f7ca7f3f0838df20"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\package.json",
+      "sha256": "a04e1c118a661daf7b9e1fa0307ca4a41b4655cc7f4fc5d77a1fe68b87ee20f7"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\startup.sh",
+      "sha256": "e4d3c64d5db837cf6cd212243478249e8d54a00b1c5a7a92cdf8e8937f05edcd"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\tsconfig.json",
+      "sha256": "8abad87a6c62322f1f4fdff02d5f3f764ea10a98c49cfafccdc288a0dced492f"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\vercel.json",
+      "sha256": "ede4380b760b6956fc67b10ae4d74af32d98c9f6b6189adbe835db86fc7ec8a2"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\vite.config.ts",
+      "sha256": "a10083438e8a59a0ae4f1dd96997633b06ea48a208e54276cfaf25688975a433"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\data\\.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\docs\\system_prompt.md",
+      "sha256": "d47d6a8fb5e1e245bbe7757cbfbcece91f6ce5bb6e138710dad66e91b8c998dd"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\docs\\tools.schema.json",
+      "sha256": "4225e52233e6986807f7abdec601e852e2e72fd94397e11611caaf9bbec7f16a"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\services\\agent.py",
+      "sha256": "e93ed55899485069ac591ecee14dc4dcf3eb835f8002e7222a5314e45c818de5"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\services\\agent_tools.py",
+      "sha256": "496484978b6f27aabbb2e024267a52a4efd78237c7255e5bfd6108c75297a51a"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\services\\ai_service.py",
+      "sha256": "c77eb360dd32a4d0fe7fbde88230c94335754ca229efa2848439efd62004e387"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\services\\file_tools.py",
+      "sha256": "ab4e93cda8622ed514a0e6195e2b1783ceecd8a3327707f24f1644ce7eb89923"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\services\\intents.py",
+      "sha256": "42d67580798ea15516ec1f88cb4ee41dd18af2a0fd2a15ceabe62a4f3951a30c"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\services\\prompts.py",
+      "sha256": "a6be00bfd8f747a1d6088f57ac5f59c29258155ccd7d777af10a50f0a32b26bd"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\services\\sheets.py",
+      "sha256": "6cf525e46d0c3675684d5aeac1d89c607c91a820d7bff3eaeb720aa279f2ce16"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\services\\space_store.py",
+      "sha256": "af88389f55133193352a06d3962c5fab28af068dc74145e4b411cb0a04f83df3"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\services\\spreadsheet_chat.py",
+      "sha256": "d2344266a9f63cff99863ad17edd9c1a17ecf3db536b178863d060d82317328c"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\services\\__init__.py",
+      "sha256": "49efe40187458a73c5eeee3fd0529720da6b0fae8fb33d70cb1ad0eeb283a930"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\templates\\index.html",
+      "sha256": "0c6d21e66bb7b6aaa20f4e4f806b32e0232cf4b9833e30bf22a94bf42e618693"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\herramientas\\Ejemplo_Turnero\\README.txt",
+      "sha256": "2b640fe567c308b2af8dcf260bbf641eba2e9bb4404ba1b609025c3b30a93768"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\herramientas\\Ejemplo_Turnero\\turnero_demo.html",
+      "sha256": "6de48cfecc4408117de1e66841f6e030489b3e45e9b95e70fac15e75f28e8741"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\tests\\fixtures\\personal-legacy.xls",
+      "sha256": "6d98d2bb8d19216f8a3d5579d1eeb5675d63a7e91991ab8e67b6138e69b5849e"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\backend\\tests\\fixtures\\personal-original.xlsx",
+      "sha256": "9434a641555ab56a88d4dc87ba7a55532146ae9ce03185b21db47eba351284f2"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\favicon-16.png",
+      "sha256": "c9e7ea40d2f5b63a743f0ae3acbe79621446fe652d84803576e5e7fac492bf6a"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\favicon-32.png",
+      "sha256": "bc373f8c7edf88daee7bf02e58e88b86494e5a72a71f03747e47d763d6850ee8"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\favicon.ico",
+      "sha256": "2c57984ef2d7a8099a6f5742a5bcf0208e089aa5e31a08649065d7f978d310d8"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\favicon.svg",
+      "sha256": "c985c566f86ecf1e11d1172bd799ab80c8a618bb699ed3f6a75843e6a6b39061"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\og.jpg",
+      "sha256": "6cf9539bd5cb8125315a56528a4edfa2ee0ef669426774b1a08084f79ecde8ab"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\api-proxy-shared.d.mts",
+      "sha256": "2544afeb42411635050155750717a9b4f63eb3df65513daf4c67a38776a7f9e9"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\api-proxy-shared.mjs",
+      "sha256": "3496a5cda331b0b92beed7fede35ae7a627354d2bd9c194114db151f93dcf4b3"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\api-proxy-shared.test.mjs",
+      "sha256": "97c08c55149d2b53c69ae66da72976e0a48c6c601962ef5fb26352b5fc15d8ce"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\app-env-plugin.mjs",
+      "sha256": "92962d2361a98413c0cef80b31266d49b063cf4ecf6421bb99f57f6eef4ed7b6"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\brand-check.mjs",
+      "sha256": "318f33ce7b29b55c386cc8847084068777880f795a5082043229bb06686be035"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\brand-check.test.mjs",
+      "sha256": "3dada9e907cf63d4127588268f38987e72108639e65a2694aebf4ee35aa9f309"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\browser-guard.mjs",
+      "sha256": "c6fb865defe5a37bd94e3805b00311d4e8267daf92812e39f62b1213d947265e"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\browser-smoke-verdict.mjs",
+      "sha256": "5699614f7fa62515e25ba9cca6397db2770cf6feb9b973f3c19f2915874c53de"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\browser-smoke-verdict.test.mjs",
+      "sha256": "48b3924b41d606f94a9b8faae47ff350b84978fdd5ab3f6ca01640ed4c7087d7"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\browser-smoke.mjs",
+      "sha256": "2e1cc3136f33bd74b73b4b3dba812e74ac299c24893b9a7c406e9bbeaf46571f"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\check-auth-invariant.mjs",
+      "sha256": "d712203c4bc92c197c342e5c91660fc5a141a31171f22f35c505a0bff45f98ee"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\check-auth-invariant.test.mjs",
+      "sha256": "75a58f44dffb2fc77eb47473638646f607dba26a68a6900156031c7b6227cf3c"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\check-suri-bridges.mjs",
+      "sha256": "9c32e2fa813e3be5043ea6feacbdcd1ea2f689aa9edf7d42ad7d24e0d5f006aa"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\grok-pwa-plugin.mjs",
+      "sha256": "36331d0bc0664debb5068bd6869d3089dc41555b7770c9ccb577d8845958835c"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\grok-pwa-plugin.test.mjs",
+      "sha256": "816c6b867c7230d739f69598202c0903e4332632293d548bde74c8d875ed8e5c"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\grok-pwa-shared.d.mts",
+      "sha256": "f4db33fcf35ef3f25fca05d1b42494b6f607c44a4d728ed3e989e65a3a1ea9d0"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\grok-pwa-shared.mjs",
+      "sha256": "7057f2fdbe38f495d56cd64829236107989a768e02058193e03a5daa451804e5"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\install-page.html",
+      "sha256": "5f8fe91f837db8d74d68db5e057948918bd9299e097700e0bd18f1cf5f94e586"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\migrate.mjs",
+      "sha256": "e1a31c8046a099df37b4bcbcafa4f4f7d7d18b1f1f0dc6d79676d41c4be976be"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\migration-plan.mjs",
+      "sha256": "9305d8cfe8cdad73671065d675c89d0f20075d18c756f9aba5043b72e7c19a0d"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\migration-plan.test.mjs",
+      "sha256": "9787b5f5f1a7057db94f0a5a8c89abf6ec569fd22d26f99be1c248a2a9f0c082"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\preview-thumbnail.mjs",
+      "sha256": "fd7263a1dd76f788c2b51e9381e1f1de1a58993fd94e01040285556cd38c0c40"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\preview.mjs",
+      "sha256": "b366b1c28844cda81d21e36a88af5f548bdec6a5a4b3000aac12be3ec99cf605"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\preview.test.mjs",
+      "sha256": "0105fe41d056ecc22c586a191a9cbd7d0e838b7c878d6993c8c9573c7ea708b1"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\sign-out-plan.mjs",
+      "sha256": "32ae072de23b5138bf849c344caf72ab2dab6cb4617ab9915db4e4f5b9c7e2f0"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\sign-out-plan.test.mjs",
+      "sha256": "1942e32f4b6a9d8b62733338b0f0e1a7d84ed278b4e6c4f24fa7616a3abc694e"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\suri-worker-memory.test.mjs",
+      "sha256": "2aeac52f539fc9d993c94d25e73628ac9ab8f4b474afa8688226b9c5dc97d606"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\with-app-env.mjs",
+      "sha256": "40dba9fdcd6101100be18b7567fd4064e4644fda31a8a549689d23c0d4c34d2d"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\with-app-env.test.mjs",
+      "sha256": "384ea7d0d20f980f733ee38d8f48b0bedd8a4ad39c80ca4792b9aeebcb275851"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\write-atomic.mjs",
+      "sha256": "650b62e8aa38697e1b931049025afe3aac829e6761a8aadf428712faef8b1544"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\scripts\\write-atomic.test.mjs",
+      "sha256": "e266ac99149651c368715317820934f0e8942db0fc763725ca4a096bf169ad3b"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\server\\virtual-grok-og-identity.d.ts",
+      "sha256": "74847f2b2bade154ac07dabb239c4718a745c095df530e78b8f1ef9f053edfa2"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\router.tsx",
+      "sha256": "0b72f2ad19d5a6e60d1e699d2fe0e4c0a2fa00d88881314e51a0e79fb1541611"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\routeTree.gen.ts",
+      "sha256": "f4a843c61899ede2abbc4a7153e6a00557765f737b724b152463c533c4e0ddb0"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\styles.css",
+      "sha256": "0634bb83543e15157284cbe1aaa6c3d5bd4ecff293f6d1277083fcf43f15360e"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\workspace.css",
+      "sha256": "43d017e2575e9a8f2d65ad79450df3ae36a13be058cfb8f0c6b861348e8eee9c"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\migrations\\auth\\0001_auth.sql",
+      "sha256": "f953cacc448c0c81ae4fe63e66b0e59569e840782ad279fdee201dff529363e9"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\alert.jpg",
+      "sha256": "8f37c5d3a0f0bd05e3315471eb0201c8c66c6f9d31d1503096a0cc30502700b6"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\idle.jpg",
+      "sha256": "b7c5f3bcbe0676d103719f57799bf33bb9d3c081b15979898c5cbc2fea62cd33"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\listen.jpg",
+      "sha256": "35467888b8e94434d80b2f991215080d6c98f520004ada18ea0f3d7dba54547e"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\ok.jpg",
+      "sha256": "10a6dadd5805f3ca426775640f90adb901984c89dfd63e8d85d21472c003dd83"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\speak.jpg",
+      "sha256": "39b59ff5f1043f5b9b9770a932997da096c050cf91fe1eac771f61c8857c2d4e"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\think.jpg",
+      "sha256": "ed79a8e467d9a52a564c23a2d0b555df36465ceee5eec635806335f681f4eb20"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-avatar-96.webp",
+      "sha256": "2cea881c63ae6a30915302b9c0d769d453ea2335ba6cbf847987c7f4ff8cf522"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-avatar.jpg",
+      "sha256": "f3eb5e341053e797a8eca1589bb0c9b9d5f4aa6a0e962f8ee25db395996921d2"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-avatar.webp",
+      "sha256": "059e74750d78f0e271f1ef49aef7ffc5d9c778ba8c88ddc29488fb5ac0c19690"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-idle-384.webp",
+      "sha256": "dadc38633c628d107c2042ae56a0c290a8c7a0c90299745fc62e83d2c3c1c3dc"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-idle.jpg",
+      "sha256": "640edc7283c38a65f4b2f2f88037409de51af19e742eeeac242f8419d6351da3"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-idle.webp",
+      "sha256": "4e85b36e074aca19b7bf4876837384c27329a072d34ddb5fcd485c986da0ba5f"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-listen-384.webp",
+      "sha256": "183a2563a1a2a0edc28444e3352f779e60e27c968e8c4238410df5aa475ae70f"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-listen.jpg",
+      "sha256": "58ac319c2985a3db02cc6f88195bdf3a8520f433316a206a76d09738b0b6fead"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-listen.webp",
+      "sha256": "67ee8a6ca37739e92c8ec23c3ecef7f7e5b3c0d53b09e3738fe2109c3ffd70a7"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-ok-384.webp",
+      "sha256": "382f34b921e22598b52c5f6cfe7cacc914314808d8e6baffe593857d75f298f9"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-ok.webp",
+      "sha256": "e2537739b069d563e28240e5bde5e499e51bc3250d3784bbd1ea9937dd0c8542"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-speak-384.webp",
+      "sha256": "0c9a78e75bd600819defcf9060af34e12d9ff86cbb61586951778425f8236071"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-speak.webp",
+      "sha256": "44fbd27cd451d158f0d1e7722bb197b732b61a158e9b07b495976861c53a655f"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-think-384.webp",
+      "sha256": "240e088847fb9933a2a5ffc9dd2771c26bad8656c1c2fc23bff93dca687f5aba"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-think.jpg",
+      "sha256": "f0857ebd015bf74260e84f63c2a2ab615e99dbe5dc32f69f216197d8af9f185b"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\robot\\wolskia-think.webp",
+      "sha256": "7104281b6df4534b91ca8db800c49d130dbff5e9a78df33bfbef021c042e0090"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\suri-tools\\control-asistencia.html",
+      "sha256": "2d993796da595e94224eeab2bfe6624a5ba8d444a06b63448cb5d853ad2a1503"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\suri-tools\\gestor-encuestas.html",
+      "sha256": "2900d6e3834a33bb238f55b42c8d7b2774baddd98c7872e6d2814cfaf9ffa981"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\suri-tools\\turnero.html",
+      "sha256": "f1f77da87117c3c12fccdf3e797d6a287c1a478733a74adc0755710e929ba227"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\__grok\\icon-180.png",
+      "sha256": "c4ae9145ba6c1630688eb7fd30de61fa26d2f7664ea229ae91033fa3960adc2f"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\__grok\\icon-192.png",
+      "sha256": "db9c54368840077cca00b9cdd756a38ff15ed4c43f4462b7582c0982db920de5"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\__grok\\icon-512.png",
+      "sha256": "5982afd45dcc86ad974778c10a15b0c1650db4e1ef6b550fa516810067916889"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\__grok\\install\\styles.css",
+      "sha256": "7e8e881302f58e54a9c07e7be395692d3de20fdaa27ce358531cc8dcca472cb6"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\__grok\\install\\assets\\homescreen\\glass-puzzle.svg",
+      "sha256": "a677c9356c23d1e699559ddbffac97cd135c2782cd893fb34f3738f6d11bee17"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\__grok\\install\\assets\\homescreen\\glass-share.svg",
+      "sha256": "efad1b4b507a68c1f1af4aad2c93e8c24076224aa593da86677697f543d026d6"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\__grok\\install\\assets\\homescreen\\logo-grok.svg",
+      "sha256": "0654e3e59cce69856f38525cbfe4ab3a9ef52d4b64c8532dd0bc1a3f34fcb5b1"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\__grok\\install\\assets\\homescreen\\ob-ipad.png",
+      "sha256": "4c9b09a4660c662b394597d551a04124293b0e37a7a7c72271dd2948c4499a14"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\__grok\\install\\assets\\homescreen\\ob-phone.png",
+      "sha256": "80e0a5ede614d9b920c67d7cb79c80a79134687b1fc9f560384e896a88e302db"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\public\\__grok\\install\\assets\\homescreen\\plus.svg",
+      "sha256": "c2c94be46aa2c3c2fda95d7c6f2fc6d0b656d1f5847828d5d95b5a81a6f4f20d"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\server\\middleware\\api-proxy.ts",
+      "sha256": "f6ec9593d38221405c3e5690c16ebb59409a7d62267716df8d7e0b09d1d39e2a"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\server\\middleware\\grok-pwa.ts",
+      "sha256": "340f1fed44355a61fefdaf29a752c524ac029afb00bea3f40cc996cdb289d2f8"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\components\\ai-keys-panel.tsx",
+      "sha256": "8125310f57bb22549f7b185a7154fecf2d3310142372949d95b2f70b4a944a94"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\components\\icon-bar.tsx",
+      "sha256": "35a4005425a3d0baa56c5a848245db29f255b687784e296e1f255a9b16e9357b"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\components\\markdown.tsx",
+      "sha256": "104aea0eb4e1004c7acc97d124c1fcf147a4b08c0581ad6400802a248630f773"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\components\\preview-host-bridge.tsx",
+      "sha256": "e4277e80ce127e7305057fb280d03d0703c5c7115b17d2e2aecf000e4867555e"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\components\\robot.tsx",
+      "sha256": "830ce4b0440d4b050ca938ca61e2f3987103e2de0eee5934d9d0791b2f156c3c"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\components\\sheet-workspace.tsx",
+      "sha256": "4b2ab888bd1a46a2fcd48ce69e134a3aeb6bdf9c7be1603b114bf6d60263b37f"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\ai-api.ts",
+      "sha256": "05a39c64a7ba86160ad50168ef9628f848aef9bd5a9b558c2fccdbedaefef0d1"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\db.ts",
+      "sha256": "8decf7689ff4833ad2f6f263eff9041dd2a68ce923824fa1d55ad620dea72e49"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\env.server.ts",
+      "sha256": "9b834e0978ae76332a65a05f5bc75f80684db8c6aa638916869385c12e3343d5"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\error-component.tsx",
+      "sha256": "d219e4297409810a21bd382e60169faf69243d49dafd17cb0ea3a1888082b2f4"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\preview-embedder-origin.ts",
+      "sha256": "c2d5e1acc5653ff2abc08a5eeb5feb3331f4e3d7c751ec83d60dee83cf33a6ee"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\preview-host-bridge.ts",
+      "sha256": "63a91311378037680b6be414937295069ec2950520d1dc959741cf430ba6b38b"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\preview-path-prefix.test.ts",
+      "sha256": "08da80da191446ed449da9a1180ccaaeebb8eaf295bf3ef9f0a5fcca51860ce1"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\preview-path-prefix.ts",
+      "sha256": "d46d4c21d47c2765198352b649037def35371c3995525cc42f5aff6a0f1519b7"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\spreadsheet-chat.test.ts",
+      "sha256": "a7e4dd225d096e195683ac64373abc55c59864b7701391106aef83766ac1a1d2"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\spreadsheet-chat.ts",
+      "sha256": "5e28544a6e15707a0ebcb3d21452cd21e579a1c4d4ff4ce0b9dcc916e1b82e70"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\worker-memory.ts",
+      "sha256": "ad960f91f1b3b0b891db82e1f216ab3a841f46525a1d872558595244b9ceb24d"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\workspace-runner.ts",
+      "sha256": "ab12e6190b0e1e45ab9e5ff714291bc7fdcd5dbeec16f58db82969b4435129f4"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\routes\\index.tsx",
+      "sha256": "cbfdc286f5ae2053cec57cbcae5c1634734514b1179b8d634519c875e8a7d08a"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\routes\\__root.tsx",
+      "sha256": "701a9904805aa86362110a114799db7e7e9ba25fc1e85b392e6727be14dd6b0d"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\app-data\\app-data.test.ts",
+      "sha256": "ec0c40fdaafb4e3d551086de9f9b4a745da7c252f7fbbc5c51a8b1b0a541391e"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\app-data\\client.server.ts",
+      "sha256": "ab544af8b5b96e16248fdcf7ce634c132ccd3659c33cf0daa22f6e74ef5a5da0"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\app-data\\errors.ts",
+      "sha256": "8e0dd8d761b2a5a1cafcb7523e2063151f0b6677837b19c3f6d494af148f3889"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\app-data\\index.ts",
+      "sha256": "72cf57dc1a863f9693d34c11772ba4bae790cc17d9efb1e8619b8a2e6247a7fa"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\app-data\\login.ts",
+      "sha256": "fbc723841bb67148dd9de12ed614ba6c095d799a533309857cc4d202d6be5ad9"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\app-data\\readiness-schedule.test.ts",
+      "sha256": "97c87401c474b9f87f2e21152fb377744f353736848f0044466ba2e260b06745"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\app-data\\readiness-schedule.ts",
+      "sha256": "3ea7f192220446b08747f3ef76c7d2fe150356470621f2220738b23e7976f683"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\app-data\\readiness.ts",
+      "sha256": "377786c1cf739eb9dc7c8b2bdcd09991686a700375a67a0c6e73b4334d394da1"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\app-data\\server-only.ts",
+      "sha256": "82821474088face6b9fcadad49793629e5f07a16386402b816262a1c070a3210"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\app-data\\types.ts",
+      "sha256": "65f3c7566db12661ee9d3633eaae66a85505e00f57a61c258fa72bd22881489f"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\app-data\\use-connector-readiness.ts",
+      "sha256": "57e6d2b3709be83ac2eed9c42eaa822a067fb5aa44a6098c982892c43f3a4f2f"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\client.ts",
+      "sha256": "4bca649afb627b11231a7b31acfcffe9323efddebc05944b2d769d2b8589294f"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\email-password.ts",
+      "sha256": "9b1da7c786e48adfa9a6f7c485bcf5817cf2075a601d8726a965f11171910354"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\gate-identity.server.ts",
+      "sha256": "96546b8b6910a01163c36c34a0d417d803bec222b93304be764d810838764159"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\gate-identity.test.ts",
+      "sha256": "21202fb2b56ffd10cb9b5bb7d9f305be88cce3902b858f73cea914df05ce2652"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\gate-session-marker.ts",
+      "sha256": "3dbf8cb789b0288f9d5c53b1515a3e87d265fcb22e11fe28dc3289c4bd7c06eb"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\gate-session.server.ts",
+      "sha256": "68aa500523ca2f0ad5c7ba34372c10aa1851a9774f8567c6b7781af5dd6cf204"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\gates.tsx",
+      "sha256": "39950c211bd4ad4f7129082bf5a43a42ff23975e681b99fd7cfbce372f83a5be"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\isolation.server.ts",
+      "sha256": "a4adf6a5d548e70a0be52d7efdc7433126028908072b47bf9f92135d9ee558a0"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\middleware.ts",
+      "sha256": "8dc37c4e9bd583f175402330d0952ef4d584c7410723cc2649c4046d5084bd80"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\pglite-dialect.ts",
+      "sha256": "bd66925574245cd47cdd98b5c068dd7b4ee4a51c9439e8421dc54c62fe7c4f50"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\popup.server.ts",
+      "sha256": "81f8833d9ab639f76b86f4bb23fed42a04cec4b0c6d90b7a67425a9232c9bb4a"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\preview.ts",
+      "sha256": "d52a3654a5cef7e841cbca789fd106dc464ea55db574f02aa5d295b7350f8664"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\provider.tsx",
+      "sha256": "4cbbc7f8cc1765788ad65455a33f64dcdafc6fe4ed1d13f90ccfa0ba4c13d1f3"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\providers.ts",
+      "sha256": "4acefac17931529bdeab053588a917b06e44abdb67a275a2ca1c7841080c6a78"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\server.ts",
+      "sha256": "e0544cadbfa1a09c3cb4cf2a0ec187dbbb2831aebf7de887a3c858abdd72ca43"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\sign-in-gate.test.ts",
+      "sha256": "2c352588cb6a8f58faf3aecc1d1f418ae827ddbb6a5eca8e56668ec72cd328d2"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\sign-in-gate.ts",
+      "sha256": "d2c65c20ab50ae41657ceecd61ded005fac29315deace9fc4d966cf56300754c"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\use-current-user.ts",
+      "sha256": "6444e7a0e6b908ad47c73981d63552ec0d33225f24a6c63370b9cec8088442d6"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\auth\\verify.server.ts",
+      "sha256": "42a7d5c1b17027ba004d6524a7f7bb4827b908d75ee3c3aefc940fa9c891c2ee"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\multiplayer\\index.ts",
+      "sha256": "bcb96816a2135e315078e2e7d0eda5522579b0caf9e768dc6c34294e4fa49137"
+    },
+    {
+      "path": "WOLSKIA_Integrado\\frontend\\src\\lib\\multiplayer\\p2p.ts",
+      "sha256": "4d0d2492ac249a2cf267c8d2db7688b5a2c488ab640da7727c0f1b73c2e92f60"
+    }
+  ]
+}

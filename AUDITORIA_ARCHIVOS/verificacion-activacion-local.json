@@ -1,0 +1,14 @@
+[
+  {
+    "port": 8080,
+    "release": "excel-empresa-20261026",
+    "configured": true,
+    "local_reader_references": true
+  },
+  {
+    "port": 8081,
+    "release": "excel-empresa-20261026",
+    "configured": true,
+    "local_reader_references": true
+  }
+]

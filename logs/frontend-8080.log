@@ -1,0 +1,42 @@
+
+> dev
+> node scripts/with-app-env.mjs vite dev --host 0.0.0.0 --port 8080
+
+
+  VITE v8.3.4  ready in 6802 ms
+
+  ➜  Local:   http://localhost:8080/
+  ➜  Network: http://192.168.50.110:8080/  Wi-Fi
+04:35:46 [vite] (client) [optimizer] scanning dependencies...
+04:35:48 [vite] (client) [optimizer] bundling dependencies...
+04:39:45 [vite] (ssr) connected.
+05:10:10 [vite] (client) hmr update /src/styles.css?direct, /src/routes/index.tsx, /src/routes/index.tsx?tsr-split=component
+05:10:10 [vite] (ssr) page reload src/routes/index.tsx
+05:10:11 [vite] (ssr) program reload
+05:10:51 [vite] (client) hmr update /src/styles.css?direct, /src/routes/index.tsx?tsr-split=component
+05:10:51 [vite] (ssr) page reload src/lib/ai-api.ts
+05:12:07 [vite] (client) hmr update /src/styles.css?direct
+05:18:46 [vite] (client) hmr update /src/styles.css?direct, /src/routes/index.tsx, /src/routes/index.tsx?tsr-split=component
+05:18:46 [vite] (ssr) page reload src/routes/index.tsx
+05:24:05 [vite] (client) hmr update /src/styles.css?direct, /src/routes/index.tsx, /src/routes/index.tsx?tsr-split=component
+05:24:05 [vite] (ssr) page reload src/routes/index.tsx
+05:24:05 [vite] (client) hmr update /src/styles.css?direct
+05:25:11 [vite] (client) page reload .vercel/output/static/suri-tools/control-asistencia.html
+05:25:11 [vite] (client) page reload .vercel/output/static/suri-tools/gestor-encuestas.html
+05:25:11 [vite] (client) page reload .vercel/output/static/suri-tools/turnero.html
+file watcher error: EBUSY: resource busy or locked, watch 'C:\Users\pasante\Desktop\Volksia-archivos\WOLSKIA_Integrado\frontend\.vercel\output\static\__grok\icon-192.png'
+05:26:01 [vite] (client) page reload .vercel/output/static/suri-tools/control-asistencia.html
+05:26:01 [vite] (client) page reload .vercel/output/static/suri-tools/gestor-encuestas.html
+05:26:01 [vite] (client) page reload .vercel/output/static/suri-tools/turnero.html
+05:33:44 [vite] (client) hmr update /src/styles.css?direct, /src/routes/index.tsx, /src/routes/index.tsx?tsr-split=component
+05:33:44 [vite] (ssr) page reload src/routes/index.tsx
+05:33:44 [vite] (ssr) program reload
+05:43:28 [vite] (client) page reload .vercel/output/static/suri-tools/control-asistencia.html
+05:43:28 [vite] (client) page reload .vercel/output/static/suri-tools/gestor-encuestas.html
+05:43:28 [vite] (client) page reload .vercel/output/static/suri-tools/turnero.html
+05:43:59 [vite] (client) page reload .vercel/output/static/suri-tools/control-asistencia.html
+05:43:59 [vite] (client) page reload .vercel/output/static/suri-tools/gestor-encuestas.html
+05:43:59 [vite] (client) page reload .vercel/output/static/suri-tools/turnero.html
+Warning: A notFoundError was encountered on the route with ID "__root__", but a notFoundComponent option was not configured, nor was a router level defaultNotFoundComponent configured. Consider configuring at least one of these to avoid TanStack Router's overly generic defaultNotFoundComponent (<p>Not Found</p>)
+Warning: A notFoundError was encountered on the route with ID "__root__", but a notFoundComponent option was not configured, nor was a router level defaultNotFoundComponent configured. Consider configuring at least one of these to avoid TanStack Router's overly generic defaultNotFoundComponent (<p>Not Found</p>)
+Warning: A notFoundError was encountered on the route with ID "__root__", but a notFoundComponent option was not configured, nor was a router level defaultNotFoundComponent configured. Consider configuring at least one of these to avoid TanStack Router's overly generic defaultNotFoundComponent (<p>Not Found</p>)

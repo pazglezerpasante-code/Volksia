@@ -1,0 +1,14 @@
+{
+  "http_status": 200,
+  "source_bytes": 252038,
+  "sheets": 55,
+  "changed_cells": 646,
+  "modified_sheets": 17,
+  "preserved_formulas": 0,
+  "all_values_and_cell_styles_verified": true,
+  "empty_trailing_extent_normalized_in_sheets": 3,
+  "original_unchanged": true,
+  "external_ai_calls": 0,
+  "elapsed_seconds": 23.7,
+  "summary": "Prefijo 54915 → 54911: 646 celdas actualizadas en 17 de 55 hojas revisadas. Fórmulas conservadas."
+}

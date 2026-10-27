@@ -1,0 +1,36 @@
+[
+  {
+    "file": "CAMPAÑAS A ENVIAR  2026 - WSP DARWIN.xlsx",
+    "bytes": 252038,
+    "sheets": 55,
+    "area_cells": 19238,
+    "import_ok": true,
+    "changed_cells": 646,
+    "export_ok": true,
+    "untouched_package_parts_identical": true,
+    "original_unchanged": true,
+    "seconds": 7.11
+  },
+  {
+    "file": "ENVIO ENCUESTAS - PPT 01-10-2026 (1).xlsx",
+    "bytes": 10058,
+    "sheets": 1,
+    "area_cells": 92,
+    "import_ok": true,
+    "changed_cells": 0,
+    "no_matching_prefix": true,
+    "original_unchanged": true,
+    "seconds": 0.02
+  },
+  {
+    "file": "ENCUESTA INTERNA 01-10-2026 a 01-10-2026 (1).xlsx",
+    "bytes": 839999,
+    "sheets": 6,
+    "area_cells": 250344,
+    "import_ok": true,
+    "changed_cells": 0,
+    "no_matching_prefix": true,
+    "original_unchanged": true,
+    "seconds": 11.39
+  }
+]
