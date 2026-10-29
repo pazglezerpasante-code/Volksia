@@ -8,7 +8,9 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Suri · Tu asistente de trabajo" },
+      { title: "SURI · Tu asistente de trabajo" },
+      { name: "application-name", content: "SURI" },
+      { name: "apple-mobile-web-app-title", content: "SURI" },
       { name: "theme-color", content: "#101010" },
     ],
     links: [
