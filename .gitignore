@@ -1,0 +1,52 @@
+# ── Secretos y configuración local ──
+.env
+.env.*
+!.env.example
+*.env.local
+*.pem
+*.key
+secrets/
+
+# ── Dependencias ──
+node_modules/
+.venv/
+venv/
+env/
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# ── Build / deploy ──
+dist/
+build/
+.output/
+.vercel/
+.vinxi/
+.tanstack/
+.wrangler/
+
+# ── Datos de usuario generados por la app ──
+WOLSKIA_Integrado/backend/data/*
+!WOLSKIA_Integrado/backend/data/.gitkeep
+
+# ── Logs y temporales ──
+logs/
+*.log
+.node_modules.lock
+.taste-skill/
+screenshots/
+
+# ── Archivos comprimidos y ejecutables sueltos ──
+*.zip
+*.rar
+*.7z
+
+# ── Sistema / editor ──
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

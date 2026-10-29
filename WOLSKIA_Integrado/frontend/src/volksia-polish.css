@@ -1,0 +1,56 @@
+/* Volksia / Suri — a quiet working surface, with feedback on action. */
+:root {
+ --color-bg:#101010; --color-side:#101010; --color-panel:#191919; --color-panel-2:#252525;
+ --color-line:#303030; --color-fg:#eeeeee; --color-muted:#ababab;
+ --color-accent:#72b7ed; --color-accent-2:#9acdf5; --color-ok:#8bd5ad; --color-warn:#e5bb73;
+ --suri-rail:#101010; --suri-line-2:#383838;
+ --suri-hover:#202020; --suri-active:#252525; --suri-ring:#9acdf544;
+}
+.suri-app .suri-sidebar { background:var(--color-bg); padding-top:30px; }
+.suri-app .suri-brand { font-size:25px; letter-spacing:-.045em; }
+.suri-app .suri-brand small { font-family:var(--font-sans); font-size:13px; letter-spacing:0; }
+.suri-app .suri-sidebar nav button[aria-current] { background:#252525; color:#fff; box-shadow:none; }
+.suri-app .suri-chat-greeting h1 { font-size:25px; letter-spacing:-.035em; }
+.suri-app .suri-chat-greeting p { color:var(--color-muted); }
+.suri-app .suri-empty-chat h2 { font-size:30px; line-height:1.15; letter-spacing:-.04em; }
+.suri-app .suri-empty-chat > p { font-size:16px; max-width:44ch; }
+.suri-app .suri-prompts { gap:8px; }
+.suri-app .suri-prompts button { border:0; background:#242424; border-radius:10px; min-height:48px; transition:background 160ms, transform 160ms; }
+.suri-app .suri-prompts button:hover { background:#303030; transform:translateY(-2px); }
+.suri-app .suri-prompts button:active { transform:scale(.98); }
+.suri-app .suri-device-card { border:0; box-shadow:none; background:var(--color-panel); border-radius:16px; }
+.suri-app .suri-device-card header h2 { font-size:16px; }
+.suri-app .suri-device-card header h2 svg { color:var(--color-muted); }
+.suri-app .suri-panel-empty { background:transparent; }
+.suri-app .suri-daily-panel { gap:16px; }
+.suri-app .suri-day-welcome { padding-block:26px; }
+.suri-app .suri-day-welcome h1 { font-size:28px; line-height:1.15; }
+.suri-app .suri-day-welcome br { display:none; }
+.suri-app .wol-btn { background:#eee; color:#111; border:0; box-shadow:none; }
+.suri-app .suri-add-toggle { color:#111; background:#eee; border:0; min-height:44px; }
+.suri-app .suri-mobile-nav { background:#151515; border-color:#303030; }
+.suri-app .suri-mobile-nav button[aria-current] { color:#fff; background:#292929; }
+.suri-app .suri-chat-composer, .suri-app form.suri-composer { background:#202020; box-shadow:none; }
+.suri-app .suri-message-area { mask-image:none; }
+@media(max-width:767px) {
+ .suri-app .suri-mobile-nav { grid-template-columns:repeat(4,minmax(0,1fr)); }
+ .suri-app .suri-mobile-nav button { min-width:0; min-height:48px; }
+ .suri-app .suri-empty-chat h2 { font-size:27px; }
+ .suri-app .suri-chat-greeting h1 { font-size:22px; }
+ .suri-app .suri-brand { font-size:22px; }
+}
+
+.suri-app .suri-chat.is-welcome .suri-chat-greeting h1 { font-size:28px; }
+.suri-app .suri-chat.is-welcome .suri-chat-greeting, .suri-app .suri-empty-chat { animation:none; }
+.suri-app .suri-mobile-header strong { font-family:var(--font-display); letter-spacing:-.03em; }
+@media(max-width:767px) { .suri-app .suri-chat.is-welcome .suri-chat-greeting h1 { font-size:24px; } }
+.suri-greeting-robot { width:76px; height:76px; object-fit:contain; flex:none; }
+.chat-mic { display:grid; place-items:center; width:44px; height:44px; flex:none; color:var(--color-fg); border-radius:10px; background:var(--color-panel-2); }
+.chat-mic[aria-pressed="true"] { background:var(--color-accent); color:var(--color-bg); }
+.chat-mic:disabled { opacity:.4; cursor:not-allowed; }
+.chat-mic:focus-visible { outline:2px solid var(--color-accent); outline-offset:3px; }
+.chat-voice-status { color:var(--color-fg); font-size:13px; line-height:1.5; padding:0 4px; }
+.chat-voice-status:not(:empty) { margin-bottom:8px; }
+.chat-voice-hint { color:var(--color-muted); font-size:12px; line-height:1.4; margin:8px 4px 0; }
+.task-filter-copy button { min-height:44px; font-size:14px; padding:8px 12px; }
+.suri-copy + .suri-copy { margin-left:12px; }

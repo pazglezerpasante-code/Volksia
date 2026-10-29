@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control de Asistencia · Organización Sur</title>
+<meta name="color-scheme" content="light dark">
+<script src="/vendor/xlsx.full.min.js"></script>
+<style>
+
+
+
+
+
+:root{
+ --bg:#f2f4f7;
+ --card-bg:#ffffff;
+ --border:#e2e6ea;
+ --text:#1b2430;
+ --text-muted:#6a7280;
+ --vw-blue:#001e50;
+ --vw-blue-hover:#00305c;
+ --accent-bg:#eef3fa;
+ --accent-border:#d7e3f2;
+ --disabled-bg:#c7ccd2;
+ --error-bg:#fff1f1;
+ --error-text:#a22626;
+ --error-border:#f1cccc;
+ --footer-bg:#001e50;
+ --footer-text:#ffffff;
+}
+@media (prefers-color-scheme: dark){
+ :root:not([data-theme="light"]){
+  --bg:#0e141b;
+  --card-bg:#161d26;
+  --border:#293241;
+  --text:#eef1f4;
+  --text-muted:#98a2b0;
+  --vw-blue:#4d90ff;
+  --vw-blue-hover:#6fa5ff;
+  --accent-bg:#1b2531;
+  --accent-border:#2c394a;
+  --disabled-bg:#3a4453;
+  --error-bg:#3a1414;
+  --error-text:#ff8f8f;
+  --error-border:#5c2323;
+  --footer-bg:#0a1024;
+  --footer-text:#ffffff;
+ }
+}
+:root[data-theme="dark"]{
+ --bg:#0e141b;
+ --card-bg:#161d26;
+ --border:#293241;
+ --text:#eef1f4;
+ --text-muted:#98a2b0;
+ --vw-blue:#4d90ff;
+ --vw-blue-hover:#6fa5ff;
+ --accent-bg:#1b2531;
+ --accent-border:#2c394a;
+ --disabled-bg:#3a4453;
+ --error-bg:#3a1414;
+ --error-text:#ff8f8f;
+ --error-border:#5c2323;
+ --footer-bg:#0a1024;
+ --footer-text:#ffffff;
+}
+
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:'VW Text Office',Arial,sans-serif;font-weight:400;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;padding:32px 18px}
+.container{width:100%;max-width:760px}
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:18px;box-shadow:0 10px 35px rgba(20,30,40,.10);overflow:hidden}
+.header{padding:28px 34px 22px;border-bottom:1px solid var(--border);background:#ffffff}
+.brand-logo{display:block;height:34px;width:auto;margin-bottom:18px}
+.brand-titles h1{margin:0;font-family:'VW Head Office',Arial,sans-serif;font-weight:700;font-size:26px;letter-spacing:-.3px;color:var(--vw-blue)}
+.brand-titles .subtitle{margin:6px 0 0;color:var(--text-muted);font-size:14px;font-family:'VW Text Office',Arial,sans-serif;font-weight:400}
+.content{padding:30px 34px 34px}
+.upload-title{font-family:'VW Text Office',Arial,sans-serif;font-weight:700;font-size:15px;margin-bottom:12px}
+.upload-area{border:2px dashed var(--accent-border);border-radius:14px;padding:30px 24px;text-align:center;background:var(--accent-bg);transition:.18s}
+.upload-area.dragover{border-color:var(--vw-blue);background:var(--accent-bg)}
+.upload-icon{width:52px;height:52px;border-radius:50%;margin:0 auto 14px;background:var(--card-bg);border:1px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--vw-blue)}
+.upload-main{font-family:'VW Text Office',Arial,sans-serif;font-weight:700;font-size:16px;margin-bottom:6px}
+.upload-help{color:var(--text-muted);font-size:13px;margin-bottom:17px;font-weight:400}
+.choose-btn{display:inline-flex;align-items:center;justify-content:center;background:var(--vw-blue);color:#fff;border-radius:9px;padding:11px 18px;font-family:'VW Text Office',Arial,sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+#fileInput{display:none}
+.selected-file{display:none;margin:17px auto 0;max-width:90%;padding:10px 13px;border:1px solid var(--border);border-radius:9px;background:var(--card-bg);color:var(--text-muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.actions{margin-top:22px;display:flex;justify-content:flex-end}
+.process-btn,.download-btn{border:0;border-radius:9px;padding:12px 20px;font-family:'VW Text Office',Arial,sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+.process-btn{background:var(--vw-blue);color:#fff}
+.process-btn:disabled{background:var(--disabled-bg);cursor:not-allowed}
+.results{display:none;margin-top:30px;padding-top:28px;border-top:1px solid var(--border)}
+.results-title{margin:0 0 16px;font-family:'VW Head Office',Arial,sans-serif;font-weight:700;font-size:19px;color:var(--vw-blue)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat{border:1px solid var(--border);border-radius:12px;padding:17px;background:var(--accent-bg)}
+.stat-number{font-family:'VW Text Office',Arial,sans-serif;font-weight:700;font-size:25px;margin-bottom:5px;color:var(--vw-blue)}
+.stat-label{color:var(--text-muted);font-size:13px;font-weight:400}
+.download-row{margin-top:18px;display:flex;justify-content:flex-end}
+.download-btn{background:var(--vw-blue);color:#fff}
+.download-btn:hover,.choose-btn:hover,.process-btn:not(:disabled):hover{background:var(--vw-blue-hover)}
+.info{margin-top:18px;padding:14px 16px;border-radius:10px;background:var(--accent-bg);color:var(--text-muted);font-size:13px;line-height:1.55;font-weight:400}
+.holidays-section{margin-top:18px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.holidays-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:var(--accent-bg);cursor:pointer}
+.holidays-title{font-family:'VW Text Office',Arial,sans-serif;font-weight:700;font-size:14px}
+.holidays-caret{font-size:12px;color:var(--text-muted);transition:.18s}
+.holidays-section.open .holidays-caret{transform:rotate(180deg)}
+.holidays-panel{display:none;padding:14px 16px;border-top:1px solid var(--border)}
+.holidays-section.open .holidays-panel{display:block}
+.holidays-hint{font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.5}
+.holidays-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;margin-bottom:14px}
+.holiday-item{display:flex;align-items:center;gap:9px;padding:7px 9px;border:1px solid var(--border);border-radius:8px;font-size:13px}
+.holiday-item.disabled{opacity:.45}
+.holiday-date{font-family:'VW Text Office',Arial,sans-serif;font-weight:700;min-width:78px}
+.holiday-label{flex:1;color:var(--text-muted)}
+.holiday-remove{border:0;background:none;color:var(--vw-blue);cursor:pointer;font-size:12px;font-weight:700;padding:2px 6px}
+.holidays-add{display:flex;flex-wrap:wrap;gap:8px}
+.holidays-add input[type="date"]{border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:13px;background:var(--card-bg);color:inherit}
+.holidays-add input[type="text"]{flex:1;min-width:160px;border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:13px;background:var(--card-bg);color:inherit}
+.holidays-add button{border:0;border-radius:8px;padding:9px 16px;background:var(--vw-blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer}
+.holidays-add button:hover{background:var(--vw-blue-hover)}
+.info strong{color:var(--text);font-family:'VW Text Office',Arial,sans-serif;font-weight:700}
+.error{display:none;margin-top:16px;padding:12px 14px;border-radius:9px;background:var(--error-bg);color:var(--error-text);border:1px solid var(--error-border);font-size:13px}
+.footer{background:var(--footer-bg);padding:18px 34px;display:flex;align-items:center;justify-content:center;gap:12px}
+.footer img{height:20px;width:auto}
+.footer span{color:var(--footer-text);font-size:12px;font-family:'VW Text Office',Arial,sans-serif;font-weight:400;opacity:.85}
+
+.modal-back{display:none;position:fixed;inset:0;background:rgba(10,16,30,.55);z-index:1000;align-items:center;justify-content:center;padding:18px}
+.modal-back.open{display:flex}
+.modal{background:var(--card-bg);color:var(--text);border:1px solid var(--border);border-radius:16px;max-width:680px;width:100%;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.modal-head{padding:22px 26px 12px}
+.modal-head h3{margin:0 0 6px;font-family:'VW Head Office',Arial,sans-serif;font-size:19px;color:var(--vw-blue)}
+.modal-head p{margin:0;font-size:13px;line-height:1.5;color:var(--text-muted)}
+.abs-list{padding:6px 26px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.abs-item{border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:var(--accent-bg)}
+.abs-name{font-family:'VW Text Office',Arial,sans-serif;font-weight:700;font-size:14px}
+.abs-leg{color:var(--text-muted);font-weight:400;font-size:12px;margin-left:6px}
+.abs-detail{font-size:12px;color:var(--text-muted);margin:4px 0 9px;line-height:1.45}
+.abs-item select{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 10px;font-size:13px;background:var(--card-bg);color:inherit}
+.modal-actions{padding:14px 26px 22px;display:flex;justify-content:flex-end;border-top:1px solid var(--border)}
+.modal-actions button{border:0;border-radius:9px;padding:12px 22px;background:var(--vw-blue);color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+.modal-actions button:hover{background:var(--vw-blue-hover)}
+@media(max-width:620px){.header,.content{padding-left:20px;padding-right:20px}.footer{padding-left:20px;padding-right:20px}.stats{grid-template-columns:1fr}.actions,.download-row{justify-content:stretch}.process-btn,.download-btn{width:100%}}
+</style>
+</head>
+<body>
+<div class="container"><div class="card">
+
+<div class="header">
+<img class="brand-logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" alt="Organización Sur">
+<div class="brand-titles">
+<h1>Control de Asistencia</h1>
+<p class="subtitle">Procesamiento de asistencia, premios, horas descontables y viáticos</p>
+</div>
+</div>
+
+<div class="content">
+<div class="upload-title">Archivo de asistencia</div>
+<div class="upload-area" id="dropArea">
+<div class="upload-icon">↑</div>
+<div class="upload-main">Cargá el archivo Excel</div>
+<div class="upload-help">Acepta archivos .XLS y .XLSX</div>
+<label class="choose-btn" for="fileInput">Seleccionar archivo</label>
+<input id="fileInput" type="file" accept=".xlsx,.xls,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+<div class="selected-file" id="selectedFile"></div>
+</div>
+
+<div class="holidays-section" id="holidaysSection">
+<div class="holidays-header" id="holidaysHeader">
+<span class="holidays-title">Feriados (afectan los días hábiles calculados)</span>
+<span class="holidays-caret">▾</span>
+</div>
+<div class="holidays-panel">
+<div class="holidays-hint">Desmarcá un feriado si no corresponde a tu provincia/planta, o agregá uno nuevo (por ejemplo, un feriado puente o provincial). Los cambios se guardan en este navegador.</div>
+<div class="holidays-list" id="holidaysList"></div>
+<div class="holidays-add">
+<input type="date" id="newHolidayDate">
+<input type="text" id="newHolidayLabel" placeholder="Descripción (ej: Feriado puente)">
+<button type="button" id="addHolidayBtn">Agregar feriado</button>
+</div>
+</div>
+</div>
+
+<div class="actions"><button class="process-btn" id="processBtn" disabled>Procesar asistencia</button></div>
+<div class="error" id="errorBox"></div>
+<div class="results" id="results">
+<h2 class="results-title">Resultado del procesamiento</h2>
+<div class="stats">
+<div class="stat"><div class="stat-number" id="workers">0</div><div class="stat-label">Trabajadores</div></div>
+<div class="stat"><div class="stat-number" id="withPrize">0</div><div class="stat-label">Con premio</div></div>
+<div class="stat"><div class="stat-number" id="withoutPrize">0</div><div class="stat-label">Sin premio</div></div>
+</div>
+<div class="info" id="reviewInfo" style="display:none;margin-bottom:12px"></div>
+<div class="info"><strong>Turnos:</strong> la jornada tiene dos turnos que hay que cumplir: <strong>mañana</strong> (8 a 12, 4 hs) y <strong>tarde</strong> (13 a 18, 5 hs). Si solo aparece la mañana se descuentan las 5 hs de la tarde; si solo aparece la tarde se descuentan las 4 hs de la mañana. Si el día tiene solo 3 fichadas, con la mañana completa y salida a las 18, se toma como fichada olvidada: no se descuenta nada y ese día no cuenta para el premio ni para las horas. Los pasantes o personas de un solo turno se comparan contra su propio horario.
+<br><strong>Faltas:</strong> si alguien tiene 3 o más días laborables <strong>seguidos</strong> sin fichar, la página pregunta el motivo. Con <strong>ART</strong> o <strong>vacaciones</strong> esos días no cuentan como falta y el premio se analiza solo con los días trabajados; las faltas sueltas siempre cuentan.<br><strong>Excepciones:</strong> Paez Luis, Quintans Santiago y Kojro Marisol siempre reciben el premio, no se les descuentan horas y se les cuentan todos los días laborables (se editan en la lista <code>EXCEPCIONES</code> del código).
+<br><strong>Días asistidos:</strong> se calculan a partir de las fichadas y fechas únicas. <strong>Horas a restar:</strong> suma los minutos de llegadas tarde, salidas temprano y turnos faltantes; 60 minutos = 1 hora; el total se redondea hacia abajo (solo cuentan las horas completas) y se muestra como "2hs". Los días con fichadas incompletas o desvíos grandes quedan en la hoja <strong>Revisar fichadas</strong>. <strong>Notas:</strong> detalla por qué no recibe el premio (inasistencias y acumulación de llegadas tarde/salidas temprano) y el motivo de las faltas si fue ART o vacaciones; quienes tienen 0 días asistidos quedan sin notas salvo que se indique ART o vacaciones. <strong>Viáticos:</strong> en el Excel generado cargás manualmente el <strong>Valor boleto</strong>; se calcula como <strong>(Días asistidos × Valor boleto) × 2</strong>.
+</div>
+<div class="download-row"><button class="download-btn" id="downloadBtn">Descargar Excel</button></div>
+</div>
+</div>
+
+<div class="footer">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" alt="Organización Sur">
+<span>Control de Asistencia</span>
+</div>
+
+</div></div>
+
+<div class="modal-back" id="absModal" role="dialog" aria-modal="true" aria-labelledby="absTitle">
+<div class="modal">
+<div class="modal-head">
+<h3 id="absTitle">Días seguidos sin fichar: ¿cuál fue el motivo?</h3>
+<p>Estas personas tienen <strong>3 o más días laborables SEGUIDOS sin fichadas</strong> (los fines de semana y feriados no cortan la racha). Si el motivo es <strong>ART</strong> o <strong>vacaciones</strong>, esos días no cuentan como falta: se cuentan solo los días trabajados y el premio se analiza con esos días. Con cualquier otro motivo, las faltas cuentan y no corresponde el premio.</p>
+</div>
+<div class="abs-list" id="absList"></div>
+<div class="modal-actions"><button type="button" id="absConfirm">Continuar</button></div>
+</div>
+</div>
+
+<script>
+let selectedFile=null, generatedWorkbook=null;
+const fileInput=document.getElementById("fileInput");
+const dropArea=document.getElementById("dropArea");
+const selectedFileEl=document.getElementById("selectedFile");
+const processBtn=document.getElementById("processBtn");
+const results=document.getElementById("results");
+const errorBox=document.getElementById("errorBox");
+const downloadBtn=document.getElementById("downloadBtn");
+
+/* Feriados nacionales argentinos de 2026 relevantes para el período mostrado.
+   Se ignoran fines de semana siempre. Este listado se puede editar desde la
+   sección "Feriados" de la página: se pueden desactivar feriados que no
+   correspondan y agregar otros (provinciales, puentes, etc.). Los cambios
+   quedan guardados en este navegador (localStorage). */
+const DEFAULT_HOLIDAYS=[
+ {date:"2026-01-01",label:"Año Nuevo"},
+ {date:"2026-02-16",label:"Carnaval"},
+ {date:"2026-02-17",label:"Carnaval"},
+ {date:"2026-03-24",label:"Día Nacional de la Memoria"},
+ {date:"2026-04-02",label:"Día del Veterano y de los Caídos en Malvinas"},
+ {date:"2026-04-03",label:"Viernes Santo"},
+ {date:"2026-05-01",label:"Día del Trabajador"},
+ {date:"2026-05-25",label:"Día de la Revolución de Mayo"},
+ {date:"2026-06-15",label:"Paso a la Inmortalidad del Gral. Güemes (traslado)"},
+ {date:"2026-06-20",label:"Día de la Bandera"},
+ {date:"2026-07-09",label:"Día de la Independencia"},
+ {date:"2026-08-17",label:"Paso a la Inmortalidad del Gral. San Martín"},
+ {date:"2026-10-12",label:"Día del Respeto a la Diversidad Cultural"},
+ {date:"2026-11-20",label:"Día de la Soberanía Nacional"},
+ {date:"2026-12-08",label:"Inmaculada Concepción de María"},
+ {date:"2026-12-25",label:"Navidad"}
+];
+
+const HOLIDAYS_STORAGE_KEY="attendance_custom_holidays_v1";
+function loadHolidayState(){
+ try{
+   const raw=localStorage.getItem(HOLIDAYS_STORAGE_KEY);
+   if(!raw)return{disabled:[],custom:[]};
+   const parsed=JSON.parse(raw);
+   return{disabled:Array.isArray(parsed.disabled)?parsed.disabled:[],custom:Array.isArray(parsed.custom)?parsed.custom:[]};
+ }catch(e){return{disabled:[],custom:[]}}
+}
+function saveHolidayState(state){
+ try{localStorage.setItem(HOLIDAYS_STORAGE_KEY,JSON.stringify(state))}catch(e){}
+}
+let holidayState=loadHolidayState();
+const HOLIDAYS=new Set();
+function rebuildHolidaySet(){
+ HOLIDAYS.clear();
+ for(const h of DEFAULT_HOLIDAYS){
+   if(!holidayState.disabled.includes(h.date))HOLIDAYS.add(h.date);
+ }
+ for(const h of holidayState.custom){
+   if(h && h.date)HOLIDAYS.add(h.date);
+ }
+}
+rebuildHolidaySet();
+
+function renderHolidaysList(){
+ const list=document.getElementById("holidaysList");
+ if(!list)return;
+ const rows=[];
+ for(const h of DEFAULT_HOLIDAYS){
+   const isDisabled=holidayState.disabled.includes(h.date);
+   rows.push(`<div class="holiday-item${isDisabled?" disabled":""}">
+     <input type="checkbox" data-type="default" data-date="${h.date}" ${isDisabled?"":"checked"}>
+     <span class="holiday-date">${h.date.split("-").reverse().join("/")}</span>
+     <span class="holiday-label">${h.label}</span>
+   </div>`);
+ }
+ holidayState.custom.forEach((h,idx)=>{
+   rows.push(`<div class="holiday-item">
+     <span style="width:16px"></span>
+     <span class="holiday-date">${h.date.split("-").reverse().join("/")}</span>
+     <span class="holiday-label">${h.label||"Feriado agregado"}</span>
+     <button type="button" class="holiday-remove" data-type="custom" data-idx="${idx}">Quitar</button>
+   </div>`);
+ });
+ list.innerHTML=rows.join("");
+ list.querySelectorAll('input[type="checkbox"][data-type="default"]').forEach(cb=>{
+   cb.addEventListener("change",()=>{
+     const date=cb.getAttribute("data-date");
+     if(cb.checked){
+       holidayState.disabled=holidayState.disabled.filter(d=>d!==date);
+     }else{
+       if(!holidayState.disabled.includes(date))holidayState.disabled.push(date);
+     }
+     saveHolidayState(holidayState);
+     rebuildHolidaySet();
+     renderHolidaysList();
+   });
+ });
+ list.querySelectorAll('.holiday-remove[data-type="custom"]').forEach(btn=>{
+   btn.addEventListener("click",()=>{
+     const idx=Number(btn.getAttribute("data-idx"));
+     holidayState.custom.splice(idx,1);
+     saveHolidayState(holidayState);
+     rebuildHolidaySet();
+     renderHolidaysList();
+   });
+ });
+}
+renderHolidaysList();
+
+const holidaysSection=document.getElementById("holidaysSection");
+const holidaysHeader=document.getElementById("holidaysHeader");
+if(holidaysHeader){
+ holidaysHeader.addEventListener("click",()=>{holidaysSection.classList.toggle("open")});
+}
+const addHolidayBtn=document.getElementById("addHolidayBtn");
+if(addHolidayBtn){
+ addHolidayBtn.addEventListener("click",()=>{
+   const dateInput=document.getElementById("newHolidayDate");
+   const labelInput=document.getElementById("newHolidayLabel");
+   const date=dateInput.value;
+   const label=labelInput.value.trim();
+   if(!date){showError("Elegí una fecha para el feriado.");return}
+   clearError();
+   holidayState.custom.push({date,label:label||"Feriado agregado"});
+   saveHolidayState(holidayState);
+   rebuildHolidaySet();
+   renderHolidaysList();
+   dateInput.value="";labelInput.value="";
+ });
+}
+
+function showError(msg){errorBox.textContent=msg;errorBox.style.display="block"}
+function clearError(){errorBox.style.display="none"}
+
+function updateFile(file){
+ if(!file)return;
+ const ext=(file.name.split(".").pop()||"").toLowerCase();
+ if(ext!=="xls"&&ext!=="xlsx"){showError("Seleccioná un archivo Excel .XLS o .XLSX.");return}
+ selectedFile=file;
+ selectedFileEl.textContent="Archivo seleccionado: "+file.name;
+ selectedFileEl.style.display="block";
+ processBtn.disabled=false; clearError();
+}
+fileInput.addEventListener("change",e=>updateFile(e.target.files[0]));
+dropArea.addEventListener("dragover",e=>{e.preventDefault();dropArea.classList.add("dragover")});
+dropArea.addEventListener("dragleave",()=>dropArea.classList.remove("dragover"));
+dropArea.addEventListener("drop",e=>{e.preventDefault();dropArea.classList.remove("dragover");updateFile(e.dataTransfer.files[0])});
+
+function cellText(v){return v==null?"":String(v).trim()}
+
+/* Reconoce fechas como:
+   27/07/2026
+   lun. - 27/07/2026
+   lunes - 27/07/2026
+   y también fechas reales de Excel. */
+function parseDate(v){
+ if(v instanceof Date&&!isNaN(v)) return new Date(v.getFullYear(),v.getMonth(),v.getDate());
+ if(typeof v==="number"){
+   const d=new Date(Date.UTC(1899,11,30)+v*86400000);
+   return new Date(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());
+ }
+ const s=cellText(v);
+ const m=s.match(/(\d{1,2})\s*[\/\-]\s*(\d{1,2})\s*[\/\-]\s*(\d{4})/);
+ if(m)return new Date(+m[3],+m[2]-1,+m[1]);
+ return null;
+}
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function formatDateShort(d){return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")}
+function laborable(d){return d.getDay()!==0&&d.getDay()!==6&&!HOLIDAYS.has(iso(d))}
+function minutes(v){
+ const m=cellText(v).match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+ return m?Number(m[1])*60+Number(m[2]):null;
+}
+function punchesFromRow(row){
+ const found=[];
+ for(const v of row){
+   const s=cellText(v);
+   if(!s)continue;
+   const matches=s.match(/\d{1,2}:\d{2}(?::\d{2})?/g);
+   if(matches) for(const x of matches){const n=minutes(x);if(n!=null)found.push(n)}
+ }
+ return found;
+}
+function late(actual,expected){return actual>expected?actual-expected:0}
+function early(actual,expected){return actual<expected?expected-actual:0}
+
+function findWorkerBlocks(rows){
+ const blocks=[];
+ for(let r=0;r<rows.length;r++){
+   const row=rows[r];
+   let legCol=-1;
+   for(let c=0;c<row.length;c++){
+     if(cellText(row[c]).toLowerCase()==="leg:"){legCol=c;break}
+   }
+   if(legCol<0)continue;
+
+   // El nombre suele estar a la izquierda. Buscamos el texto más cercano
+   // que no sea una etiqueta administrativa.
+   let name="";
+   for(let c=legCol-1;c>=0;c--){
+     const s=cellText(row[c]);
+     if(s && !/^(cuil|persona|sector|sucursal|gerencia|leg:)$/i.test(s)){name=s;break}
+   }
+   if(!name){
+     for(let c=0;c<row.length;c++){
+       const s=cellText(row[c]);
+       if(s && !/^(cuil|persona|sector|sucursal|gerencia|leg:)$/i.test(s)){name=s;break}
+     }
+   }
+
+   // El legajo puede estar en la columna siguiente o un poco más a la derecha.
+   let leg="";
+   for(let c=legCol+1;c<Math.min(row.length,legCol+6);c++){
+     const s=cellText(row[c]);
+     if(/^\d+(?:\.0+)?$/.test(s)){leg=s.replace(/\.0+$/,"");break}
+   }
+   blocks.push({start:r,name,leg});
+ }
+ return blocks;
+}
+
+/* Muchos archivos de origen ya traen, al final del bloque de cada
+   trabajador, una columna/etiqueta "Días" con el total real de días
+   asistidos calculado por el sistema de fichadas. Cuando está presente
+   se prioriza ese valor por sobre el que calculamos a partir de las
+   fichadas individuales, porque es la fuente más confiable. */
+function findDaysTotal(rows,start,end){
+ const toNumber=v=>{
+   const s=cellText(v);
+   if(s==="")return null;
+   const n=Number(s.replace(",","."));
+   return isFinite(n)?n:null;
+ };
+ const candidates=[];
+ for(let r=start;r<end;r++){
+   const row=rows[r];
+   for(let c=0;c<row.length;c++){
+     const s=cellText(row[c]).toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"");
+     if(s==="dias"||s==="dia"){
+       const sameRow=toNumber(row[c+1]);
+       if(sameRow!=null && Number.isInteger(sameRow) && sameRow>=0 && sameRow<=31)
+         candidates.push(sameRow);
+       if(rows[r+1]){
+         const below=toNumber(rows[r+1][c]);
+         if(below!=null && Number.isInteger(below) && below>=0 && below<=31)
+           candidates.push(below);
+       }
+     }
+   }
+ }
+ return candidates.length ? candidates[0] : null;
+}
+
+/*BEGIN_CORE*/
+/* ===== TURNOS Y REGLAS (editables) =====
+   Jornada completa = dos turnos que hay que cumplir:
+     Turno mañana: hasta las 12:00  (4 hs, de 8 a 12)
+     Turno tarde : 13:00 a 18:00    (5 hs)
+   - Mañana completa + salida a las 18 con solo 3 fichadas -> fichada olvidada:
+     ese día NO se descuenta nada y NO cuenta para el premio ni para las horas.
+   - Aparece solo el turno mañana (falta la tarde) -> se descuentan 5 hs.
+   - Aparece solo el turno tarde (falta la mañana) -> se descuentan 4 hs.
+   Las personas con un único turno (pasantes de mañana o de tarde) se siguen
+   comparando contra su propio horario. */
+const TURNOS={
+ DIA_INICIO:480,              // 08:00
+ MANANA_FIN:720,              // 12:00
+ TARDE_INICIO:780,            // 13:00
+ DIA_FIN:1080,                // 18:00
+ HORAS_MANANA_MIN:240,        // 4 hs
+ HORAS_TARDE_MIN:300,         // 5 hs
+ ENTRADA_MANANA_LIMITE:690,   // una primera fichada hasta las 11:30 es entrada de la mañana
+ SALIDA_OLVIDO_DESDE:1050,    // salida desde las 17:30 = "salió a las 18"
+ MANANA_SALIDA_LIMITE:750,    // una 2ª fichada hasta las 12:30 es la salida de la mañana; después es la vuelta del almuerzo
+ REDONDEO_HORAS:"abajo",      // "abajo" (solo horas completas, como el Excel manual) o "cercano" (30 min o más suben)
+ DESCONTAR_MANANA_FALTANTE:true,
+ FALTAS_SEGUIDAS_PARA_PREGUNTAR:3  // desde 3 días laborables SEGUIDOS sin fichar se pregunta el motivo
+};
+/* EXCEPCIONES: siempre reciben el premio, no se les descuentan horas y se les
+   cuentan todos los días laborables del período. Se identifican por legajo. */
+const EXCEPCIONES=[
+ {leg:"00243",nombre:"Paez, Luis"},
+ {leg:"00093",nombre:"Quintans, Santiago"},
+ {leg:"00252",nombre:"Kojro, Marisol"}
+];
+function esExcepcion(leg){
+ const k=String(leg||"").replace(/\D/g,"").replace(/^0+/,"");
+ return EXCEPCIONES.some(e=>e.leg.replace(/^0+/,"")===k);
+}
+function fmtHM(mins){const h=Math.floor(mins/60),m=mins%60;return h+" h "+String(m).padStart(2,"0")+" min"}
+function fmtT(m){return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}
+function fmtFullDate(d){return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear()}
+function hoursFromMinutes(mins){
+ return TURNOS.REDONDEO_HORAS==="abajo"?Math.floor(mins/60):Math.floor(mins/60+0.5);
+}
+function medianOf(arr){
+ const v=[...arr].sort((x,y)=>x-y),n=v.length;
+ return n?(n%2?v[(n-1)/2]:(v[n/2-1]+v[n/2])/2):null;
+}
+
+/* Detecta cuántas veces ficha la persona y cuál es su horario. */
+function detectSchedule(list){
+ const counts=list.filter(x=>x.punches.length).map(x=>x.punches.length);
+ const count2=counts.filter(n=>n===2).length, count4=counts.filter(n=>n>=4).length;
+ const twoPunch=count2>count4;
+ const expectedPunches=twoPunch?2:4;
+ let schedule={entry:480,exit:1080,label:"8:00 a 18:00 (dos turnos)",full:true};
+ const complete=list.filter(x=>x.punches.length>=expectedPunches);
+ if(complete.length){
+   const medFirst=medianOf(complete.map(x=>x.punches[0]));
+   const medLast=medianOf(complete.map(x=>x.punches[x.punches.length-1]));
+   if(medLast<=900) schedule={entry:480,exit:720,label:"8:00 a 12:00",full:false};
+   else if(medFirst>=660) schedule={entry:780,exit:1080,label:"13:00 a 18:00",full:false};
+ }
+ return {schedule,twoPunch,expectedPunches};
+}
+
+function newDayResult(){
+ return {lateMin:0,lunchMin:0,finalMin:0,missingMin:0,missingKind:null,ignored:false,note:null,inProgress:false};
+}
+
+/* Regla anterior (personas de un solo turno). */
+function analyzeSingleShiftDay(p,schedule,expectedPunches,checkLunch,isLast){
+ const n=p.length, r=newDayResult();
+ if(n>=expectedPunches){
+   r.lateMin=late(p[0],schedule.entry);
+   if(checkLunch&&n>=2)r.lunchMin=early(p[1],720);
+   r.finalMin=early(p[n-1],schedule.exit);
+   const big=[];
+   if(r.lateMin>60)big.push("llegó "+fmtHM(r.lateMin)+" tarde");
+   if(r.lunchMin>60)big.push("salió a almorzar "+fmtHM(r.lunchMin)+" antes");
+   if(r.finalMin>60)big.push("se fue "+fmtHM(r.finalMin)+" antes");
+   if(big.length)r.note="Día completo con un desvío grande ("+big.join(", ")+"). Se descontó; revisar si estaba autorizado.";
+ }else{
+   if(p[0]<=schedule.entry+120)r.lateMin=late(p[0],schedule.entry);
+   if(n===1&&isLast)r.inProgress=true;
+   else r.note="Fichadas incompletas (tiene "+n+" y debería tener al menos "+expectedPunches+"): puede ser una fichada olvidada. "+
+        (r.lateMin>0?"Solo se descontó la llegada tarde de "+fmtHM(r.lateMin)+".":"No se descontó nada por este día.");
+ }
+ return r;
+}
+
+/* Regla nueva: jornada completa = turno mañana (hasta 12) + turno tarde (13 a 18). */
+function analyzeFullDay(p,twoPunch,checkLunch,isLast){
+ const T=TURNOS, n=p.length, r=newDayResult();
+ const a=p[0], last=p[n-1];
+ const hasMorning=a<=T.ENTRADA_MANANA_LIMITE;
+ const horas=m=>(m/60)+" hs";
+
+ if(n>=4){
+   r.lateMin=late(a,T.DIA_INICIO);
+   if(checkLunch)r.lunchMin=early(p[1],T.MANANA_FIN);
+   r.finalMin=early(last,T.DIA_FIN);
+   const big=[];
+   if(r.lateMin>60)big.push("llegó "+fmtHM(r.lateMin)+" tarde");
+   if(r.lunchMin>60)big.push("salió a almorzar "+fmtHM(r.lunchMin)+" antes");
+   if(r.finalMin>60)big.push("se fue "+fmtHM(r.finalMin)+" antes");
+   if(big.length)r.note="Día completo con un desvío grande ("+big.join(", ")+"). Se descontó; revisar si estaba autorizado.";
+ }else if(n===3){
+   if(!hasMorning){
+     // Solo aparece el turno tarde.
+     r.lateMin=late(p[1],T.TARDE_INICIO);
+     r.finalMin=early(last,T.DIA_FIN);
+     if(T.DESCONTAR_MANANA_FALTANTE){r.missingMin=T.HORAS_MANANA_MIN;r.missingKind="manana"}
+     r.note="Solo aparece el turno tarde (falta el turno mañana). "+
+       (T.DESCONTAR_MANANA_FALTANTE?"Se descontaron "+horas(T.HORAS_MANANA_MIN)+" del turno mañana.":"No se descontó el turno mañana.");
+   }else if(last>=T.SALIDA_OLVIDO_DESDE&&p[1]<=T.MANANA_SALIDA_LIMITE){
+     // Mañana completa + salida a las 18 con solo 3 fichadas: fichada olvidada.
+     r.ignored=true;
+     r.note="Tiene 3 fichadas y salió a las 18: la mañana está completa, se toma como fichada olvidada. No se descontó nada y este día no se tiene en cuenta para el premio ni las horas.";
+   }else if(last>=T.SALIDA_OLVIDO_DESDE){
+     // Falta la salida de la mañana (la 2ª fichada ya es la vuelta del almuerzo): solo cuenta la llegada.
+     r.lateMin=late(a,T.DIA_INICIO);
+     r.note="Tiene 3 fichadas y salió a las 18, pero falta la salida de la mañana (fichada olvidada). "+
+       (r.lateMin>0?"Solo se descontó la llegada tarde de "+fmtHM(r.lateMin)+".":"No se descontó nada por este día.");
+   }else{
+     r.lateMin=late(a,T.DIA_INICIO);
+     r.finalMin=early(last,T.DIA_FIN);
+     r.note="Tiene 3 fichadas y se fue antes de las 18: se descontó la llegada tarde y la salida temprano; la fichada que falta no se descuenta.";
+   }
+ }else if(n===2){
+   const b=p[1];
+   if(hasMorning&&b<T.TARDE_INICIO){
+     // Solo aparece el turno mañana: se descuentan las horas del turno tarde.
+     r.lateMin=late(a,T.DIA_INICIO);
+     r.missingMin=T.HORAS_TARDE_MIN;r.missingKind="tarde";
+     r.note="Solo aparece el turno mañana (falta el turno tarde). Se descontaron "+horas(T.HORAS_TARDE_MIN)+" del turno tarde"+
+       (r.lateMin>0?" más la llegada tarde de "+fmtHM(r.lateMin):"")+".";
+   }else if(!hasMorning){
+     r.lateMin=late(a,T.TARDE_INICIO);
+     r.finalMin=early(b,T.DIA_FIN);
+     if(T.DESCONTAR_MANANA_FALTANTE){r.missingMin=T.HORAS_MANANA_MIN;r.missingKind="manana"}
+     r.note="Solo aparece el turno tarde (falta el turno mañana). "+
+       (T.DESCONTAR_MANANA_FALTANTE?"Se descontaron "+horas(T.HORAS_MANANA_MIN)+" del turno mañana.":"No se descontó el turno mañana.");
+   }else{
+     // Entrada por la mañana y salida por la tarde.
+     r.lateMin=late(a,T.DIA_INICIO);
+     r.finalMin=early(b,T.DIA_FIN);
+     if(!twoPunch)r.note="Solo tiene entrada y salida (faltan las fichadas del almuerzo): puede ser una fichada olvidada. Solo se descontó llegada tarde / salida temprano si hubo.";
+   }
+ }else{
+   // Una sola fichada: no se sabe a qué turno corresponde.
+   if(a<=T.DIA_INICIO+120)r.lateMin=late(a,T.DIA_INICIO);
+   if(isLast&&a<=T.ENTRADA_MANANA_LIMITE)r.inProgress=true;
+   else r.note="Tiene 1 sola fichada: no se puede saber a qué turno corresponde. "+
+        (r.lateMin>0?"Solo se descontó la llegada tarde de "+fmtHM(r.lateMin)+".":"No se descontó nada por este día.");
+ }
+ return r;
+}
+
+/* Analiza a una persona a partir de sus días (ya sin duplicados y ordenados). */
+function analyzeWorker(list,lastIso){
+ const {schedule,twoPunch,expectedPunches}=detectSchedule(list);
+ const checkLunch=!twoPunch&&schedule.exit===1080;
+ let attended=0,absences=0,t10=0,tM=0,e10=0,eM=0,totalMinutes=0,inProgress=0;
+ const absenceDates=[], review=[];
+ // Rachas de días laborables SEGUIDOS sin fichadas (fines de semana y feriados no cortan la racha).
+ const streakDates=[]; let run=[];
+ const closeRun=()=>{if(run.length>=TURNOS.FALTAS_SEGUIDAS_PARA_PREGUNTAR)streakDates.push(...run);run=[]};
+ for(const day of list){
+   if(!day.punches.length)run.push(formatDateShort(day.d));else closeRun();
+ }
+ closeRun();
+ for(const day of list){
+   if(!day.punches.length){absences++;absenceDates.push(formatDateShort(day.d));continue}
+   attended++;
+   const p=[...day.punches].sort((x,y)=>x-y);
+   const isLast=iso(day.d)===lastIso;
+   const r=schedule.full?analyzeFullDay(p,twoPunch,checkLunch,isLast)
+                        :analyzeSingleShiftDay(p,schedule,expectedPunches,checkLunch,isLast);
+   if(r.inProgress)inProgress++;
+   else if(r.note)review.push({date:fmtFullDate(day.d),punches:p.map(fmtT).join(" - "),motivo:r.note,
+        minutes:r.ignored?0:r.lateMin+r.lunchMin+r.finalMin+r.missingMin});
+   if(r.ignored)continue; // fichada olvidada: el día no cuenta para premio ni horas
+   if(r.lateMin>0){totalMinutes+=r.lateMin;if(r.lateMin<=10)t10++;else tM++}
+   if(r.lunchMin>0){totalMinutes+=r.lunchMin;if(r.lunchMin<=10)e10++;else eM++}
+   if(r.finalMin>0){totalMinutes+=r.finalMin;if(r.finalMin<=10)e10++;else eM++}
+   if(r.missingMin>0){
+     totalMinutes+=r.missingMin;
+     if(r.missingKind==="tarde")eM++;   // se fue sin hacer la tarde = salida temprano
+     else tM++;                          // vino recién a la tarde = llegada tarde
+   }
+ }
+ return {attended,absences,absenceDates,streakDates,totalDays:list.length,t10,tM,e10,eM,penaltyMinutes:totalMinutes,review,inProgress,schedule:schedule.label};
+}
+
+/* Cierra el resultado de una persona. reason: null | "ART" | "VACACIONES" | "OTRO".
+   Con ART o vacaciones, los días de la racha (3 o más seguidos) no cuentan como falta:
+   el premio se evalúa solo con los días trabajados. Las demás faltas sueltas sí cuentan. */
+function finalizeWorker(x,reason){
+ const excused=reason==="ART"||reason==="VACACIONES";
+ const streak=new Set(x.streakDates);
+ const counted=excused?x.absenceDates.filter(d=>!streak.has(d)):x.absenceDates;
+ const noDays=x.attended===0;
+ const prize=!noDays&&counted.length===0&&x.t10<=3&&x.tM<=1&&x.e10<=3&&x.eM<=1;
+ const notes=[];
+ if(excused)notes.push(reason);
+ if(counted.length)notes.push("Inasistencia del día"+(counted.length>1?"s":"")+": "+counted.join(", "));
+ if(!noDays){
+   if(x.t10>3)notes.push("Acumulación de llegadas tarde de hasta 10 minutos ("+x.t10+" casos)");
+   if(x.tM>1)notes.push("Acumulación de llegadas tarde de más de 10 minutos ("+x.tM+" casos)");
+   if(x.e10>3)notes.push("Acumulación de salidas temprano de hasta 10 minutos ("+x.e10+" casos)");
+   if(x.eM>1)notes.push("Acumulación de salidas temprano de más de 10 minutos ("+x.eM+" casos)");
+ }
+ return {prize,notes:(noDays&&!excused)?"":notes.join(" | ")};
+}
+/*END_CORE*/
+
+/* Aviso para preguntar el motivo de las faltas (ART / vacaciones / otro). */
+function askAbsenceReasons(items){
+ return new Promise(resolve=>{
+   const modal=document.getElementById("absModal");
+   const list=document.getElementById("absList");
+   list.textContent="";
+   const selects=[];
+   items.forEach(({idx,x})=>{
+     const box=document.createElement("div");box.className="abs-item";
+     const name=document.createElement("div");name.className="abs-name";
+     name.textContent=x.name;
+     const leg=document.createElement("span");leg.className="abs-leg";leg.textContent="Leg. "+x.leg;
+     name.appendChild(leg);
+     const det=document.createElement("div");det.className="abs-detail";
+     det.textContent=x.attended===0?"Sin fichadas en todo el período ("+x.absenceDates.length+" días laborables).":x.streakDates.length+" días seguidos sin fichar ("+x.streakDates.join(", ")+"). Días trabajados: "+x.attended+".";
+     const sel=document.createElement("select");
+     [["OTRO","Otro motivo / sin justificar (cuenta como falta)"],["ART","ART"],["VACACIONES","Vacaciones"]].forEach(([v,t])=>{
+       const o=document.createElement("option");o.value=v;o.textContent=t;sel.appendChild(o);
+     });
+     box.appendChild(name);box.appendChild(det);box.appendChild(sel);
+     list.appendChild(box);selects.push({idx,sel});
+   });
+   modal.classList.add("open");
+   const btn=document.getElementById("absConfirm");
+   const done=()=>{
+     btn.removeEventListener("click",done);
+     modal.classList.remove("open");
+     const out={};selects.forEach(({idx,sel})=>{out[idx]=sel.value});
+     resolve(out);
+   };
+   btn.addEventListener("click",done);
+ });
+}
+
+processBtn.addEventListener("click",async()=>{
+ clearError(); processBtn.disabled=true;
+ try{
+   if(!selectedFile)throw new Error("No hay ningún archivo seleccionado.");
+   const data=await selectedFile.arrayBuffer();
+   const wb=XLSX.read(data,{cellDates:true,raw:false});
+   if(!wb.SheetNames.length)throw new Error("El archivo no contiene hojas.");
+   const ws=wb.Sheets[wb.SheetNames[0]];
+   const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:"",raw:true});
+   const blocks=findWorkerBlocks(rows);
+   if(!blocks.length)throw new Error("No pude encontrar trabajadores. El archivo debe contener filas con 'Leg:' y fichadas diarias.");
+
+   // Detecta el mes del archivo a partir de las fechas reales de asistencia.
+   // Así el Excel descargado queda, por ejemplo,
+   // "resultado asistencia agosto.xlsx".
+   const monthNames=[
+     "enero","febrero","marzo","abril","mayo","junio",
+     "julio","agosto","septiembre","octubre","noviembre","diciembre"
+   ];
+   // En vez de quedarnos con la PRIMERA fecha de fichaje que aparece
+   // (lo que hacía que un período como 25/07 al 25/08 quedara mal
+   // etiquetado como "julio" por unos pocos días sueltos), contamos
+   // cuántos días de fichaje hay por cada mes/año y usamos el que tiene
+   // más días. Así el reporte queda con el mes que realmente predomina
+   // (agosto, en el ejemplo).
+   let reportMonth=null;
+   let reportMonthIndex=-1;
+   let reportYear=null;
+   const monthCounts=new Map(); // clave "YYYY-M" -> cantidad de días
+   let maxDate=null; // último día que aparece en el archivo
+   for(let r=0;r<rows.length;r++){
+     for(const v of rows[r]){
+       const text=cellText(v).trim();
+       const isAttendanceDate=/^(?:dom|lun|mar|mi[eé]|jue|vie|s[aá]b)\.?\s*-\s*\d{1,2}\/\d{1,2}\/\d{4}/i.test(text);
+       if(!isAttendanceDate)continue;
+       const d=parseDate(v);
+       if(d&&laborable(d)){
+         if(!maxDate||d>maxDate)maxDate=d;
+         const key=d.getFullYear()+"-"+d.getMonth();
+         monthCounts.set(key,(monthCounts.get(key)||0)+1);
+       }
+     }
+   }
+   let bestCount=-1;
+   for(const [key,count] of monthCounts){
+     if(count>bestCount){
+       bestCount=count;
+       const [y,mIdx]=key.split("-").map(Number);
+       reportYear=y;
+       reportMonthIndex=mIdx;
+       reportMonth=monthNames[mIdx];
+     }
+   }
+
+   // Formatea minutos totales como "X h YY min" (valor exacto a descontar).
+   const fmtHM=mins=>{
+     const h=Math.floor(mins/60), m=mins%60;
+     return h+" h "+String(m).padStart(2,"0")+" min";
+   };
+
+   // El último día del archivo suele estar "en curso": muchos solo tienen la entrada
+   // porque todavía no fichó la salida. No se descuenta ni se lista uno por uno.
+   const lastIso=maxDate?iso(maxDate):null;
+   const lastDateText=maxDate?formatDateShort(maxDate):"";
+   let inProgressCount=0;
+
+   const summaries=[];
+
+   for(let i=0;i<blocks.length;i++){
+     const b=blocks[i], end=i+1<blocks.length?blocks[i+1].start:rows.length;
+     const days=[];
+     for(let r=b.start+1;r<end;r++){
+       // Solo contamos filas que representan un día del calendario.
+       // Esto evita que fechas ajenas a las fichadas (por ejemplo
+       // "Fecha de emision") se interpreten como un día trabajado.
+       let d=null;
+       for(const v of rows[r]){
+         const text=cellText(v).trim();
+         const isAttendanceDate=/^(?:dom|lun|mar|mi[eé]|jue|vie|s[aá]b)\.?\s*-\s*\d{1,2}\/\d{1,2}\/\d{4}/i.test(text);
+         if(!isAttendanceDate)continue;
+         const candidate=parseDate(v);
+         if(candidate){d=candidate;break}
+       }
+       if(!d||!laborable(d))continue;
+       const punches=punchesFromRow(rows[r]);
+       days.push({d,punches});
+     }
+
+     // El mismo día puede aparecer más de una vez en el export.
+     // Contamos FECHAS ÚNICAS con fichadas para evitar días duplicados.
+     const uniqueDays=new Map();
+     for(const day of days){
+       const key=iso(day.d);
+       if(!uniqueDays.has(key))uniqueDays.set(key,day);
+       else if(day.punches.length>uniqueDays.get(key).punches.length)uniqueDays.set(key,day);
+     }
+     const uniqueDayList=[...uniqueDays.values()].sort((a,b)=>a.d-b.d);
+     const a=analyzeWorker(uniqueDayList,lastIso);
+     inProgressCount+=a.inProgress;
+     summaries.push({
+       name:b.name,
+       leg:b.leg,
+       attended:a.attended,
+       absences:a.absences,
+       absenceDates:a.absenceDates,
+       streakDates:a.streakDates,
+       totalDays:a.totalDays,
+       t10:a.t10,tM:a.tM,e10:a.e10,eM:a.eM,
+       penaltyMinutes:a.penaltyMinutes,
+       hours:a.penaltyMinutes/60,
+       schedule:a.attended===0?"-":a.schedule,
+       prize:false,
+       notes:"",
+       review:a.review
+     });
+   }
+
+   // Orden: legajo de menor a mayor (cada fila conserva su nombre y sus datos).
+   // Los que no tengan legajo numérico quedan al final.
+   const legKey=x=>{
+     const d=String(x.leg).replace(/[^0-9]/g,"");
+     return d===""?Infinity:Number(d);
+   };
+   summaries.sort((a,b)=>{
+     const ka=legKey(a), kb=legKey(b);
+     if(ka!==kb)return ka<kb?-1:1;
+     return String(a.leg).localeCompare(String(b.leg),"es",{numeric:true});
+   });
+
+
+   // Personas con 3 o más días sin fichar: se pregunta el motivo (ART / vacaciones / otro).
+   const askList=[];
+   summaries.forEach((x,idx)=>{if(x.streakDates.length&&!esExcepcion(x.leg))askList.push({idx,x})});
+   const reasons=askList.length?await askAbsenceReasons(askList):{};
+   summaries.forEach((x,idx)=>{
+     if(esExcepcion(x.leg)){
+       // Excepción: premio siempre, sin horas descontadas y con todos los días laborables.
+       x.prize=true;x.notes="";x.penaltyMinutes=0;x.review=[];x.attended=x.totalDays;
+       return;
+     }
+     const fin=finalizeWorker(x,reasons[idx]||null);
+     x.prize=fin.prize;x.notes=fin.notes;x.reason=reasons[idx]||null;
+   });
+
+   // Columnas: A Legajo | B Nombre | C Días asistidos | D Notas | E Merece el premio |
+   //           F Horas a restar (redondeadas) | G Valor boleto | H Viático
+   const output=[["Número de legajo","Nombre del trabajador","Días asistidos","Notas","Merece el premio","Horas a restar","Valor boleto","Viático"]];
+   summaries.forEach(x=>output.push([x.leg,x.name,x.attended,x.notes,x.prize?"SI":"NO",hoursFromMinutes(x.penaltyMinutes),"",null]));
+
+   const outWs=XLSX.utils.aoa_to_sheet(output);
+   outWs["!cols"]=[{wch:20},{wch:32},{wch:16},{wch:70},{wch:20},{wch:16},{wch:18},{wch:18}];
+
+   for(let r=2;r<=output.length;r++){
+     outWs[`H${r}`]={t:"n",f:`(C${r}*G${r})*2`};
+     outWs[`F${r}`].z='0"hs"';
+     outWs[`G${r}`].z='$ #,##0.00';
+     outWs[`H${r}`].z='$ #,##0.00';
+   }
+
+   for(let c=0;c<8;c++){
+     const cell=outWs[XLSX.utils.encode_cell({r:0,c})];
+     cell.s={font:{bold:true,color:"FFFFFF"},fill:{fgColor:{rgb:"001E50"}},alignment:{horizontal:"center",vertical:"center"}};
+   }
+   for(let r=2;r<=output.length;r++){
+     outWs[`C${r}`].s={alignment:{horizontal:"center"}};
+     outWs[`D${r}`].s={alignment:{vertical:"top",wrapText:true}};
+     outWs[`E${r}`].s={alignment:{horizontal:"center"}};
+     outWs[`F${r}`].s={alignment:{horizontal:"center"}};
+     outWs[`G${r}`].s={alignment:{horizontal:"right"}};
+     outWs[`H${r}`].s={alignment:{horizontal:"right"}};
+   }
+
+   // Hoja 2: días con fichadas incompletas o desvíos grandes, para revisar a mano.
+   const reviewRows=[["Número de legajo","Nombre del trabajador","Fecha","Fichadas del día","Qué pasó","Minutos descontados"]];
+   summaries.forEach(x=>x.review.forEach(rv=>reviewRows.push([x.leg,x.name,rv.date,rv.punches,rv.motivo,rv.minutes])));
+   const reviewCount=reviewRows.length-1;
+   if(!reviewCount)reviewRows.push(["","","","","No hay días para revisar.",""]);
+   const reviewWs=XLSX.utils.aoa_to_sheet(reviewRows);
+   reviewWs["!cols"]=[{wch:20},{wch:32},{wch:14},{wch:38},{wch:95},{wch:20}];
+   for(let c=0;c<6;c++){
+     const cell=reviewWs[XLSX.utils.encode_cell({r:0,c})];
+     cell.s={font:{bold:true,color:"FFFFFF"},fill:{fgColor:{rgb:"001E50"}},alignment:{horizontal:"center",vertical:"center"}};
+   }
+   for(let r=2;r<=reviewRows.length;r++){
+     if(reviewWs[`E${r}`])reviewWs[`E${r}`].s={alignment:{vertical:"top",wrapText:true}};
+     if(reviewWs[`C${r}`])reviewWs[`C${r}`].s={alignment:{horizontal:"center"}};
+     if(reviewWs[`F${r}`])reviewWs[`F${r}`].s={alignment:{horizontal:"center"}};
+   }
+
+   generatedWorkbook=XLSX.utils.book_new();
+   XLSX.utils.book_append_sheet(generatedWorkbook,outWs,"Asistencia");
+   XLSX.utils.book_append_sheet(generatedWorkbook,reviewWs,"Revisar fichadas");
+   // Dato interno para construir automáticamente el nombre del archivo.
+   generatedWorkbook.__reportMonth=reportMonth;
+   generatedWorkbook.__reportYear=reportYear;
+
+   const reviewInfo=document.getElementById("reviewInfo");
+   if(reviewInfo){
+     let msg=reviewCount
+       ? "<strong>"+reviewCount+" día"+(reviewCount>1?"s":"")+" para revisar</strong> (fichadas incompletas o desvíos grandes). Están detallados en la hoja <strong>Revisar fichadas</strong> del Excel."
+       : "No hay días con fichadas incompletas para revisar.";
+     if(inProgressCount)msg+=" Además, "+inProgressCount+" persona"+(inProgressCount>1?"s":"")+" tiene"+(inProgressCount>1?"n":"")+" solo la entrada del "+lastDateText+" (día en curso): no se descontó salida temprano por ese día.";
+     reviewInfo.innerHTML=msg;
+     reviewInfo.style.display="block";
+   }
+   document.getElementById("workers").textContent=summaries.length;
+   document.getElementById("withPrize").textContent=summaries.filter(x=>x.prize).length;
+   document.getElementById("withoutPrize").textContent=summaries.filter(x=>!x.prize).length;
+   results.style.display="block";
+   results.scrollIntoView({behavior:"smooth",block:"nearest"});
+ }catch(err){
+   showError(err.message||"Ocurrió un error al procesar el archivo.");
+ }finally{
+   processBtn.disabled=!selectedFile;
+ }
+});
+
+downloadBtn.addEventListener("click",()=>{
+ if(!generatedWorkbook)return;
+ const month=generatedWorkbook.__reportMonth || "";
+ const filename=month
+   ? `resultado asistencia ${month}.xlsx`
+   : "resultado asistencia.xlsx";
+ XLSX.writeFile(generatedWorkbook,filename);
+});
+</script>
+<script id="suri-chat-bridge">
+(async function() {
+ function reply(id,payload,transfer=[]) { parent.postMessage({suriToolResult:true,id,...payload},location.origin,transfer); }
+ function suriFile(msg) {
+   if(!(msg.data instanceof ArrayBuffer)||!msg.data.byteLength||msg.data.byteLength>8*1024*1024)throw Error("Falta un Excel válido de menos de 8 MB.");
+   const name=String(msg.filename||"planilla.xlsx").replace(/[\/\\\x00-\x1f]/g,"_").slice(0,120);
+   const ext=name.split(".").pop().toLowerCase(),h=new Uint8Array(msg.data.slice(0,8));
+   const zip=h[0]===80&&h[1]===75,ole=h[0]===208&&h[1]===207&&h[2]===17&&h[3]===224;
+   if(!["xls","xlsx"].includes(ext)||(ext==="xls"&&!ole)||(ext==="xlsx"&&!zip))throw Error("El contenido no coincide con la extensión.");
+   return new File([msg.data],name,{type:"application/octet-stream"});
+ }
+ async function toBuffer(data) {
+   const buf=data instanceof Blob?await data.arrayBuffer():data.buffer?data.buffer.slice(data.byteOffset||0,(data.byteOffset||0)+data.byteLength):data;
+   if(!(buf instanceof ArrayBuffer)||new Uint8Array(buf)[0]!==80||new Uint8Array(buf)[1]!==75)throw Error("El resultado no es un XLSX válido.");
+   return buf;
+ }
+ let working=false;
+ async function run(msg) {
+   if(working)throw Error("Ya se procesa un archivo de asistencia.");
+   working=true;
+   const priorHolidays=new Set(HOLIDAYS);
+   try{
+     const file=suriFile(msg);
+     const additional=Array.isArray(msg.holidays)?msg.holidays:[];
+     for(const d of additional){
+       if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||new Date(d).toISOString().slice(0,10)!==d)throw Error("Feriado inválido: "+d);
+       HOLIDAYS.add(d);
+     }
+     const oldAsk=askAbsenceReasons;
+     askAbsenceReasons=async items=>{
+       const reasons=msg.reasons||{},chosen={},missing=[];
+       for(const {idx,x} of items){
+         const leg=String(x.leg||"").replace(/\D/g,"");
+         const chosenReason=reasons[leg]??reasons["*"];
+         if(!["ART","VACACIONES","OTRO"].includes(chosenReason))missing.push((x.name||"Sin nombre")+" (legajo "+(x.leg||"sin legajo")+")");
+         else chosen[idx]=chosenReason;
+       }
+       if(missing.length)throw Error('Falta confirmar los motivos de ausencias prolongadas: '+missing.join("; ")+'. Respondé, por ejemplo: "legajo 123: ART, legajo 456: VACACIONES" (también podés indicar OTRO). SURI no los inventa.');
+       return chosen;
+     };
+     try{
+       generatedWorkbook=null;clearError();updateFile(file);
+       if(!selectedFile)throw Error("La herramienta rechazó el archivo.");
+       processBtn.click();
+       const start=Date.now();
+       while(!generatedWorkbook){
+         const err=errorBox.style.display==="block"?errorBox.textContent:"";
+         if(err)throw Error(err);
+         if(Date.now()-start>60000)throw Error("El control de asistencia superó 60 segundos.");
+         await new Promise(resolve=>setTimeout(resolve,75));
+       }
+     }finally{askAbsenceReasons=oldAsk;}
+     const name="resultado asistencia "+(generatedWorkbook.__reportMonth||"")+".xlsx";
+     const buffer=await toBuffer(XLSX.write(generatedWorkbook,{bookType:"xlsx",type:"array"}));
+     return {files:[{name,data:buffer}],summary:"Control de asistencia: "+document.getElementById("workers").textContent+" trabajadores. Feriados excluidos: "+(additional.join(", ")||"ninguno")+". No se cuentan en días, faltas, tardanzas, horas ni premio."};
+   }finally{
+     HOLIDAYS.clear();for(const h of priorHolidays)HOLIDAYS.add(h);
+     working=false;
+   }
+ }
+ window.addEventListener("message",async event=>{
+   if(event.source!==parent||event.origin!==location.origin||event.data?.suriToolRun!=="asistencia")return;
+   const id=String(event.data.id||"");if(!/^[a-zA-Z0-9_-]{8,60}$/.test(id))return;
+   try{const r=await run(event.data);reply(id,{ok:true,...r},r.files.map(f=>f.data));}
+   catch(e){reply(id,{ok:false,error:String(e?.message||e)});}
+ });
+ parent.postMessage({suriToolReady:"asistencia"},location.origin);
+})();
+</script></body>
+</html>

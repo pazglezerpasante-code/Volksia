@@ -1,0 +1,31 @@
+{
+  "tool_roots": [
+    "./herramientas",
+    "C:/RUTA/A/TUS/HERRAMIENTAS"
+  ],
+  "exclude_dirs": [
+    ".git",
+    "node_modules",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "dist",
+    "build"
+  ],
+  "extensions": [
+    ".html",
+    ".htm",
+    ".py",
+    ".js",
+    ".css",
+    ".json",
+    ".xlsx",
+    ".xls",
+    ".csv",
+    ".pdf",
+    ".docx",
+    ".txt",
+    ".md",
+    ".zip"
+  ]
+}

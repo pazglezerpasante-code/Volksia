@@ -1,0 +1,534 @@
+/* ═══════════════════════════════════════════════════════════════
+   SURI · capa visual (octubre 2026)
+
+   SOLO estética. No cambia estructura, lógica ni nombres de clase.
+   Se importa al final de styles.css, así que pisa a workspace.css y
+   a las utilidades de Tailwind (las reglas sin @layer ganan a las
+   que sí lo tienen). Para volver atrás: sacar el @import de
+   styles.css y borrar este archivo.
+
+   Ideas que ordenan todo:
+   · Un solo acento (azul) y solo donde hay que actuar: botón de
+     enviar, foco, ítem activo, enlaces. Nada brilla porque sí.
+   · La conversación es lo principal. SURI contesta sobre el fondo,
+     sin burbuja; vos escribís en una burbuja neutra.
+   · Lo único con vida propia es el robot de la bienvenida.
+   · Ningún texto por debajo de 12 px.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Los tokens que ya usa Tailwind (bg-bg, border-line, text-muted…)
+     cambian de valor acá; así hasta el markdown y los chips se
+     recolorean solos. */
+  --color-bg: #0c1015;
+  --color-side: #090c10;
+  --color-panel: #12171e;
+  --color-panel-2: #1a212b;
+  --color-line: #232b36;
+  --color-fg: #eceff4;
+  --color-muted: #9aa5b5;
+  --color-accent: #2a68f0;
+  --color-accent-2: #7fb2ff;
+  --color-ok: #5bd3a8;
+  --color-warn: #e6b45a;
+
+  --font-display: "Bricolage Grotesque", "IBM Plex Sans", "Segoe UI", sans-serif;
+
+  --suri-rail: #090c10;
+  --suri-line-2: #2f3946;
+  --suri-hover: rgba(255, 255, 255, 0.05);
+  --suri-active: rgba(255, 255, 255, 0.08);
+  --suri-ring: rgba(42, 104, 240, 0.28);
+  --suri-col: 760px; /* ancho de lectura de la conversación */
+}
+
+html { color-scheme: dark; }
+body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+* { scrollbar-color: #2a3340 transparent; }
+::selection { background: rgba(42, 104, 240, 0.45); color: #fff; }
+:focus-visible { outline: 2px solid var(--color-accent-2); outline-offset: 2px; }
+
+/* ─── Fondo: plano. Sin aurora, sin cuadrícula, sin vidrio ─── */
+.suri-app.wol-aurora { background: var(--color-bg); font-size: 15px; }
+.suri-app.wol-aurora::before { display: none; }
+
+/* Sin brillos permanentes: ni el halo ni el resplandor del robot */
+.suri-app figure .wol-glow { animation: none; filter: none; }
+.suri-app figure .wol-float.wol-glow { animation: none; }
+
+/* ─── Barra lateral ─────────────────────────────────────────── */
+.suri-app .suri-sidebar {
+  width: 232px;
+  padding: 22px 14px 16px;
+  background: var(--suri-rail);
+  border-right: 1px solid var(--color-line);
+  box-shadow: none;
+}
+.suri-app .suri-sidebar.is-collapsed { width: 72px; padding-inline: 12px; }
+
+.suri-app .suri-brand {
+  padding: 4px 10px;
+  font: 700 22px/1 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.suri-app .suri-brand small {
+  margin-top: 7px;
+  font: 400 12.5px/1.3 var(--font-sans);
+  letter-spacing: 0;
+  color: var(--color-muted);
+}
+.suri-app .suri-sidebar.is-collapsed .suri-brand { font-size: 15px; padding-inline: 0; justify-content: center; }
+
+.suri-app .suri-collapse {
+  align-self: stretch;
+  width: 100%;
+  min-height: 40px;
+  margin: 18px 0 12px;
+  padding: 0 10px;
+  gap: 10px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  box-shadow: none;
+  color: var(--color-muted);
+}
+.suri-app .suri-collapse:hover { background: var(--suri-hover); color: var(--color-fg); border: 0; }
+.suri-app .suri-collapse-icon { width: 22px; height: 22px; border: 0; border-radius: 0; background: none; }
+.suri-app .suri-collapse-icon svg { width: 18px; height: 18px; }
+.suri-app .suri-collapse-copy { font-size: 13px; }
+.suri-app .suri-sidebar.is-collapsed .suri-collapse { width: 44px; padding: 0; margin: 18px auto 12px; justify-content: center; }
+
+.suri-app .suri-sidebar nav { gap: 2px; }
+.suri-app .suri-sidebar nav button {
+  min-height: 44px;
+  padding: 0 12px;
+  gap: 12px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  box-shadow: none;
+  color: var(--color-muted);
+  font-size: 14.5px;
+  font-weight: 500;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.suri-app .suri-sidebar nav button:hover { background: var(--suri-hover); color: var(--color-fg); }
+.suri-app .suri-sidebar nav button[aria-current] {
+  background: var(--suri-active);
+  border: 0;
+  box-shadow: none;
+  color: #fff;
+}
+.suri-app .suri-sidebar nav button[aria-current] svg { color: var(--color-accent-2); }
+.suri-app .suri-sidebar.is-collapsed nav button { justify-content: center; padding: 0; }
+
+.suri-app .suri-sidebar-footer {
+  padding: 14px 10px 0;
+  gap: 10px;
+  border-top: 1px solid var(--color-line);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--color-muted);
+}
+.suri-app .suri-sidebar-footer small { margin-top: 2px; font-size: 12px; color: var(--color-muted); }
+
+/* ─── Zona principal ────────────────────────────────────────── */
+.suri-app .suri-sidebar + section > div { padding: 20px 32px; }
+.suri-app .suri-sidebar + section > .suri-tools-content { padding: 12px 16px 16px; }
+
+/* ─── Chat: sin tarjeta, la conversación respira sobre el fondo ─── */
+.suri-app .suri-chat-layout {
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 0;
+  max-width: 1480px;
+}
+.suri-app .suri-chat {
+  padding: 0 clamp(16px, 3vw, 44px) 0 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* Encabezado compacto cuando ya hay conversación */
+.suri-app .suri-chat-greeting {
+  width: 100%;
+  max-width: var(--suri-col);
+  margin-inline: auto;
+  gap: 12px;
+  padding: 2px 0 14px;
+  border-bottom: 1px solid var(--color-line);
+}
+.suri-app .suri-chat-greeting > figure { width: 44px; height: 44px; }
+.suri-app .suri-chat-greeting figure > div { width: 44px !important; height: 44px !important; }
+.suri-app .suri-chat-greeting h1 { font: 600 18px/1.2 var(--font-display); letter-spacing: -0.02em; }
+.suri-app .suri-chat-greeting p { margin-top: 2px; font-size: 13.5px; color: var(--color-muted); }
+
+/* ─── Bienvenida: un bloque centrado, con el robot como protagonista ─── */
+.suri-app .suri-chat.is-welcome { justify-content: safe center; }
+.suri-app .suri-chat.is-welcome .suri-chat-greeting {
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 0 6px;
+  border: 0;
+  text-align: center;
+  animation: suri-arrive 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.suri-app .suri-chat.is-welcome .suri-chat-greeting > figure { width: 132px; height: 132px; }
+.suri-app .suri-chat.is-welcome .suri-chat-greeting figure > div { width: 132px !important; height: 132px !important; }
+.suri-app .suri-chat.is-welcome .suri-chat-greeting figure .wol-float.wol-glow {
+  animation: wol-float 5.5s ease-in-out infinite;
+}
+.suri-app .suri-chat.is-welcome .suri-chat-greeting h1 {
+  font-size: clamp(30px, 3.2vw, 40px);
+  letter-spacing: -0.03em;
+}
+.suri-app .suri-chat.is-welcome .suri-chat-greeting p { font-size: 15px; }
+
+.suri-app .suri-chat.is-welcome .suri-stage { flex: 0 0 auto; overflow: visible; padding: 0; }
+.suri-app .suri-empty-chat {
+  max-width: 600px;
+  padding: 16px 8px 8px;
+  text-align: center;
+  animation: suri-arrive 0.55s 0.08s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.suri-app .suri-empty-chat h2 { margin-bottom: 8px; font: 500 19px/1.35 var(--font-display); letter-spacing: -0.015em; color: var(--color-fg); }
+.suri-app .suri-empty-chat > p { max-width: 460px; margin-inline: auto; font-size: 15px; line-height: 1.65; color: var(--color-muted); }
+
+.suri-app .suri-prompts { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 22px; }
+.suri-app .suri-prompts button {
+  min-height: 42px;
+  padding: 0 16px;
+  gap: 9px;
+  border: 1px solid var(--suri-line-2);
+  border-radius: 999px;
+  background: none;
+  color: var(--color-fg);
+  font-size: 14px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.suri-app .suri-prompts button svg { color: var(--color-accent-2); }
+.suri-app .suri-prompts button:hover { background: var(--suri-hover); border-color: #46536a; }
+
+.suri-app .suri-chat.is-welcome .suri-composer { animation: suri-arrive 0.55s 0.16s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+/* Un solo movimiento de entrada, no uno por sección */
+@keyframes suri-arrive {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ─── Conversación ──────────────────────────────────────────── */
+.suri-app .suri-stage { padding: 0; }
+.suri-app .suri-message-area > div {
+  width: 100%;
+  max-width: var(--suri-col);
+  margin-inline: auto;
+  padding: 22px 2px 30px;
+  gap: 30px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent);
+}
+
+.suri-app .wol-msg {
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: #dbe1ea;
+}
+/* Lo que escribís vos: burbuja neutra, a la derecha */
+.suri-app .wol-msg.is-user {
+  align-self: flex-end;
+  margin-left: auto;
+  max-width: min(84%, 580px);
+  padding: 11px 17px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--color-panel-2);
+  color: var(--color-fg);
+}
+/* Lo que contesta SURI: texto sobre el fondo, con su avatar chico */
+.suri-app .wol-msg.is-assistant > div:first-child {
+  gap: 9px;
+  margin-bottom: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-fg);
+}
+.suri-app .suri-message-robot { width: 30px; height: 30px; }
+.suri-app .wol-msg.is-assistant > div:nth-child(2) > div { gap: 14px; line-height: 1.72; }
+.suri-app .wol-msg table { font-size: 13.5px; }
+.suri-app .wol-msg th { color: var(--color-muted); font-weight: 600; }
+.suri-app .wol-msg pre { border: 1px solid var(--color-line); background: var(--color-panel); font-size: 13px; }
+.suri-app .wol-msg code { font-size: 13px; }
+
+.suri-app .suri-copy { margin-top: 6px; padding: 6px 0; font-size: 12.5px; color: var(--color-muted); transition: color 0.15s ease; }
+.suri-app .suri-copy:hover { color: var(--color-fg); }
+
+.suri-app .wol-msg [aria-label="Acciones realizadas"] > span {
+  padding: 4px 11px;
+  font-size: 12.5px;
+  background: rgba(127, 178, 255, 0.08);
+  border-color: rgba(127, 178, 255, 0.24);
+}
+.suri-app .wol-msg [aria-label="Acciones realizadas"] > span.text-warn { background: rgba(230, 180, 90, 0.1); border-color: rgba(230, 180, 90, 0.35); }
+
+/* "Pensando…" también sin caja */
+.suri-app .suri-message-area [role="status"] { padding: 0; border: 0; background: none; }
+.suri-app .suri-message-area [role="status"] img { width: 36px; height: 36px; }
+.suri-app .suri-message-area [role="status"] span { font-size: 13.5px; }
+
+/* Archivo listo para bajar */
+.suri-app .suri-file-download {
+  flex-wrap: nowrap;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 12px 14px 12px 16px;
+  border: 1px solid var(--suri-line-2);
+  border-radius: 14px;
+  background: var(--color-panel);
+  transition: border-color 0.15s ease;
+}
+.suri-app .suri-file-download:hover { border-color: #46536a; }
+.suri-app .suri-file-icon { width: auto; height: auto; border-radius: 0; background: none; color: var(--color-ok); }
+.suri-app .suri-file-download strong { font-size: 14.5px; font-weight: 600; }
+.suri-app .suri-file-download small { font-size: 12.5px; color: var(--color-ok); }
+.suri-app .suri-file-download > svg { display: none; } /* el botón ya dice "Descargar" */
+.suri-app .suri-download-label {
+  width: auto;
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: var(--color-accent);
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ─── Barra de escribir ─────────────────────────────────────── */
+.suri-app .suri-composer {
+  width: 100%;
+  max-width: var(--suri-col);
+  margin-inline: auto;
+  padding: 12px 0 0;
+}
+.suri-app .suri-composer form {
+  gap: 6px;
+  padding: 8px 8px 8px 10px;
+  border: 1px solid var(--suri-line-2);
+  border-radius: 22px;
+  background: var(--color-panel);
+  box-shadow: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.suri-app .suri-composer form:focus-within {
+  border-color: rgba(127, 178, 255, 0.6);
+  box-shadow: 0 0 0 3px var(--suri-ring);
+}
+.suri-app .suri-composer form input:not([type="file"]) { padding: 10px 6px; font-size: 15.5px; outline: none; text-overflow: ellipsis; }
+.suri-app .suri-composer form input:not([type="file"])::placeholder { color: #7d8898; opacity: 1; }
+.suri-app .suri-composer form > button[aria-label="Adjuntar archivos"] {
+  width: 40px; height: 40px;
+  border: 0; border-radius: 50%;
+  background: none;
+  color: var(--color-muted);
+}
+.suri-app .suri-composer form > button[aria-label="Adjuntar archivos"]:hover { background: var(--suri-hover); color: var(--color-fg); }
+.suri-app .suri-composer button[type="submit"] {
+  width: 40px; height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #fff;
+  box-shadow: none;
+  transition: background 0.15s ease;
+}
+.suri-app .suri-composer button[type="submit"]:hover:not(:disabled) { background: #3a78ff; filter: none; box-shadow: none; }
+.suri-app .suri-composer button[type="submit"]:disabled { background: var(--color-panel-2); color: #6f7a8a; opacity: 1; }
+.suri-app .suri-composer > p { margin-top: 10px; font-size: 12px; opacity: 1; color: #7d8898; }
+
+.suri-app .suri-active-sheet { margin-bottom: 10px; padding: 9px 14px; border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-panel); font-size: 13px; color: var(--color-muted); }
+.suri-app .suri-active-sheet strong { color: var(--color-fg); font-weight: 600; }
+.suri-app .suri-active-sheet button { font-size: 12.5px; }
+
+/* ─── Panel de tareas y notas (columna derecha) ─────────────── */
+.suri-app .suri-daily-panel { gap: 30px; padding: 4px 0 0 28px; border-left: 1px solid var(--color-line); }
+.suri-app .suri-device-card { border: 0; border-radius: 0; background: none; overflow: visible; }
+.suri-app .suri-device-card > header { padding: 0 0 10px; }
+.suri-app .suri-device-card h2 { gap: 9px; font: 600 14.5px/1.3 var(--font-sans); letter-spacing: 0; color: var(--color-fg); }
+.suri-app .suri-device-card h2 svg { width: 18px; height: 18px; color: var(--color-muted); }
+.suri-app .suri-device-card > header button { min-height: 32px; font-size: 13px; color: var(--color-accent-2); }
+.suri-app .suri-device-card > header button:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.suri-app .suri-mini-tasks { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; }
+.suri-app .suri-mini-tasks label { gap: 12px; padding: 12px 0; }
+.suri-app .suri-mini-tasks label + label { border-top: 1px solid var(--color-line); }
+.suri-app .suri-mini-tasks label > span { font-size: 14.5px; line-height: 1.45; }
+.suri-app .suri-mini-tasks small { font-size: 12px; color: var(--color-muted); }
+.suri-app .is-done { color: #7d8898; }
+
+.suri-app .suri-mini-notes { gap: 8px; padding: 0; }
+.suri-app .suri-mini-notes > button {
+  padding: 13px 14px;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: var(--color-panel);
+  transition: border-color 0.15s ease;
+}
+.suri-app .suri-mini-notes > button:hover { border-color: var(--suri-line-2); }
+.suri-app .suri-mini-notes strong { font-size: 14.5px; font-weight: 600; }
+.suri-app .suri-mini-notes p { margin-top: 5px; font-size: 13.5px; line-height: 1.55; color: var(--color-muted); }
+
+.suri-app .suri-panel-empty { padding: 6px 0 2px; font-size: 14px; color: var(--color-muted); }
+.suri-app .suri-panel-empty button { margin-top: 8px; font-size: 13.5px; color: var(--color-accent-2); }
+
+.suri-app .suri-device-label { margin-top: 12px; padding: 0; gap: 8px; border: 0; font-size: 12.5px; color: #7d8898; }
+
+/* Tilde de las tareas: círculo fino, relleno azul al completar */
+.suri-app input[type="checkbox"] { width: 22px; height: 22px; border: 1.5px solid #6f7a8a; background: transparent; transition: background 0.15s ease, border-color 0.15s ease; }
+.suri-app input[type="checkbox"]:checked { background: var(--color-accent); border-color: var(--color-accent); }
+
+/* ─── Páginas de Tareas y Notas ─────────────────────────────── */
+.suri-app .suri-organizer-page {
+  max-width: 720px;
+  padding: 6px 0 48px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+.suri-app .suri-organizer-page > h1 { font: 600 32px/1.15 var(--font-display); letter-spacing: -0.03em; }
+.suri-app .suri-organizer-page > p { margin-top: 8px; font-size: 14.5px; line-height: 1.6; color: var(--color-muted); }
+.suri-app .suri-organizer-page form { margin-top: 20px; }
+
+.suri-app .suri-organizer-page input:not([type="checkbox"]),
+.suri-app .suri-organizer-page textarea {
+  padding: 12px 14px;
+  border: 1px solid var(--suri-line-2);
+  border-radius: 12px;
+  background: var(--color-panel);
+  font-size: 15px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.suri-app .suri-organizer-page input:not([type="checkbox"]):focus,
+.suri-app .suri-organizer-page textarea:focus {
+  outline: none;
+  border-color: rgba(127, 178, 255, 0.6);
+  box-shadow: 0 0 0 3px var(--suri-ring);
+}
+.suri-app .suri-organizer-page .wol-btn,
+.suri-app .suri-organizer-page button[type="submit"] { border-radius: 12px; }
+
+.suri-app .suri-organizer-page ul { gap: 0; margin-top: 12px; }
+.suri-app .suri-organizer-page li {
+  padding: 14px 2px;
+  border: 0;
+  border-bottom: 1px solid var(--color-line);
+  border-radius: 0;
+  background: none;
+  font-size: 15px;
+}
+.suri-app .suri-organizer-page li button { min-height: 36px; font-size: 13px; }
+.suri-app .suri-organizer-page .suri-device-label { margin: 24px 0 0; padding: 0; }
+.suri-app .suri-add-toggle { margin-top: 14px; font-size: 14px; color: var(--color-accent-2); }
+
+/* Botón principal de toda la app: plano, sin degradé */
+.suri-app .wol-btn { background: var(--color-accent); color: #fff; border-radius: 12px; font-weight: 600; box-shadow: none; }
+.suri-app .wol-btn:hover:not(:disabled) { background: #3a78ff; filter: none; box-shadow: none; }
+
+/* ─── Herramientas ──────────────────────────────────────────── */
+.suri-app .suri-tools-frame { border: 1px solid var(--color-line); border-radius: 14px; background: var(--color-panel); }
+.suri-app .suri-tools-toolbar { min-height: 48px; }
+
+.suri-app .suri-error { border-radius: 10px; background: rgba(255, 107, 107, 0.1); color: #ffb4b4; font-size: 13.5px; }
+
+/* ─── Pantallas medianas ────────────────────────────────────── */
+@media (min-width: 768px) and (max-width: 1150px) {
+  .suri-app .suri-chat-layout { grid-template-columns: minmax(0, 1fr) 260px; }
+  .suri-app .suri-sidebar { width: 200px; }
+  .suri-app .suri-sidebar.is-collapsed { width: 72px; }
+  .suri-app .suri-sidebar + section > div { padding: 16px 20px; }
+  .suri-app .suri-daily-panel { padding-left: 20px; }
+}
+@media (min-width: 768px) and (max-width: 960px) {
+  .suri-app .suri-chat-layout { grid-template-columns: minmax(0, 1fr); }
+  .suri-app .suri-chat { padding-right: 0; }
+}
+@media (min-width: 1600px) {
+  .suri-app .suri-chat-layout { grid-template-columns: minmax(0, 1fr) 360px; }
+}
+/* Pantallas bajas: la bienvenida se compacta para no scrollear */
+@media (min-width: 768px) and (max-height: 760px) {
+  .suri-app .suri-chat.is-welcome .suri-chat-greeting > figure { width: 96px; height: 96px; }
+  .suri-app .suri-chat.is-welcome .suri-chat-greeting figure > div { width: 96px !important; height: 96px !important; }
+  .suri-app .suri-chat.is-welcome .suri-chat-greeting h1 { font-size: 28px; }
+  .suri-app .suri-empty-chat { padding-top: 8px; }
+  .suri-app .suri-prompts { margin-top: 16px; }
+}
+
+/* ─── Celular ───────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .suri-app .suri-mobile-header { flex-direction: row; align-items: baseline; gap: 10px; padding: 16px 20px 4px; }
+  .suri-app .suri-mobile-header strong { font: 700 20px/1.1 var(--font-display); letter-spacing: -0.02em; }
+  .suri-app .suri-mobile-header span { font-size: 13px; color: var(--color-muted); }
+  .suri-app .suri-chat.is-welcome .suri-chat-greeting p { display: none; } /* ya está en el encabezado */
+
+  .suri-app .suri-sidebar + section > div { padding: 8px 16px calc(84px + env(safe-area-inset-bottom)); }
+  .suri-app .suri-sidebar + section > .suri-tools-content { padding: 6px 6px 84px; }
+
+  .suri-app .suri-chat { padding: 0; }
+  .suri-app .suri-chat-greeting { padding-bottom: 10px; }
+  .suri-app .suri-chat.is-welcome { justify-content: flex-start; }
+  .suri-app .suri-chat.is-welcome .suri-chat-greeting { padding-top: 6px; }
+  .suri-app .suri-chat.is-welcome .suri-chat-greeting > figure { width: 92px; height: 92px; }
+  .suri-app .suri-chat.is-welcome .suri-chat-greeting figure > div { width: 92px !important; height: 92px !important; }
+  .suri-app .suri-chat.is-welcome .suri-chat-greeting h1 { font-size: 27px; }
+  .suri-app .suri-chat.is-welcome .suri-stage { flex: 1 1 auto; overflow-y: auto; }
+  .suri-app .suri-empty-chat { padding: 12px 2px 8px; }
+  .suri-app .suri-empty-chat h2 { font-size: 18px; }
+  .suri-app .suri-empty-chat > p { font-size: 14.5px; }
+  .suri-app .suri-prompts { margin-top: 16px; gap: 8px; }
+  .suri-app .suri-prompts button { min-height: 44px; }
+
+  .suri-app .suri-message-area > div { gap: 24px; padding-top: 14px; }
+  .suri-app .wol-msg { font-size: 15.5px; }
+  .suri-app .wol-msg.is-user { max-width: 88%; }
+  .suri-app .suri-file-download { flex-wrap: wrap; }
+  .suri-app .suri-download-label { flex: 1 1 100%; text-align: center; }
+
+  .suri-app .suri-composer { padding-top: 8px; }
+  .suri-app .suri-composer form { border-radius: 20px; }
+  .suri-app .suri-composer form input:not([type="file"]) { font-size: 16px; }
+
+  .suri-app .suri-organizer-page { padding: 4px 0 32px; }
+  .suri-app .suri-organizer-page > h1 { font-size: 26px; }
+  .suri-app .suri-organizer-page li { padding: 12px 0; }
+  .suri-app .suri-day-welcome h1 { font: 600 28px/1.2 var(--font-display); letter-spacing: -0.03em; }
+  .suri-app .suri-day-welcome p { font-size: 14px; color: var(--color-muted); }
+
+  /* Navegación de abajo: sólida, con el activo marcado arriba */
+  .suri-app .suri-mobile-nav {
+    padding: 6px 12px max(10px, env(safe-area-inset-bottom));
+    background: var(--suri-rail);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-top: 1px solid var(--color-line);
+  }
+  .suri-app .suri-mobile-nav button { gap: 4px; font-size: 12px; font-weight: 500; color: var(--color-muted); }
+  .suri-app .suri-mobile-nav button[aria-current] { color: var(--color-fg); }
+  .suri-app .suri-mobile-nav button[aria-current] svg { color: var(--color-accent-2); }
+  .suri-app .suri-mobile-nav button[aria-current]::after {
+    top: -7px; bottom: auto;
+    width: 28px; height: 2px;
+    background: var(--color-accent-2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .suri-app .suri-chat-greeting,
+  .suri-app .suri-empty-chat,
+  .suri-app .suri-composer { animation: none !important; }
+}

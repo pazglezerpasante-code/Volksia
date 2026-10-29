@@ -1,0 +1,27 @@
+# Backend de Wolskia en Render (Blueprint). El frontend va en Vercel: ver WOLSKIA_Integrado/DEPLOY_ONLINE.md
+services:
+  - type: web
+    name: wolskia-api
+    runtime: python
+    plan: free
+    rootDir: WOLSKIA_Integrado/backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: WOLSKIA_PUBLIC_MODE
+        value: "1"
+      - key: WOLSKIA_PROXY_SECRET
+        generateValue: true
+      - key: WOLSKIA_GLOBAL_DAILY_LIMIT
+        value: "300"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false

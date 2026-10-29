@@ -1,0 +1,48 @@
+WOLSKIA integrado  =  interfaz de Studio (frontend/)  +  servidor de Pro (backend/)
+
+REQUISITOS
+  Node.js 22   https://nodejs.org
+  Python 3.10+ https://www.python.org/downloads/   (marcar "Add to PATH")
+
+USO (Windows)
+  1. Doble clic en INICIAR_TODO.bat  (la primera vez instala todo; tarda unos minutos)
+  2. Se abre http://127.0.0.1:8080   ->  usuario: admin   clave: admin123
+  3. En el panel "Modelos de IA" pegue su clave de Gemini y/o de Grok (xai-...) o Groq (gsk_...)
+  4. "Guardar y probar"  ->  escriba en el chat.
+
+USO (Mac / Linux):  ./INICIAR_TODO.sh
+
+COMO FUNCIONA
+  Navegador --> Vite :8080 --(proxy /api/*)--> Flask :5050 --> Gemini / Groq / xAI
+  Las claves se envian a Flask y viven SOLO en su memoria (no se guardan en disco).
+  Si prefiere dejarlas fijas, copie backend/.env.example a backend/.env.
+
+ENDPOINTS  (todos JSON, solo atendidos desde esta misma computadora)
+  GET    /api/ai/status      que claves hay cargadas (enmascaradas)
+  POST   /api/ai/keys        {"gemini": "...", "grok": "..."}   ("" borra, ausente no cambia)
+  DELETE /api/ai/keys        borra todas
+  POST   /api/ai/test-keys   valida cada clave contra su proveedor (no gasta cuota)
+  POST   /api/ai/chat        {"message", "history":[{role,content}], "provider":"auto|gemini|groq|xai"}
+  (siguen existiendo /api/tools /api/search /api/chat /api/health de Pro)
+
+VARIABLES
+  WOLSKIA_API            destino del proxy (defecto http://127.0.0.1:5050)
+  WOLSKIA_CORS_ORIGINS   origenes extra para CORS, separados por coma
+  WOLSKIA_ALLOW_REMOTE=1 desactiva la restriccion "solo esta computadora"
+  GEMINI_MODEL / GROQ_MODEL / XAI_MODEL   modelo preferido
+
+PRUEBAS DEL BACKEND:  cd backend && python tests_api.py && python tests_ai.py
+
+NOVEDADES v5 — IA CON HERRAMIENTAS
+  La IA ahora agrega / edita / elimina Tareas, Notas y Eventos ("Tu espacio") y lee / modifica / crea archivos
+  de backend/herramientas (o las rutas de config.json). Ejemplos para probar en el chat:
+    "agregá una tarea: llamar al proveedor mañana"      "recordame pagar la luz el viernes a las 10"
+    "marcá como hecha la tarea de la yerba"             "borrá la nota de la reunión"
+    "cambiá la reunión de mañana para las 16"           "qué tengo esta semana"
+    "creá un archivo notas.md en herramientas con ..."  "leé el archivo demo.html y cambiá el título"
+  Endpoints nuevos: GET/POST /api/space[/tasks|notes|events], PATCH|DELETE /api/space/<col>/<id>, POST /api/space/import
+  Solo "admin" escribe archivos (WOLSKIA_WORKERS_CAN_WRITE=1 para permitirlo a todos).
+  Datos viejos de localStorage se migran solos al primer ingreso.
+
+  PESTAÑA HERRAMIENTAS: ahora muestra VOLKSIA Workspace (https://pazglezerpasante-code.github.io/volksia-workspace/)
+  embebido. Para cambiar la URL: frontend/.env  ->  VITE_WORKSPACE_URL=...

@@ -1,0 +1,296 @@
+/* SURI workspace: layout and shared interaction tokens. */
+:root { --workspace-radius: 16px; --workspace-space: 24px; }
+.suri-sidebar { width: 224px; flex-shrink: 0; display: flex; flex-direction: column; padding: 26px 16px 20px; border-right: 1px solid var(--color-line); background: #030b18e6; transition: width .2s ease; }
+.suri-brand { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 700; letter-spacing: .12em; }
+.suri-brand small { display: block; font-size: 8px; letter-spacing: .14em; color: var(--color-muted); }
+.suri-collapse { align-self: flex-end; margin: 24px 0; padding: 10px; border: 1px solid var(--color-line); border-radius: 8px; color: var(--color-muted); }
+.suri-nav-label { font-size: 9px; letter-spacing: .14em; color: var(--color-muted); margin: 0 10px 14px; }
+.suri-sidebar nav { display: grid; gap: 6px; }
+.suri-sidebar nav button { display: flex; align-items: center; gap: 13px; min-height: 46px; padding: 12px; text-align: left; border-radius: 9px; color: var(--color-muted); border: 1px solid transparent; }
+.suri-sidebar nav button:hover { color: var(--color-fg); background: #10244188; }
+.suri-sidebar nav button[aria-current] { background: linear-gradient(90deg, #0866ff30, #168cff0c); color: #b9e9ff; border-color: #168cff44; box-shadow: inset 3px 0 #168cff; }
+.suri-sidebar-footer { margin-top: auto; display: flex; align-items: center; gap: 10px; padding-top: 24px; font-size: 12px; }
+.suri-sidebar-footer small { display: block; color: var(--color-muted); font-size: 10px; }
+.suri-avatar { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 9px; border: 1px solid #168cff66; color: #24e5ff; font-size: 10px; }
+.suri-sidebar.is-collapsed { width: 80px; }
+.suri-sidebar.is-collapsed .suri-brand > span, .suri-sidebar.is-collapsed .suri-nav-label, .suri-sidebar.is-collapsed nav span, .suri-sidebar.is-collapsed .suri-sidebar-footer { display: none; }
+.suri-header-section { color: var(--color-muted); font-weight: 400; font-size: 12px; }
+.suri-sidebar + section > header { padding: 20px 28px; border-bottom: 1px solid var(--color-line); margin-bottom: 20px; }
+.suri-sidebar + section > div { padding-left: 24px; }
+.suri-sheet { max-width: 1160px; margin: auto; display: grid; gap: 20px; padding: 24px 28px 40px; border: 1px solid var(--color-line); border-radius: var(--workspace-radius); background: #0a1930cc; }
+.suri-sheet h1 { font-size: clamp(24px, 3vw, 36px); font-weight: 600; letter-spacing: -.04em; }
+.suri-upload { display: flex; position: relative; gap: 18px; align-items: center; min-height: 100px; padding: 22px; border: 1px dashed #168cff99; border-radius: 12px; background: #0866ff0c; color: var(--color-accent-2); overflow: hidden; }
+.suri-upload span { min-width: 0; overflow-wrap: anywhere; }
+.suri-upload small { display: block; color: var(--color-muted); margin-top: 6px; }
+.suri-upload input { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; }
+.suri-upload:focus-within { outline: 2px solid var(--color-accent-2); }
+.suri-sheet-toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; font-size: 12px; }
+.suri-sheet select, .suri-sheet input { color: var(--color-fg); background: var(--color-bg); border: 1px solid var(--color-line); border-radius: 7px; padding: 12px; min-width: 0; }
+.suri-sheet select { margin-left: 10px; max-width: 200px; }
+.suri-table { overflow: auto; max-height: 400px; border: 1px solid var(--color-line); border-radius: 9px; }
+.suri-table table { width: 100%; border-collapse: collapse; white-space: nowrap; font-size: 12px; }
+.suri-table th, .suri-table td { padding: 10px 14px; border-bottom: 1px solid var(--color-line); text-align: left; max-width: 400px; overflow: hidden; text-overflow: ellipsis; }
+.suri-table th { color: var(--color-accent-2); background: var(--color-panel-2); }
+.suri-sheet-form { display: grid; gap: 10px; }
+.suri-sheet-form > div { display: flex; gap: 10px; }
+.suri-sheet-form input { flex: 1; }
+.suri-sheet-form button { padding: 10px 16px; border-radius: 8px; }
+.suri-result { border-left: 2px solid var(--color-accent-2); padding: 12px 16px; background: #168cff0c; overflow-wrap: anywhere; }
+.suri-error { color: #ffb4b4; background: #ff444410; padding: 12px; border-radius: 8px; }
+.suri-download { display: inline-flex; align-items: center; gap: 10px; color: var(--color-accent-2); min-height: 44px; }
+@media (min-width: 1280px) { .suri-context { display: block; } }
+@media (max-width: 1279px) { .suri-chat:has(+ .suri-context) { display: none; } .suri-context { display: block; overflow-y: auto; } }
+@media (max-width: 767px) {
+  .suri-sidebar { display: none; }
+  .suri-sidebar + section > header { padding: 12px 16px; margin-bottom: 12px; }
+  .suri-sidebar + section > div { padding-left: 12px; padding-right: 12px; }
+  .suri-chat.glass { padding: 14px 12px; }
+  .suri-chat-top { margin-bottom: 10px; }
+  .suri-chat .wol-lead { font-size: 12px; line-height: 1.5; }
+  .suri-sheet { padding: 18px 14px; gap: 16px; }
+  .suri-sheet-form > div { flex-direction: column; }
+  .suri-upload { padding: 16px; }
+  .gnav { --bar-slot: 40px; --bar-gap: 2px; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; scroll-behavior: auto !important; transition: none !important; } }
+/* Electric-blue workspace */
+.suri-app.wol-aurora { background: radial-gradient(ellipse at 78% 38%, #07388466, transparent 47%), radial-gradient(ellipse at 25% 100%, #08265355, transparent 55%), #050a16; }
+.suri-app .suri-sidebar { width: 216px; padding: 30px 18px 22px; background: #060d1be6; border-color: #4d77aa26; }
+.suri-app .suri-sidebar.is-collapsed { width: 80px; }
+.suri-app .suri-brand { font-size: 27px; }
+.suri-app .suri-collapse { margin: 24px 0 18px; border: 0; }
+.suri-app .suri-nav-label { font-size: 10px; margin-bottom: 18px; }
+.suri-app .suri-sidebar nav { gap: 9px; }
+.suri-app .suri-sidebar nav button { min-height: 48px; font-size: 14px; }
+.suri-app .suri-sidebar nav button[aria-current] { background: linear-gradient(100deg, #0a61ef38, #0a61ef12); color: #eff8ff; border-color: #2e80ff50; }
+.suri-app .suri-sidebar + section > header { padding: 20px 32px; margin-bottom: 0; border-color: #4d77aa26; }
+.suri-app .suri-sidebar + section > div { padding: 22px 28px 24px; }
+.suri-chat { position: relative; display: flex; flex-direction: column; height: 100%; min-height: 0; min-width: 0; padding: 20px 28px; border: 1px solid #4a7bb42e; border-radius: 24px; background: linear-gradient(125deg, #0d1b30c9, #0813299c 55%, #0b1d389c); box-shadow: 0 24px 80px #0003, inset 0 1px #a5cfff08; }
+.suri-chat-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; }
+.suri-eyebrow { display: flex; align-items: center; gap: 9px; color: #a7c8f4; letter-spacing: .14em; font-size: 10px; font-weight: 600; }
+.suri-status-dot { width: 6px; height: 6px; border-radius: 50%; background: #51b3ff; box-shadow: 0 0 12px #248cff; }
+.suri-chat-top button { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border: 1px solid #6394d030; border-radius: 8px; font-size: 12px; color: #a8bfdc; }
+.suri-stage { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; justify-content: safe center; }
+.suri-welcome { width: 100%; }
+.suri-hero { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; min-height: 340px; position: relative; }
+.suri-hero-copy { z-index: 1; padding: 20px 0 20px 12px; }
+.suri-kicker { color: #6c9dce; font-size: 10px; font-weight: 600; letter-spacing: .19em; }
+.suri-hero h1 { font-family: var(--font-display); font-size: clamp(34px, 3.8vw, 60px); line-height: 1.15; font-weight: 600; letter-spacing: -.055em; margin: 18px 0; color: #f1f7ff; }
+.suri-hero h1 span { color: #5bacff; background: linear-gradient(100deg,#3889ff,#7bdfff); background-clip: text; -webkit-text-fill-color: transparent; }
+.suri-hero-copy > p { color: #a5b6cf; font-size: 14px; line-height: 1.8; max-width: 340px; }
+.suri-hero-caption { display: flex; gap: 8px; align-items: center; font-size: 11px; color: #7896bb; margin-top: 22px; }
+.suri-hero-caption > span { width: 18px; height: 1px; background: #3c8eff; }
+.suri-hero-robot { position: relative; display: grid; place-items: center; min-height: 340px; background: radial-gradient(ellipse, #1268ff33, transparent 68%); }
+.suri-hero-robot .wol-robot-fit { width: clamp(260px, 25vw, 360px); height: clamp(260px, 25vw, 360px); }
+.suri-hero-robot figure { position: relative; z-index: 1; }
+.suri-hero-robot figure figcaption { font-size: 10px; opacity: .7; }
+.suri-orbit { position: absolute; width: 88%; aspect-ratio: 1; border: 1px solid #317fe030; border-radius: 50%; background: repeating-conic-gradient(from 0deg, #438bdd22 0deg 1deg, transparent 1deg 30deg); mask-image: radial-gradient(transparent 68%, black 69%); }
+.suri-robot-label { position: absolute; right: 0; bottom: 38px; font-size: 11px; letter-spacing: .2em; color: #75b5ff; z-index: 2; border-right: 2px solid #387eff; padding: 5px 10px; text-align: right; }
+.suri-robot-label span { display: block; font-size: 7px; margin-top: 5px; color: #6d8caf; }
+.suri-shortcuts { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin: 14px 0 20px; }
+.suri-shortcuts button { display: flex; gap: 12px; align-items: center; text-align: left; padding: 20px 15px; border: 1px solid #5885b832; background: linear-gradient(130deg,#142a4599,#0c1b3099); border-radius: 14px; transition: border-color .2s, background .2s; }
+.suri-shortcuts button:hover { border-color: #3c91ff; background: #153462; }
+.suri-shortcuts svg { color: #6eafff; flex-shrink: 0; }
+.suri-shortcuts strong { display: block; font-size: 12px; font-weight: 500; color: #dfecff; }
+.suri-shortcuts small { display: block; font-size: 10px; color: #86a0c0; margin-top: 5px; }
+.suri-shortcut-arrow { color: #6d96c4; margin-left: auto; font-size: 16px; }
+.suri-composer { flex-shrink: 0; width: 100%; margin-top: 14px; }
+.suri-composer form { padding: 12px; border-color: #477ecb70; background: #071326; border-radius: 16px; box-shadow: 0 0 32px #0866ff0c; }
+.suri-composer .wol-btn { background: #166aff; color: white; box-shadow: 0 4px 20px #0753dc40; }
+.suri-composer input { font-size: 14px; }
+.suri-composer > p { text-align: center; font-size: 10px; opacity: .7; }
+.suri-message-area { padding: 24px 0 8px; }
+.suri-chat .wol-msg { max-width: 90%; line-height: 1.7; }
+.suri-copy { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #9db5d4; padding: 8px 0; }
+.suri-context-close { padding: 10px; color: #8bc6ff; font-size: 12px; }
+.suri-chat button:focus-visible { outline: 2px solid #79caff; outline-offset: 3px; }
+@media (max-width: 1100px) and (min-width: 768px) { .suri-app .suri-sidebar { width: 180px; padding: 24px 12px; } .suri-chat { padding: 18px; } .suri-app .suri-sidebar + section > div { padding: 18px; } .suri-hero { min-height: 300px; } .suri-hero-robot { min-height: 300px; } .suri-hero-robot .wol-robot-fit { width: 250px; height: 250px; } .suri-shortcuts { gap: 8px; } .suri-shortcuts button { flex-wrap: wrap; padding: 14px; } .suri-shortcut-arrow { display: none; } }
+@media (max-width: 767px) {
+ .suri-app .suri-sidebar + section > header { padding: 14px 18px; } .suri-app .suri-sidebar + section > div { padding: 10px 12px 80px; }
+ .suri-chat { padding: 14px; border-radius: 18px; } .suri-eyebrow { font-size: 8px; letter-spacing: .08em; } .suri-chat-top button { padding: 8px; font-size: 10px; } .suri-chat-top button svg { display: none; }
+
+ .suri-hero { grid-template-columns: 1fr; min-height: 0; text-align: center; } .suri-hero-copy { padding: 26px 0 0; } .suri-kicker { font-size: 8px; letter-spacing: .11em; } .suri-hero h1 { font-size: 36px; margin: 12px 0; } .suri-hero-copy > p { font-size: 12px; line-height: 1.6; margin: auto; } .suri-hero-caption { display: none; }
+ .suri-hero-robot { min-height: 215px; } .suri-hero-robot .wol-robot-fit { width: 205px; height: 205px; } .suri-orbit { width: 215px; } .suri-robot-label { right: 10px; bottom: 35px; } .suri-hero-robot figure figcaption { display: none; }
+ .suri-shortcuts { grid-template-columns: 1fr; gap: 7px; margin: 8px 0; } .suri-shortcuts button { padding: 12px; gap: 12px; } .suri-shortcuts strong { font-size: 12px; } .suri-shortcuts small { margin-top: 2px; } .suri-shortcuts svg { width: 20px; }
+ .suri-composer { margin-top: 12px; } .suri-composer form { padding: 6px; gap: 2px; } .suri-composer input { font-size: 16px; } .suri-composer form > button:first-of-type { width: 32px; border: 0; } .suri-composer .wol-btn { padding: 10px; font-size: 12px; } .suri-stage { justify-content: flex-start; } .suri-chat .wol-msg { max-width: 100%; }
+}
+@media (min-width: 768px) and (max-height: 800px) {
+ .suri-app .suri-sidebar + section > div { padding-top: 16px; padding-bottom: 16px; }
+ .suri-chat { padding-top: 14px; padding-bottom: 14px; }
+ .suri-hero { min-height: 260px; }
+ .suri-hero-robot { min-height: 260px; }
+ .suri-hero-robot .wol-robot-fit { width: 250px; height: 250px; }
+ .suri-hero h1 { font-size: 44px; margin: 12px 0; }
+ .suri-hero-copy { padding-top: 12px; padding-bottom: 10px; }
+ .suri-hero-copy > p { font-size: 13px; line-height: 1.6; }
+ .suri-hero-caption { margin-top: 12px; }
+ .suri-orbit { width: 270px; }
+ .suri-shortcuts { margin: 10px 0 4px; }
+ .suri-shortcuts button { padding: 16px 12px; }
+}
+
+/* Navigation control and roomier tools */
+.suri-app .suri-sidebar { overflow: visible; }
+.suri-app .suri-collapse { display: flex; align-items: center; gap: 10px; width: 100%; align-self: stretch; margin: 26px 0 24px; padding: 6px; border: 1px solid #4c86d54a; border-radius: 12px; background: linear-gradient(120deg,#184c8c55,#10254177); color: #a9d4ff; box-shadow: inset 0 1px #b9deff0c; transition: background .2s, border-color .2s; }
+.suri-collapse-icon { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; background: #2172ed24; border: 1px solid #589df12b; flex-shrink: 0; }
+.suri-collapse-copy { font-size: 11px; font-weight: 500; white-space: nowrap; }
+.suri-app .suri-collapse:hover { border-color: #5aa6ff; background: #16457b88; color: white; }
+.suri-app .suri-collapse:focus-visible { outline: 2px solid #7ed1ff; outline-offset: 4px; }
+.suri-app .suri-sidebar.is-collapsed .suri-collapse { width: 44px; padding: 6px; margin-left: auto; margin-right: auto; }
+.suri-sidebar.is-collapsed .suri-collapse-copy { display: none; }
+.suri-app .suri-sidebar + section > .suri-tools-content { padding: 8px 10px 12px; }
+.suri-tools-frame { border: 1px solid #4a7bb42e; border-radius: 16px; background: #081326; }
+.suri-tools-toolbar { min-height: 46px; }
+@media (max-width: 767px) {
+ .suri-app .suri-sidebar + section > .suri-tools-content { padding: 6px 6px 80px; }
+ .suri-tools-frame { border-radius: 12px; }
+}
+
+.suri-active-sheet { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 9px 12px; border: 1px solid #347de94a; background: #1254ad1a; border-radius: 10px; color: #a9c9ef; font-size: 11px; min-width: 0; }
+.suri-active-sheet > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.suri-active-sheet > svg { flex-shrink: 0; color: #76b9ff; }
+.suri-active-sheet button { margin-left: auto; display: flex; align-items: center; gap: 5px; flex-shrink: 0; padding: 3px; color: #9eb4d0; }
+/* Approved SURI concept — responsive chat and device organizer. */
+:root { --color-accent-2: #54adff; --color-line: #20354e; --color-muted: #a0b4cd; }
+.suri-app.wol-aurora { background: radial-gradient(ellipse at 35% 0%,#142d4780,transparent 65%),#07121f; font-family: 'IBM Plex Sans','Segoe UI',sans-serif; }
+.suri-app.wol-aurora::before { display:none; }
+.suri-app .suri-sidebar { width:220px; background:linear-gradient(150deg,#112338,#081421); border-color:#263c5255; padding:32px 20px 24px; }
+.suri-app .suri-brand { font-size:30px; letter-spacing:-.04em; }
+.suri-app .suri-brand small { font-size:12px; letter-spacing:0; font-weight:400; margin-top:2px; color:#b7c9dd; }
+.suri-app .suri-collapse { margin:24px 0; padding:6px; min-height:34px; align-self:flex-end; background:#142a43; border:1px solid #294664; box-shadow:none; }
+.suri-app .suri-collapse-copy { font-size:11px; }
+.suri-app .suri-sidebar nav { gap:10px; }
+.suri-app .suri-sidebar nav button { min-height:52px; border-radius:12px; color:#d7e3f3; font-size:15px; padding:14px; }
+.suri-app .suri-sidebar nav button[aria-current] { background:#0667f9; border-color:#277eff; color:white; box-shadow:0 8px 24px #0067ff20; }
+.suri-app .suri-sidebar-footer { font-size:11px; color:#a2bad2; line-height:1.6; }
+.suri-app .suri-sidebar-footer small { font-size:10px; }
+.suri-app .suri-sidebar.is-collapsed { width:78px; padding-inline:14px; }
+.suri-app .suri-sidebar.is-collapsed .suri-brand { font-size:15px; letter-spacing:0; }
+.suri-app .suri-sidebar.is-collapsed .suri-brand > span { display:block; }
+.suri-app .suri-sidebar.is-collapsed .suri-brand small { display:none; }
+.suri-mobile-header { display:none; }
+.suri-app .suri-sidebar + section > div { padding:24px; }
+.suri-chat-layout { display:grid; grid-template-columns:minmax(0,1fr) 300px; height:100%; min-height:0; width:100%; max-width:1600px; margin:auto; gap:20px; }
+.suri-app .suri-chat { border:1px solid #233a505c; border-radius:18px; background:linear-gradient(145deg,#10213799,#08162399); padding:24px; box-shadow:none; }
+.suri-chat-greeting { display:flex; align-items:center; gap:14px; flex-shrink:0; padding-bottom:18px; }
+.suri-chat-greeting > figure { width:92px; height:100px; flex-shrink:0; }
+.suri-chat-greeting h1 { font-size:clamp(24px,2.5vw,34px); font-weight:600; letter-spacing:-.04em; }
+.suri-chat-greeting p { color:#b5c6dc; font-size:15px; margin-top:3px; }
+.suri-chat-greeting figure > div { width:100px!important; height:100px!important; }
+.suri-chat-greeting figure figcaption { display:none; }
+.suri-chat-greeting figure > div > div:not(:last-child) { display:none; }
+.suri-chat-greeting figure .wol-glow { filter:none; }
+.suri-chat-greeting figure .wol-float { animation:none; }
+.suri-app .suri-stage { justify-content:flex-start; padding:8px 0 16px; }
+.suri-empty-chat { padding:clamp(28px,8vh,100px) 8px 28px; max-width:560px; margin:auto; }
+.suri-empty-chat h2 { font-size:28px; font-weight:600; letter-spacing:-.04em; margin-bottom:12px; }
+.suri-empty-chat > p { font-size:15px; line-height:1.8; color:#acbed4; max-width:450px; }
+.suri-prompts { display:grid; gap:10px; margin-top:28px; }
+.suri-prompts button { display:flex; align-items:center; gap:12px; text-align:left; padding:14px 16px; background:#13283e; border:1px solid #2b435c; border-radius:12px; color:#d0e1f6; transition:background .2s; }
+.suri-prompts button:hover { background:#193853; border-color:#327bba; }
+.suri-app .suri-message-area { padding:0; }
+.suri-message-area > div { mask-image:none; padding:0 2px 6px; gap:20px; }
+.suri-app .wol-msg { max-width:94%; border-color:#263c53; background:linear-gradient(120deg,#152b41,#102136); padding:18px; box-shadow:none; overflow-wrap:anywhere; }
+.suri-app .wol-msg.is-user { color:white; background:#0667f9; border-color:#217bff; padding:12px 18px; max-width:86%; }
+.wol-msg.is-user > div:first-child { display:none; }
+.wol-msg.is-assistant > div:first-child { color:#e2edfa; }
+.suri-message-robot { width:52px; height:52px; object-fit:contain; }
+.suri-file-download { margin-top:16px; display:flex; align-items:center; gap:12px; border:1px solid #2f5275; background:#142b45; border-radius:12px; padding:16px; color:#eff6ff; flex-wrap:wrap; }
+.suri-file-download > span:nth-child(2) { flex:1; min-width:100px; overflow-wrap:anywhere; }
+.suri-file-download strong { display:block; font-size:14px; font-weight:500; }
+.suri-file-download small { display:flex; align-items:center; gap:5px; color:#42dcba; font-size:11px; margin-top:5px; }
+.suri-file-icon { display:grid; place-items:center; background:#078957; border-radius:8px; width:42px; height:46px; }
+.suri-download-label { width:100%; text-align:center; background:#0667f9; color:white; border-radius:8px; padding:10px; }
+.suri-app .suri-composer { padding-top:8px; background:none; border:0; flex-shrink:0; }
+.suri-composer form { background:#12263c; border:1px solid #365371; border-radius:14px; padding:8px; }
+.suri-composer form > button:first-of-type { border:0; background:transparent; }
+.suri-app .wol-btn { background:#0667f9; color:white; box-shadow:none; font-weight:500; }
+.suri-composer button[type=submit] { width:44px; height:44px; display:grid; place-items:center; padding:0; border-radius:50%; }
+.suri-app .suri-active-sheet { background:#11283f; color:#c2d5ed; }
+.suri-daily-panel { overflow-y:auto; min-height:0; display:flex; flex-direction:column; gap:20px; }
+.suri-device-card { border:1px solid #233c55; background:linear-gradient(140deg,#15293f,#102033); border-radius:16px; overflow:hidden; flex-shrink:0; }
+.suri-device-card > header { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:20px 18px 16px; }
+.suri-device-card h2 { display:flex; gap:10px; align-items:center; font-size:16px; font-weight:600; letter-spacing:-.03em; }
+.suri-device-card > header button { font-size:12px; color:#52aeff; white-space:nowrap; min-height:32px; }
+.suri-mini-tasks { margin:0 14px; padding:0 12px; border:1px solid #28425c; border-radius:12px; background:#0d1f33; }
+.suri-mini-tasks label { display:flex; gap:12px; align-items:center; padding:16px 0; min-width:0; }
+.suri-mini-tasks label + label { border-top:1px solid #233a52; }
+.suri-mini-tasks label > span { flex:1; overflow-wrap:anywhere; font-size:13px; }
+.suri-mini-tasks input { width:21px; height:21px; accent-color:#087bff; flex-shrink:0; cursor:pointer; }
+.suri-mini-tasks small { color:#97b1cb; font-size:10px; }
+.is-done { color:#8da7c5; text-decoration:line-through; }
+.suri-device-label { display:flex; align-items:center; gap:10px; padding:16px 18px; color:#b0c4dd; font-size:11px; line-height:1.5; border-top:1px solid #21374e; margin-top:16px; }
+.suri-panel-empty { padding:18px 0; color:#9eb5d0; font-size:13px; }
+.suri-panel-empty button { display:flex; align-items:center; gap:6px; color:#54adff; margin-top:12px; min-height:36px; }
+.suri-mini-notes { display:grid; gap:10px; padding:0 14px; }
+.suri-mini-notes > button { text-align:left; padding:14px; border:1px solid #2a425c; border-radius:10px; background:#1a3049; border-left:3px solid #e2b953; }
+.suri-mini-notes strong { display:block; font-size:14px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.suri-mini-notes p { color:#abc1dd; font-size:13px; line-height:1.6; margin-top:6px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; overflow-wrap:anywhere; }
+.suri-day-welcome,.mobile-notes-preview,.suri-mobile-nav { display:none; }
+.suri-organizer-page { padding:26px; border:1px solid #29425b; border-radius:18px; background:linear-gradient(140deg,#14283e,#0c1e31); }
+.suri-organizer-page > h1 { font-size:26px; font-weight:600; }
+.suri-organizer-page > p { line-height:1.7; }
+.suri-organizer-page form { margin-top:22px; }
+.suri-organizer-page input:not([type=checkbox]),.suri-organizer-page textarea { background:#102338; border-color:#304b68; min-width:0; }
+.suri-organizer-page input[type=checkbox] { height:22px; width:22px; }
+.suri-organizer-page li { background:#11263b; padding:16px; border-color:#2a425c; }
+.suri-organizer-page li > span[title] { white-space:normal; overflow-wrap:anywhere; }
+.suri-organizer-page li button { min-height:36px; font-size:12px; }
+.suri-organizer-page .suri-device-label { margin-inline:-26px; margin-bottom:-26px; }
+@media(min-width:1600px) { .suri-chat-layout { grid-template-columns:minmax(0,1fr) 340px; gap:28px; } .suri-app .suri-chat { padding:32px; } }
+@media(min-width:768px) and (max-width:1150px) { .suri-chat-layout { grid-template-columns:minmax(0,1fr) 260px; gap:14px; } .suri-app .suri-sidebar { width:180px; padding-inline:14px; } .suri-app .suri-sidebar + section > div { padding:16px; } .suri-app .suri-chat { padding:18px; } .suri-device-card > header { padding-inline:12px; } .suri-device-card h2 { font-size:14px; } }
+@media(min-width:768px) and (max-width:960px) { .suri-daily-panel { display:none; } .suri-chat-layout { grid-template-columns:minmax(0,1fr); } }
+@media(max-width:767px) {
+  .suri-app .suri-sidebar { display:none; }
+  .suri-mobile-header { display:flex; flex-direction:column; padding:20px 22px 8px; margin:0!important; border:0!important; }
+  .suri-mobile-header strong { font-size:20px; font-weight:600; letter-spacing:-.04em; }
+  .suri-mobile-header span { font-size:12px; color:#a9bed6; }
+  .suri-app .suri-sidebar + section > div { padding:12px 16px calc(88px + env(safe-area-inset-bottom)); }
+  .suri-app .suri-sidebar + section > div:has(.suri-chat-layout):not(.hidden) { min-height:0; }
+  .suri-chat-layout { display:block; }
+  .suri-daily-panel { display:none; }
+  .suri-app .suri-chat { border:0; border-radius:0; padding:0; background:transparent; }
+  .suri-chat-greeting { gap:6px; padding-bottom:8px; }
+  .suri-chat-greeting h1 { font-size:24px; }
+  .suri-chat-greeting p { font-size:12px; }
+  .suri-chat-greeting > figure { width:80px; height:90px; }
+  .suri-chat-greeting figure > div { width:88px!important; height:88px!important; }
+  .suri-empty-chat { padding:24px 4px; }
+  .suri-empty-chat h2 { font-size:23px; }
+  .suri-empty-chat > p { font-size:14px; }
+  .suri-prompts { margin-top:20px; }
+  .suri-app .wol-msg { max-width:96%; padding:14px; }
+  .suri-app .wol-msg.is-user { max-width:90%; }
+  .suri-message-area > div { gap:14px; }
+  .suri-message-robot { width:42px; height:42px; }
+  .suri-app .suri-composer { padding-top:4px; }
+  .suri-composer input { font-size:16px; }
+  .suri-mobile-nav { position:fixed; z-index:30; inset:auto 0 0; display:grid; grid-template-columns:repeat(3,1fr); padding:8px 16px max(12px,env(safe-area-inset-bottom)); background:#091827f5; backdrop-filter:blur(18px); border-top:1px solid #253e56; }
+  .suri-mobile-nav button { display:flex; flex-direction:column; align-items:center; gap:5px; min-height:48px; justify-content:center; color:#bfcee0; font-size:11px; position:relative; border-radius:8px; }
+  .suri-mobile-nav button[aria-current] { color:#45a9ff; }
+  .suri-mobile-nav button[aria-current]::after { content:''; position:absolute; height:3px; background:#168bff; bottom:-7px; width:70%; border-radius:3px; }
+  .suri-day-welcome { display:flex; align-items:center; justify-content:space-between; min-height:174px; margin:0 4px 14px; }
+  .suri-day-welcome h1 { font-size:29px; line-height:1.25; letter-spacing:-.04em; font-weight:600; }
+  .suri-day-welcome p { color:#b5c7dd; font-size:12px; line-height:1.6; margin-top:12px; }
+  .suri-day-welcome > figure { width:42%; height:170px; }
+  .suri-day-welcome figure > div { width:178px; height:178px; }
+  .suri-day-welcome figure figcaption { display:none; }
+  .suri-day-welcome figure > div > div:not(:last-child) { display:none; }
+  .suri-day-welcome figure .wol-glow { filter:none; }
+  .suri-organizer-page { padding:18px 14px; border-radius:14px; }
+  .suri-organizer-page > h1 { font-size:19px; }
+  .suri-organizer-page > p { font-size:12px; }
+  .suri-organizer-page form { margin-top:16px; }
+  .suri-organizer-page li { padding:12px 10px; flex-wrap:wrap; gap:10px; }
+  .suri-organizer-page input:not([type=checkbox]),.suri-organizer-page textarea { font-size:16px; }
+  .suri-organizer-page .suri-device-label { margin-inline:-14px; margin-bottom:-18px; padding-inline:14px; }
+  .mobile-notes-preview { display:block; margin-top:16px; }
+  .suri-mini-notes p { -webkit-line-clamp:2; }
+}
+@media(max-width:360px) { .suri-day-welcome h1 { font-size:26px; } .suri-day-welcome figure > div { width:150px; height:150px; } .suri-chat-greeting h1 { font-size:21px; } }
+.suri-add-toggle { display:flex; align-items:center; gap:7px; color:#58b0ff; min-height:40px; margin-top:12px; font-size:13px; }
+.suri-app input[type=checkbox] { appearance:none; width:22px; height:22px; border:2px solid #afc2d9; border-radius:50%; background:transparent; display:grid; place-content:center; cursor:pointer; flex-shrink:0; }
+.suri-app input[type=checkbox]:checked { background:#087aff; border-color:#087aff; }
+.suri-app input[type=checkbox]:checked::after { content:''; width:9px; height:5px; border-left:2px solid white; border-bottom:2px solid white; transform:translateY(-1px) rotate(-45deg); }
+.suri-day-welcome { overflow:hidden; }
+@media(min-width:768px) { .suri-chat-greeting > figure { width:116px; height:120px; } .suri-chat-greeting figure > div { width:120px!important; height:120px!important; } }
