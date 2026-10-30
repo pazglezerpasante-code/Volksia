@@ -42,7 +42,7 @@ CONFIG_FILE = BASE / "config.json"
 PUBLIC_MODE = os.getenv("WOLSKIA_PUBLIC_MODE") == "1"
 PROXY_SECRET = os.getenv("WOLSKIA_PROXY_SECRET", "")
 MIN_PUBLIC_USER_LEN = 12
-GATED_PREFIXES = ("/api/ai/", "/api/space", "/api/chat", "/api/tools", "/api/search", "/api/project")
+GATED_PREFIXES = ("/api/kb/", "/api/ai/", "/api/space", "/api/chat", "/api/tools", "/api/search", "/api/project")
 
 
 @app.before_request
@@ -301,6 +301,32 @@ def spreadsheet_chat_endpoint():
 def spreadsheet_ask_endpoint():
     from services.sheet_reader import process_ask
     return process_ask(client_ip())
+
+@app.route('/api/kb/search', methods=['GET', 'POST'])
+@local_only
+def kb_search_endpoint():
+    request.max_content_length = 16 * 1024
+    from kb.store import Store, DEFAULT_DB
+    from services.ai_service import check_local_rate_limit
+    data = request.get_json(silent=True) if request.method == 'POST' else request.args
+    if not isinstance(data, (dict, type(request.args))):
+        return jsonify(message='La consulta no es válida.'), 400
+    query = data.get('q', '')
+    if not isinstance(query, str) or not query.strip() or len(query) > 1000:
+        return jsonify(message='Escribí una búsqueda de hasta 1.000 caracteres.'), 400
+    ok, error = check_local_rate_limit(client_ip())
+    if not ok:
+        return jsonify(message=error), 429
+    results = []
+    if DEFAULT_DB.is_file():
+        store = Store(DEFAULT_DB, readonly=True)
+        try:
+            results = store.search(query)
+        finally:
+            store.close()
+    response = jsonify(results)
+    response.headers['Cache-Control'] = 'no-store'
+    return response
 
 @app.get("/api/ai/status")
 @local_only

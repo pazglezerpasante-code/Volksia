@@ -32,7 +32,7 @@ export function parseAbsenceReasons(text:string):Record<string,AbsenceReason>{
   const t=text.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
   const group=/(?:^|[;.!?\n])\s*(?:todos(?: los legajos| ellos| de ellos)?|todas|para todos|el resto|los restantes|los demas)\s*(?:(?:estan|estuvieron|son|fueron|tienen)\s+(?:de\s+)?|(?:por|de)\s+|[:=]\s*)?(art|vacaciones|otro)\b/i;
   const g=t.match(group);if(g)out["*"]=g[1].toUpperCase() as AbsenceReason;
-  for(const m of t.matchAll(/legajo\s*#?\s*(\d+)\s*(?:es\s+|[:=\-]\s*)?(art|vacaciones|otro)\b/ig)){
+  for(const m of t.matchAll(/legajo\s*#?\s*(\d+)\s*(?:es\s+|[:=-]\s*)?(art|vacaciones|otro)\b/ig)){
     out[String(Number(m[1]))]=m[2].toUpperCase() as AbsenceReason;
   }
   return out;
@@ -41,13 +41,13 @@ export function resolveSuriOperation(text:string,pending:SuriOperation|"certific
   const direct=selectSuriOperation(text);if(direct)return direct;
   if(!pending||pending==="certificados")return null;
   if(pending==="asistencia"&&Object.keys(parseAbsenceReasons(text)).length)return pending;
-  if(/^(?:\s*(?:aca|aqui|te lo adjunto|listo|es este|el archivo|la planilla|\d{1,2}[\/.-]\d{1,2}[\/.-]\d{4})\b)/i.test(text)||/feriad|no laborable|\bfecha\b|legajo\s*\d+/i.test(text))return pending;
+  if(/^(?:\s*(?:aca|aqui|te lo adjunto|listo|es este|el archivo|la planilla|\d{1,2}[/.-]\d{1,2}[/.-]\d{4})\b)/i.test(text)||/feriad|no laborable|\bfecha\b|legajo\s*\d+/i.test(text))return pending;
   return newExcel&&!text.trim()?pending:null;
 }
 export function parseHolidayDates(text:string):string[]{
   const t=text.toLowerCase();if(!/feriad|no laborable/.test(t))return [];
   const out:string[]=[];
-  for(const m of t.matchAll(/\b(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})\b/g)){
+  for(const m of t.matchAll(/\b(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})\b/g)){
     const iso=m[3]+"-"+m[2].padStart(2,"0")+"-"+m[1].padStart(2,"0");
     const d=new Date(iso+"T12:00:00Z");
     if(Number.isNaN(d.getTime())||d.toISOString().slice(0,10)!==iso)throw Error("Fecha inválida: "+m[0]);

@@ -8,12 +8,12 @@ function harness() {
   const cleanups = [];
   const statuses = [];
   let result = '';
-  let instance;
+  const instances = [];
   class Recognition {
     start() { this.started = true; }
     stop() { this.onend?.(); }
     abort() { this.aborted = true; }
-    constructor() { instance = this; }
+    constructor() { instances.push(this); }
   }
   const source = readFileSync(new URL('../src/components/chat-voice.tsx', import.meta.url), 'utf8');
   const js = ts.transpileModule(source, { compilerOptions: { jsx: ts.JsxEmit.ReactJSX, module: ts.ModuleKind.CommonJS } }).outputText;
@@ -25,7 +25,7 @@ function harness() {
   } };
   vm.runInNewContext(js, context);
   const voice = exports.useChatVoice({ active: true, disabled: false, text: 'Por favor', onText: value => { result = value; } });
-  return { voice, context, statuses, instance: () => instance, result: () => result, cleanups };
+  return { voice, context, statuses, instance: () => instances.at(-1), result: () => result, cleanups };
 }
 test('dictation uses Spanish, preserves draft, replaces interim results without duplication', () => {
   const h = harness(); h.voice.button.props.onClick();

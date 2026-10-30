@@ -82,3 +82,18 @@ def analyze(message: str) -> Intent:
             and not re.search(r"\.\w{2,4}\b|\barchivos?\b", m, _F):
         files = None
     return Intent(space, files)
+
+
+MANUAL = re.compile(
+    r"\b(?:manual|instructivo|procedimiento|proceso de trabajo|seg[uú]n el manual|"
+    r"paso a paso de|qui[eé]n (?:es )?(?:responsable|se encarga)|"
+    r"qu[eé] (?:hace|debe hacer) (?:el |la )?(?:asesor|jefe|t[eé]cnico|cajero)|"
+    r"c[oó]mo (?:se realiza|se hace|atender|recibir|entregar|agendar))\b", _F)
+
+def is_manual_question(message: str) -> bool:
+    """Solo enruta consultas de proceso; las intenciones de espacio/archivos ganan."""
+    m = (message or "")[:1000]
+    analyzed = analyze(m)
+    if analyzed.space or analyzed.files:
+        return False
+    return bool(MANUAL.search(m))

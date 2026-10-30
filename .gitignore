@@ -50,3 +50,9 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# Material interno del instructivo e índice privado
+WOLSKIA_Integrado/backend/data/kb.sqlite*
+manuales_origen/
+Manual de Instructivo/
+*.xlsm

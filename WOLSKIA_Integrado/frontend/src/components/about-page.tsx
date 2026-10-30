@@ -1,6 +1,6 @@
 import { Bot, FileSpreadsheet, Lightbulb, ListChecks, Mic, Sparkles, Wrench } from "lucide-react";
 import { SuriFace } from "@/components/suri-face";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 /* ════════════════════════════════════════════════════════════
    ACERCA DE SURI — todo el texto está acá arriba, en ABOUT.
@@ -50,11 +50,11 @@ const ICONS: Record<string, ReactNode> = {
   list: <ListChecks size={22} />,
   sheet: <FileSpreadsheet size={22} />,
 };
-const TINTS = [
+const TINTS: (CSSProperties & Record<"--b1" | "--b2", string>)[] = [
   { "--b1": "#5b97ff", "--b2": "#2a55d6" },
   { "--b1": "#a78bfa", "--b2": "#6a47d6" },
   { "--b1": "#34d3a0", "--b2": "#138a68" },
-] as React.CSSProperties[];
+];
 
 export function AboutPage() {
   return (
