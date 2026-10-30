@@ -85,7 +85,7 @@ def analyze(message: str) -> Intent:
 
 
 MANUAL = re.compile(
-    r"\b(?:manual|instructivo|procedimiento|proceso de trabajo|seg[uú]n el manual|"
+    r"\b(?:manual|instructivo|libro|pasos?\s+(?:numero\s+)?\d+|procedimiento|proceso de trabajo|seg[uú]n el manual|"
     r"paso a paso de|qui[eé]n (?:es )?(?:responsable|se encarga)|"
     r"qu[eé] (?:hace|debe hacer) (?:el |la )?(?:asesor|jefe|t[eé]cnico|cajero)|"
     r"c[oó]mo (?:se realiza|se hace|atender|recibir|entregar|agendar))\b", _F)
@@ -94,6 +94,8 @@ def is_manual_question(message: str) -> bool:
     """Solo enruta consultas de proceso; las intenciones de espacio/archivos ganan."""
     m = (message or "")[:1000]
     analyzed = analyze(m)
-    if analyzed.space or analyzed.files:
+    if analyzed.space == "mutate" or analyzed.files:
         return False
-    return bool(MANUAL.search(m))
+    if analyzed.space == "read" and re.search(r"\b(tareas?|notas?|eventos?|recordatorios?|calendario|mis turnos|mis citas)\b",m,_F):
+        return False
+    return bool(MANUAL.search(m) or re.search(r"\b(repuestos?|stock|ventaniller[oa]|dealer care|orden de reparaci[oó]n|asesor de servicio|recepci[oó]n|entrega de (?:la )?unidad|garant[ií]a|agendamiento|ejecuci[oó]n|entrega|asesor de citas|jefe de taller|cajero|facturaci[oó]n|factura|mantenimiento|control final|POC)\b", m, _F))

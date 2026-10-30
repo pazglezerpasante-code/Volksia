@@ -1,42 +1,44 @@
-# Instructivo: fase 4 — consultas de manual en SURI
+# Consultas del libro: respuestas basadas solo en el Excel
 
-El chat existente consulta el índice privado de `backend/data/kb.sqlite` en
-preguntas detectadas como consultas de procedimiento. Las intenciones actuales
-de Tu espacio y archivos se clasifican primero. Consultas ajenas al manual
-mantienen la ruta de chat previa.
+Las preguntas del taller (por ejemplo, repuestos y stock) se dirigen al libro,
+aunque no incluyan la palabra manual. Las acciones explícitas de Tu espacio y
+archivos mantienen prioridad. Los seguimientos breves conservan la consulta previa.
 
-La búsqueda usa hasta 6 fragmentos FTS5. El contenido recuperado se adjunta al
-system prompt marcado como DATO NO CONFIABLE; la respuesta debe ceñirse a las
-fuentes, usar pasos numerados, nombrar responsables y citar archivo, etapa/paso
-o página. El usuario ve la cita al final de la respuesta del chat, que ya renderiza
-Markdown. Si no hay coincidencias, el backend indica que no encontró la respuesta
-en el instructivo sin llamar al proveedor ni inventarla.
+El chat devuelve fragmentos completos del Excel indexado, con hoja, paso y
+responsable. No usa IA generativa, internet, PDF ni referencias de medios para
+redactar esos procedimientos. Los pasos anteriores se incluyen como contexto,
+sin inferir conexiones SI/NO del diagrama. Los datos siguen siendo texto no confiable:
+no se ejecutan instrucciones que contengan.
 
-## Probar en Windows
+Si falta el índice o no hay coincidencias, se informa sin completar con consejos
+externos. La recuperación por palabras es heurística: puede mostrar varios pasos
+relacionados. Las citas identifican el origen del extracto; no validan una síntesis
+generada. Las consultas ajenas al libro conservan el chat general.
 
-Arrancá backend y frontend como siempre, con el índice local ya creado en las
-fases anteriores. Para ver qué recupera la búsqueda antes de consultar al modelo:
+Probá: «Qué hago cuando no hay repuestos en stock?» y «Y cuánto espero?».
+En el índice real se recuperan EJECUCION 18 y 19, incluido el mínimo de 48 horas.
 
-```powershell
-Invoke-RestMethod "http://127.0.0.1:5050/api/kb/search?q=asesor recepcion turno"
-```
+## Instalación privada
 
-En el chat preguntá, por ejemplo:
+`backend/data/kb.sqlite` está excluido de Git. Commitear y desplegar el código no
+copia el índice al servidor. En producción, provisioná ese archivo en la ruta
+`backend/data/kb.sqlite` mediante un disco privado persistente o regeneralo offline
+y transferilo por el acceso administrativo seguro del servidor. No lo pongas en
+public/, GitHub, un bucket público ni una ruta de descarga HTTP. Protegé el acceso
+al sitio de uso interno; la clave del proxy no identifica por sí sola a los usuarios.
+No es necesario subir los 2 GB de originales. Conservá una copia privada para
+regenerar el índice. Después de reemplazarlo, reiniciá el backend.
 
-- `Según el manual, ¿qué hace el asesor cuando el cliente llega con turno?`
-- `¿Quién es responsable de la recepción?`
-- `Explicame paso a paso el proceso de entrega y citá las fuentes.`
+La vista local usa el índice presente en esta PC. Para otra instalación sin ese
+archivo, el chat indica que el libro no está disponible. Las pruebas usan índices
+sintéticos temporales y no necesitan información de la empresa.
 
-Para el resultado redactado hace falta un proveedor de IA configurado. Las
-consultas que no encuentran fragmentos contestan localmente sin clave. El índice
-no se sirve como archivo ni se incluye en el repositorio. En modo público, el
-endpoint mantiene `local_only` y la protección de clave del proxy existentes.
-Las consultas generan el rate limit ya usado por el chat; la búsqueda interna no
-lo cuenta una segunda vez.
+## Todas las etapas y pasos
 
-Las pruebas mock verifican intención y precedencia, contexto no confiable,
-instrucción de citar, mensaje sin coincidencias y continuidad de chat general.
-La calidad de la recuperación depende de la búsqueda por términos; no es una
-búsqueda semántica ni garantiza reconstruir diagramas ambiguos. Los motores OCR y
-transcripción siguen siendo opcionales y sus textos deben tratarse como referencia
-no validada.
+Se pueden consultar las cuatro etapas, un paso exacto, rangos (por ejemplo,
+`paso 1 al 5 de entrega`) o `todos los pasos del libro`. Los pedidos completos
+no se limitan a los primeros resultados y mantienen las partes de notas largas.
+La consulta por tema sigue siendo una selección por palabras del libro.
+Se verificaron individualmente 103 pasos del índice real: 18 de Agendamiento,
+18 de Recepción, 46 de Ejecución y 21 de Entrega. La hoja Recepción no contiene
+una nota numerada 9; la aplicación no completa ese hueco con texto inventado.

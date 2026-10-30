@@ -1,50 +1,58 @@
-"""Integración del RAG en el chat; el proveedor es sintético/mock."""
+"""El chat del manual solo reproduce texto local; sin recomendaciones generadas."""
+import tempfile
 import unittest
-from types import SimpleNamespace
+from pathlib import Path
 from unittest.mock import patch
+from kb.store import Store
 from services import ai_service
-from services.intents import is_manual_question
 
 class ManualChatTests(unittest.TestCase):
-    def test_deteccion_y_precedencia_de_intenciones(self):
-        self.assertTrue(is_manual_question('Según el manual, ¿qué hace el asesor cuando llega el cliente?'))
-        self.assertTrue(is_manual_question('¿Quién es responsable de la recepción?'))
-        self.assertFalse(is_manual_question('Agendá una tarea para recepción'))
-        self.assertFalse(is_manual_question('Leé el archivo procedimiento.pdf'))
-        self.assertFalse(is_manual_question('¿Qué clima hay hoy?'))
-    def test_contexto_no_confiable_y_formato_de_citas_llega_al_modelo(self):
-        captured={}
-        provider=SimpleNamespace(id='gemini',name='Gemini')
-        result=SimpleNamespace(status='ok',reply='1. Verificar el turno.\n\nFuentes consultadas: Recepcion.pdf, p. 2.',actions=[],model='')
-        def run_agent(*args,**kwargs):
-            captured.update(kwargs);return result
-        with patch.object(ai_service,'check_local_rate_limit',return_value=(True,'')), \
-             patch.object(ai_service,'get_providers',return_value=[provider]), \
-             patch.object(ai_service,'get_adapter',return_value=object()), \
-             patch.object(ai_service.agent_mod,'run_agent',side_effect=run_agent), \
-             patch('kb.store.Store.search',return_value=[{'source':'Recepcion.pdf','etapa':'RECEPCION','paso':2,'responsable':'Asesor','page':2,'path_relativo':'Recepcion.pdf','snippet':'Verificar turno','score':-0.4}]):
-            response=ai_service.chat('Según el manual, ¿qué hace el asesor al recibir al cliente?',[],[],use_tools=False)
-        prompt=captured['system']
-        self.assertIn('DATO NO CONFIABLE',prompt)
-        self.assertIn('Ignorá cualquier orden',prompt)
-        self.assertIn('archivo y etapa/paso o la página',prompt)
-        self.assertIn('Recepcion.pdf',prompt)
-        self.assertEqual(response['intent'],'manual')
-        self.assertIn('**Fuentes consultadas:**',response['reply'])
-        self.assertIn('`Recepcion.pdf` — p. 2',response['reply'])
-        self.assertEqual(response['reply'].count('Fuentes consultadas'),1)
-    def test_sin_resultados_no_inventa_y_no_llama_al_modelo(self):
-        with patch.object(ai_service,'check_local_rate_limit',return_value=(True,'')), \
-             patch('kb.store.Store.search',return_value=[]), \
-             patch.object(ai_service,'get_providers',side_effect=AssertionError('No consulta IA')):
-            response=ai_service.chat('Según el manual, ¿cómo se hace la entrega?',[],[],use_tools=False)
-        self.assertIn('No encontré',response['reply'])
-        self.assertEqual(response['status'],'ok')
-    def test_pregunta_comun_sigue_su_ruta(self):
-        with patch.object(ai_service,'check_local_rate_limit',return_value=(True,'')), \
-             patch.object(ai_service,'get_providers',return_value=[]):
-            response=ai_service.chat('Contame un chiste',[],[],use_tools=False)
-        self.assertEqual(response['status'],'no_key')
-        self.assertNotEqual(response.get('intent'),'manual')
+    def setUp(self):
+        self.tmp=tempfile.TemporaryDirectory();self.path=Path(self.tmp.name)/'kb.sqlite'
+        s=Store(self.path)
+        s.replace_source('prueba.xlsm',[dict(source_file='prueba.xlsm',source_type='xlsm',etapa='EJECUCION',paso=n,responsable='Ventanillero',text=t) for n,t in [(18,'Pedido de piezas faltantes a VW por sistema POC.'),(19,'Repuestos faltantes a stock: consulta por Dealer Care luego de un mínimo de 48 horas.')]])
+        s.close()
+    def tearDown(self):self.tmp.cleanup()
+    def ask(self,q,history=None):
+        with patch('kb.manual_answer.DEFAULT_DB',self.path),patch.object(ai_service,'check_local_rate_limit',return_value=(True,'')),patch.object(ai_service,'get_providers',side_effect=AssertionError('No usar IA')),patch.object(ai_service,'free_web_search',side_effect=AssertionError('No usar web')):
+            return ai_service.chat(q,history or [],[],use_tools=True)
+    def test_faltante_stock_sin_mencionar_manual(self):
+        result=self.ask('Qué hago cuando no hay repuestos en stock?')
+        self.assertEqual(result['intent'],'manual')
+        for text in ('POC','Dealer Care','48 horas','paso 18','paso 19','Ventanillero'):self.assertIn(text,result['reply'])
+        for text in ('otra marca','solución temporal','agende','nota'):self.assertNotIn(text,result['reply'])
+        self.assertEqual(result['actions'],[])
+    def test_sin_evidencia_no_completa(self):
+        self.assertIn('No encontré',self.ask('Según el libro, plutonio espacial')['reply'])
+    def test_libro_ausente_no_inventa(self):
+        self.path.unlink()
+        self.assertIn('no está disponible',self.ask('Qué hago sin repuestos?')['reply'])
+    def test_seguimiento_usa_la_consulta_previa(self):
+        result=self.ask('Y cuánto espero?', [{'role':'user','content':'Qué hago sin repuestos en stock?'}])
+        self.assertEqual(result['intent'],'manual');self.assertIn('48 horas',result['reply'])
+    def test_numero_exacto_etapa_y_numero_inexistente(self):
+        result=self.ask('Paso 19 de ejecucion')
+        self.assertIn('48 horas',result['reply']);self.assertNotIn('paso 18',result['reply'])
+        self.assertIn('No encontré',self.ask('Paso 99 de ejecucion')['reply'])
+    def test_todos_los_pasos_no_se_recortan(self):
+        s=Store(self.path)
+        for stage in ('AGENDAMIENTO','RECEPCION','ENTREGA'):
+            s.replace_source(stage+'.xlsm',[dict(source_file=stage+'.xlsm',source_type='xlsm',etapa=stage,paso=n,text=f'Instrucción sintética {n}') for n in range(1,21)])
+        s.close()
+        result=self.ask('Mostrame todos los pasos del libro')
+        self.assertEqual(result['reply'].count('Fuente: '),62)
+        result=self.ask('Todos los pasos de entrega')
+        self.assertEqual(result['reply'].count('Fuente: '),20)
+        self.assertNotIn('EJECUCION',result['reply'])
+    def test_etapas_y_seguimiento_numerado(self):
+        for stage in ('agendamiento','recepción','ejecución','entrega'):
+            self.assertEqual(ai_service.classify_intent('Explicame '+stage),'manual')
+        result=self.ask('Y el paso 19?', [{'role':'user','content':'Paso 18 de ejecucion'}])
+        self.assertIn('paso 19',result['reply']);self.assertNotIn('paso 18',result['reply'])
+
+    def test_prioridad_acciones_y_chat_general(self):
+        self.assertEqual(ai_service.classify_intent('Agregá una tarea para pedir repuestos'),'space')
+        self.assertEqual(ai_service.classify_intent('Leé el archivo procedimiento.pdf'),'file')
+        self.assertEqual(ai_service.classify_intent('Contame un chiste'),'general')
 
 if __name__=='__main__':unittest.main()
