@@ -296,6 +296,12 @@ def spreadsheet_chat_endpoint():
     from services.spreadsheet_chat import process_chat
     return process_chat(client_ip())
 
+@app.post('/api/ai/sheets/ask')
+@local_only
+def spreadsheet_ask_endpoint():
+    from services.sheet_reader import process_ask
+    return process_ask(client_ip())
+
 @app.get("/api/ai/status")
 @local_only
 def ai_status():

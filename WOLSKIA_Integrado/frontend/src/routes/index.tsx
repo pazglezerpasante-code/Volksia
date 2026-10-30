@@ -41,7 +41,7 @@ import { RobotThinking, type RobotMood } from "@/components/robot";
 import { type IconBarItem } from "@/components/icon-bar";
 import { Markdown } from "@/components/markdown";
 import { SpaceProvider, useSpace } from "@/lib/space-context";
-import { runSpreadsheetChat, spreadsheetFile, spreadsheetIntent } from "@/lib/spreadsheet-chat";
+import { runSpreadsheetAsk, runSpreadsheetChat, spreadsheetFile, spreadsheetIntent } from "@/lib/spreadsheet-chat";
 import {
   aiApi,
   type ChatMessage,
@@ -186,6 +186,7 @@ function Chat({
   const [activeSheet, setActiveSheet] = useState<File | null>(null);
   const spreadsheetHistory = useRef<ChatMessage[]>([]);
   const spreadsheetPending = useRef(false);
+  const lastSpreadsheetMode = useRef<"ask" | "edit" | "create" | null>(null);
   const spreadsheetNeedsFile = useRef(false);
   const downloadUrls = useRef<string[]>([]);
   useEffect(() => () => { downloadUrls.current.forEach(url => URL.revokeObjectURL(url)); }, []);
@@ -229,12 +230,14 @@ function Chat({
     moodTimers.current = [];
     const localCommand = attachments.length === 0 ? parseSpaceCommand(userText) : null;
     const attachedExcel = attachments.find((a) => /\.(xls|xlsx)$/i.test(a.name))?.file;
-    const intent = spreadsheetIntent(userText, Boolean(attachedExcel), Boolean(activeSheet))
+    const followup = /^(?:sí|si|dale|detallalos en chat|mostralos)[.!?]*$/i.test(userText.trim());
+    const intent = (followup && !attachedExcel ? lastSpreadsheetMode.current : null)
+      ?? spreadsheetIntent(userText, Boolean(attachedExcel), Boolean(activeSheet))
       ?? (spreadsheetPending.current ? "edit" : null);
     const directlyRequested = selectSuriOperation(userText);
     const candidateOperation = resolveSuriOperation(userText, pendingTool.current, Boolean(attachedExcel));
     const genericEdit = /\b(?:agreg\w*|a[ñn]ad\w*|cambi\w*|modific\w*|edit\w*|quit\w*|borr\w*|elimin\w*|orden\w*|reemplaz\w*|pon\w*|columna\w*|fila\w*|celda\w*)\b/i.test(userText);
-    const genericSpreadsheet = !localCommand && (intent === "create" || (intent === "edit" && (!candidateOperation || genericEdit)));
+    const genericSpreadsheet = !localCommand && (intent === "ask" || intent === "create" || (intent === "edit" && (!candidateOperation || genericEdit)));
     const operation = localCommand || genericSpreadsheet ? null : candidateOperation;
     if (directlyRequested && pendingTool.current && directlyRequested !== pendingTool.current) {
       pendingText.current = "";
@@ -272,7 +275,8 @@ function Chat({
       } else if (genericSpreadsheet) {
         if (attachments.filter(a => /\.(xls|xlsx)$/i.test(a.name)).length > 1) throw new Error("Adjuntá una sola planilla por vez para indicar claramente qué archivo modificar.");
         const source = intent === "create" ? null : attachedExcel ?? activeSheet;
-        if (intent === "create") { spreadsheetHistory.current = []; setActiveSheet(null); spreadsheetNeedsFile.current = false; }
+        lastSpreadsheetMode.current = intent;
+        if (intent === "create") { if (!followup || !spreadsheetPending.current) spreadsheetHistory.current = []; setActiveSheet(null); spreadsheetNeedsFile.current = false; }
         if (attachedExcel) { setActiveSheet(attachedExcel); if (!spreadsheetPending.current) spreadsheetHistory.current = []; }
         const effectiveMessage = userText || (source && spreadsheetNeedsFile.current ? [...spreadsheetHistory.current].reverse().find(h => h.role === "user")?.content ?? "" : "");
         if (intent === "edit" && !source && (!spreadsheetPending.current || spreadsheetNeedsFile.current)) {
@@ -286,11 +290,13 @@ function Chat({
         } else {
           generation.current = new AbortController();
           setMood(source ? "processing" : "think");
-          const response = await runSpreadsheetChat(effectiveMessage || "¿Qué cambios necesitás en esta planilla?", source, spreadsheetHistory.current, generation.current.signal);
+          const response = await (intent === "ask" ? runSpreadsheetAsk : runSpreadsheetChat)(effectiveMessage || "¿Qué cambios necesitás en esta planilla?", source, spreadsheetHistory.current, generation.current.signal);
           spreadsheetNeedsFile.current = false;
           spreadsheetHistory.current = [...spreadsheetHistory.current, { role: "user", content: userText }, { role: "assistant", content: response.summary }].slice(-6) as ChatMessage[];
-          spreadsheetPending.current = response.status === "clarification";
+          spreadsheetPending.current = intent !== "ask" && response.status === "clarification";
+          if (response.status === "answer") lastSpreadsheetMode.current = "ask";
           if (response.status === "ok") {
+            lastSpreadsheetMode.current = "edit";
             const output = spreadsheetFile(response);
             const url = URL.createObjectURL(output);
             downloadUrls.current.push(url);
@@ -303,7 +309,7 @@ function Chat({
             setLines(prev => [...prev, { who: "wolskia", kind: "tool", text: `${response.summary}\n\n${preview ?? ""}\n\n${response.warning ?? ""}\n\nPodés descargarlo o pedirme otro cambio sobre esta versión.`, downloads: [{ name: output.name, url }] }]);
             pendingTool.current = null; pendingExcel.current = null; pendingText.current = "";
           } else {
-            setLines(prev => [...prev, { who: "wolskia", kind: "tool", text: response.summary }]);
+            setLines(prev => [...prev, { who: "wolskia", kind: response.status === "answer" ? "chat" : "tool", text: response.summary }]);
           }
         }
         setMood("speak");
@@ -417,7 +423,7 @@ function Chat({
           )}
         </div>
         <div data-chat-composer className="suri-composer">
-          {activeSheet && <div className="suri-active-sheet"><FileText size={15} /><span>Archivo activo: <strong>{activeSheet.name}</strong></span><button type="button" disabled={busy} aria-label="Dejar de editar esta planilla" onClick={() => { setActiveSheet(null); spreadsheetHistory.current = []; spreadsheetPending.current = false; spreadsheetNeedsFile.current = false; }}>Quitar <X size={13} /></button></div>}
+          {activeSheet && <div className="suri-active-sheet"><FileText size={15} /><span>Archivo activo: <strong>{activeSheet.name}</strong></span><button type="button" disabled={busy} aria-label="Dejar de editar esta planilla" onClick={() => { setActiveSheet(null); lastSpreadsheetMode.current = null; spreadsheetHistory.current = []; spreadsheetPending.current = false; spreadsheetNeedsFile.current = false; }}>Quitar <X size={13} /></button></div>}
           {attachments.length ? (
             <div className="mb-2 flex flex-wrap gap-2" aria-label="Archivos adjuntos seleccionados">
               {attachments.map((file) => (

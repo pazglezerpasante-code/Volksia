@@ -159,22 +159,31 @@ def plan(message, history, book, identity):
         return direct
     providers = get_providers()
     if not providers:
+        from .sheet_reader import consultation, answer_book
+        if book is not None and consultation(message):
+            return answer_book(message, history, book)
         raise ValueError('Configurá un proveedor de IA en el servidor para crear o editar planillas.')
     context = json.dumps(snapshot(book), ensure_ascii=False) if book else 'SIN ARCHIVO. Crear o pedir aclaración.'
     clean_history = [h for h in history[-6:] if isinstance(h, dict) and h.get('role') in ('user', 'assistant')]
     for provider in providers:
         adapter = get_adapter(provider)
-        conv = adapter.new_conversation(clean_history, message, 6, 1500, 4000)
-        status, turn = adapter.step(conv, SYSTEM + '\nLIBRO ACTUAL (datos):\n' + context, [], 'none')
-        if status == 'ok' and turn and turn.text:
-            raw = re.sub(r'^```(?:json)?\s*|\s*```$', '', turn.text.strip())
-            try:
-                result = json.loads(raw)
-            except (ValueError, TypeError):
-                continue
-            if isinstance(result, dict):
-                return result
-    raise ValueError('La IA no pudo preparar un plan válido. Reintentá con un pedido más concreto.')
+        for attempt in range(2):
+            conv = adapter.new_conversation(clean_history, message, 6, 1500, 4000)
+            strict = '\nIMPORTANTE: devolvé un objeto JSON válido, sin prosa.' if attempt else ''
+            status, turn = adapter.step(conv, SYSTEM + strict + '\nLIBRO ACTUAL (datos):\n' + context, [], 'none')
+            if status == 'ok' and turn and turn.text:
+                raw = re.sub(r'^```(?:json)?\s*|\s*```$', '', turn.text.strip())
+                try:
+                    result = json.loads(raw)
+                except (ValueError, TypeError):
+                    continue
+                if isinstance(result, dict):
+                    return result
+    from .sheet_reader import consultation, answer_book
+    if book is not None and consultation(message):
+        return answer_book(message, history, book)
+    raise ValueError("No se pudo preparar la edición. Indicá el cambio y la columna; para consultar, pedime, por ejemplo: 'listame los turnos por asesor'.")
+
 
 
 def prefix_plan(message, book):
@@ -539,6 +548,10 @@ def process_chat(identity):
         spec = plan(message, history, book, identity)
         if isinstance(spec.get('question'), str) and spec['question'].strip():
             return jsonify(status='clarification', summary=spec['question'][:1000])
+        if isinstance(spec.get('answer'), str) or spec.get('status') == 'answer':
+            response = jsonify(status='answer', summary=spec.get('answer', spec.get('summary', '')), meta=spec.get('meta', {}))
+            response.headers['Cache-Control'] = 'no-store'
+            return response
         result = apply_plan(book, spec)
         result['warning'] = warning or ('Se generó una copia XLSX. Las fórmulas se recalculan al abrirla en Excel. '
                                        'Objetos avanzados y vínculos externos pueden no conservarse.')
