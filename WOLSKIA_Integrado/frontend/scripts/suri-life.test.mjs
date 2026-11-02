@@ -47,3 +47,12 @@ test("weather thresholds and storm priority", () => {
   assert.match(weatherLine({ ...w, weather_code: 95 }), /Truenos/);
   assert.match(weatherLine({ ...w, temperature_2m: 5 }), /bufanda/);
 });
+
+test('sleep starts after one minute and typing wakes immediately',()=>{
+  const now=Date.parse('2026-11-02T15:00:00Z');
+  const s=newLife(now);
+  assert.equal(advance(s,now+59000).asleep,false);
+  const sleeping=advance(s,now+60000);
+  assert.equal(sleeping.asleep,true);
+  assert.equal(reactTo(sleeping,'Necesito ayuda',now+61000).asleep,false);
+});

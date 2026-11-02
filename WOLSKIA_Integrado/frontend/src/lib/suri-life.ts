@@ -28,8 +28,10 @@ export const EMOTIONS = [
 ] as const;
 export type Emotion = (typeof EMOTIONS)[number];
 export const PERSONALITY = { curiosa: 0.9, leal: 1, dramatica: 0.3, sarcasmo: 0.2 };
+// Un único reloj para el motor y el avatar, en segundos sin interacción.
+export const IDLE_TIMINGS = { mirar: 6, estirar: 14, bostezar: 24, jugar: 38, dormir: 60 };
 export const LIFE_CONFIG = {
-  idleSleepMinutes: 20,
+  idleSleepMinutes: IDLE_TIMINGS.dormir / 60,
   commentMinutes: 20,
   dailyComments: 5,
   weatherMinutes: 30,

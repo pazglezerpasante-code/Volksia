@@ -20,3 +20,7 @@ La SURI original del chat es la única interfaz del personaje. No hay botón «S
 `frontend/src/components/suri-life.css`: expresiones y accesorios sobre el avatar original.
 
 Las pruebas y los valores editables son de desarrollo; no hay controles de configuración en la aplicación. La integración no cambia prompts, resultados del libro, archivos Excel ni endpoints de trabajo. Tampoco agrega voz automática.
+
+## Ciclo de inactividad restaurado
+
+Sin interacciones: mira alrededor a los 6 s, se estira a los 14 s, bosteza a los 24 s, juega unos segundos con una pelotita a los 38 s y duerme a los 60 s, con ojos cerrados, respiración, zzz y la ovejita que ya tenía. Enfocar el cuadro de mensaje no bloquea el ciclo. Escribir, tocar o desplazarse la despierta; mover el cursor solo mueve la mirada. Una tarea en proceso mantiene a SURI despierta. Todos los tiempos están juntos en IDLE_TIMINGS, sin ajustes visibles para el usuario.

@@ -185,3 +185,12 @@
   .suri-face:not(.suri-face-compact) .sr-say{top:auto;bottom:-8%;max-width:min(260px,calc(100vw - 40px));font-size:12px;padding:8px 12px}
   .suri-face:not(.suri-face-compact) .sr-say::after{bottom:auto;top:-4px}
 }
+/* Se entretiene sola con una pelotita antes de quedarse dormida. */
+.suri-face .sr-idle-toy{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
+.sr-toy-ball{animation:sr-toy-bounce 1.15s cubic-bezier(.35,0,.65,1) infinite;transform-box:fill-box;transform-origin:center}
+.sr-toy-shadow{animation:sr-toy-shadow 1.15s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.suri-face[data-state="play"][data-mood] .sr-stage{animation:sr-toy-sway 2.3s ease-in-out infinite}
+@keyframes sr-toy-bounce{0%,100%{transform:translateY(12px) scale(1.15,.8)}50%{transform:translate(-6px,-17px) scale(.92,1.08)}}
+@keyframes sr-toy-shadow{50%{transform:scaleX(.45);opacity:.06}}
+@keyframes sr-toy-sway{25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}
+@media(prefers-reduced-motion:reduce){.suri-face .sr-idle-toy *,.suri-face[data-state="play"][data-mood] .sr-stage{animation:none!important}}

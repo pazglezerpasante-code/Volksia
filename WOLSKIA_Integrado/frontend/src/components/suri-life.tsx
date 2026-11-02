@@ -39,6 +39,7 @@ export function SuriLife() {
     const message = (event: Event) => {
       const d = (event as CustomEvent<{ text?: string; busy?: boolean; success?: boolean }>).detail;
       if (typeof d.busy === "boolean") busy.current = d.busy;
+      if (typeof d.busy === "boolean") setLife(s=>({...s,active:Date.now(),asleep:false}));
       if (d.text) setLife((s) => reactTo(s, d.text!));
       else if (d.success)
         setLife((s) => ({
@@ -48,7 +49,7 @@ export function SuriLife() {
     };
     let last = 0;
     const activity = () => {
-      if (Date.now() - last < 15000) return;
+      if (Date.now() - last < 500) return;
       last = Date.now();
       setLife((s) => ({ ...advance(s), active: Date.now(), asleep: false }));
     };
@@ -56,11 +57,15 @@ export function SuriLife() {
     window.addEventListener("suri-life", message);
     window.addEventListener("keydown", activity);
     window.addEventListener("pointerdown", activity);
+    window.addEventListener("wheel", activity, {passive:true});
+    window.addEventListener("input", activity, true);
     window.addEventListener("suri-poke", poke);
     return () => {
       window.removeEventListener("suri-life", message);
       window.removeEventListener("keydown", activity);
       window.removeEventListener("pointerdown", activity);
+      window.removeEventListener("wheel", activity);
+      window.removeEventListener("input", activity, true);
       window.removeEventListener("suri-poke", poke);
     };
   }, []);
@@ -72,6 +77,7 @@ export function SuriLife() {
         const n = advance(s);
         if (busy.current) {
           n.asleep = false;
+          n.active = Date.now();
           return n;
         }
         const idle = Date.now() - n.active;
@@ -96,7 +102,7 @@ export function SuriLife() {
         }
         return n;
       });
-    }, 15000);
+    }, 2000);
     return () => clearInterval(timer);
   }, [ready, weather]);
   useEffect(() => {
@@ -158,6 +164,7 @@ export function SuriLife() {
             line: life.lastLine,
             emotion,
             energy: life.energy,
+            activeAt: life.active,
             temperature: weather?.temperature_2m ?? null,
             storm: (weather?.weather_code ?? 0) >= 95,
           },
@@ -166,6 +173,6 @@ export function SuriLife() {
     broadcast();
     window.addEventListener("suri-life-request", broadcast);
     return () => window.removeEventListener("suri-life-request", broadcast);
-  }, [ready, life.asleep, life.lastLine, life.energy, emotion, weather]);
+  }, [ready, life.asleep, life.lastLine, life.energy, life.active, emotion, weather]);
   return null;
 }

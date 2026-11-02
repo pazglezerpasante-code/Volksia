@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RobotMood } from "@/components/robot";
 import type { Emotion } from '@/lib/suri-life';
+import { IDLE_TIMINGS } from '@/lib/suri-life';
 
 const EXPRESSION: Record<Emotion,string> = {
   alegría:'happy', entusiasmo:'happy', tristeza:'sad', enojo:'serious', fastidio:'serious',
@@ -32,7 +33,7 @@ const EXPRESSION: Record<Emotion,string> = {
    Todos los tiempos y textos editables están en TIEMPOS y FRASES. */
 
 /** Segundos sin actividad para cada cosa (editables). */
-const TIEMPOS = { mirar: 6, estirar: 14, bostezar: 24, dormir: 32 };
+const TIEMPOS = IDLE_TIMINGS;
 
 const FRASES = {
   saludo: "¡Hola!",
@@ -88,7 +89,7 @@ const src = (p: Pose, small = false) => `/robot/wolskia-${p}-ne${small ? "-384" 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const pick = <T,>(a: readonly T[]) => a[Math.floor(Math.random() * a.length)];
 
-type Act = "greet" | "wave" | "jump" | "stretch" | "yawn" | null;
+type Act = "greet" | "wave" | "jump" | "stretch" | "yawn" | "play" | null;
 type OrientationCtor = typeof DeviceOrientationEvent & { requestPermission?: () => Promise<"granted" | "denied"> };
 
 export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMood; size?: number; compact?: boolean }) {
@@ -139,6 +140,8 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
     live.current.sleeping = on;
     setSleeping(on);
     if (on) {
+      live.current.act = null;
+      setAct(null);
       setLook(0, 0.2);
       setSay(null);
     }
@@ -151,7 +154,7 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
       sleep(false);
       if (!reduced()) doAct("jump", 700);
       doSay(pick(FRASES.despertar), 2200);
-    } else if (l.act === "stretch" || l.act === "yawn") {
+    } else if (l.act === "stretch" || l.act === "yawn" || l.act === "play") {
       l.act = null;
       setAct(null);
       setSay(null);
@@ -161,13 +164,14 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
   // El motor persistente dirige el reposo; los estados de trabajo tienen prioridad.
   useEffect(() => {
     const sync = (event: Event) => {
-      const d = (event as CustomEvent<{asleep:boolean;quiet:boolean;line:string;emotion:Emotion;temperature:number|null;storm:boolean}>).detail;
+      const d = (event as CustomEvent<{asleep:boolean;quiet:boolean;line:string;emotion:Emotion;temperature:number|null;storm:boolean;activeAt:number}>).detail;
       managedLife.current = true;
       setFeeling(d.emotion);
       setTemperature(d.temperature);
       setStorm(d.storm);
       if (root.current) root.current.dataset.emotion = d.emotion;
-      if (live.current.mood !== 'idle') return;
+      if (Number.isFinite(d.activeAt)) live.current.last = Math.max(live.current.last,d.activeAt);
+      if (live.current.mood !== 'idle' && live.current.mood !== 'listen') return;
       sleep(d.asleep && !d.quiet);
       if (d.quiet) setSay(null);
       else if (d.line && d.line !== lastLifeLine.current) {
@@ -215,7 +219,6 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
       });
     };
     const onPointer = (e: PointerEvent) => {
-      live.current.last = Date.now();
       if (e.type === "pointerdown") wake();
       lookAt(e.clientX, e.clientY);
     };
@@ -274,9 +277,9 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
           blinkOff = window.setTimeout(() => delete el.dataset.blink, 130);
         }
       }
-      if (l.mood !== "idle") return;
+      if (l.mood !== "idle" && l.mood !== "listen") return;
       const idle = (now - l.last) / 1000;
-      if (!managedLife.current && !l.sleeping && idle > TIEMPOS.dormir) {
+      if (!l.sleeping && idle >= TIEMPOS.dormir) {
         sleep(true);
         return;
       }
@@ -292,11 +295,15 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
       if (idle < TIEMPOS.mirar) {
         delete el.dataset.stretched;
         delete el.dataset.yawned;
+        delete el.dataset.played;
         return;
       }
-      if (idle > TIEMPOS.bostezar && l.act === null && !el.dataset.yawned) {
+      if (idle >= TIEMPOS.jugar && l.act === null && !el.dataset.played) {
+        el.dataset.played = '1';
+        doAct('play', 6500);
+      } else if (idle > TIEMPOS.bostezar && l.act === null && !el.dataset.yawned) {
         el.dataset.yawned = "1";
-        doAct("yawn", (TIEMPOS.dormir - TIEMPOS.bostezar) * 1000);
+        doAct("yawn", 4500);
         if(!managedLife.current) doSay(FRASES.bostezo, (TIEMPOS.dormir - TIEMPOS.bostezar) * 1000);
       } else if (idle > TIEMPOS.estirar && idle <= TIEMPOS.bostezar && l.act === null && !el.dataset.stretched) {
         el.dataset.stretched = "1";
@@ -378,7 +385,7 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
 
   const pose = POSE_OF[mood];
   const warn = mood === "alert";
-  const quiet = mood === "idle" && !sleeping;
+  const quiet = (mood === "idle" || mood === "listen") && !sleeping;
   const waving = (act === "greet" || act === "wave") && quiet;
   const shown: Pose = waving ? "speak" : act === "jump" && quiet ? "ok" : pose;
   const eyes = EYES[shown];
@@ -449,6 +456,10 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
             <g className="sr-question"><text x="68" y="29">?</text></g>
             <g className="sr-spark"><path d="M27 26v8m-4-4h8M73 45v6m-3-3h6"/></g>
           </svg>
+          {act==='play'&&!sleeping&&quiet&&<svg className="sr-idle-toy" viewBox="0 0 100 100" aria-hidden="true">
+            <circle className="sr-toy-ball" cx="75" cy="64" r="3" fill="#9acdf5"/>
+            <ellipse className="sr-toy-shadow" cx="75" cy="80" rx="4" ry="1" fill="#9acdf5" opacity=".18"/>
+          </svg>}
           {sleeping ? (
             <span className="sr-zzz" aria-hidden="true">
               <b>z</b>
