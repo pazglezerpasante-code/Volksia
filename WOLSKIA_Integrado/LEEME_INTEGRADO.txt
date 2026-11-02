@@ -44,5 +44,5 @@ NOVEDADES v5 — IA CON HERRAMIENTAS
   Solo "admin" escribe archivos (WOLSKIA_WORKERS_CAN_WRITE=1 para permitirlo a todos).
   Datos viejos de localStorage se migran solos al primer ingreso.
 
-  PESTAÑA HERRAMIENTAS: ahora muestra VOLKSIA Workspace (https://pazglezerpasante-code.github.io/volksia-workspace/)
+  PESTAÑA HERRAMIENTAS: ahora muestra VOLKSIA Workspace (https://pazglezerpasante-code.github.io/suri-herramientas/)
   embebido. Para cambiar la URL: frontend/.env  ->  VITE_WORKSPACE_URL=...

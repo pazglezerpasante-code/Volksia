@@ -633,7 +633,7 @@ function WorkspaceOverview() {
 }
 
 const WORKSPACE_URL: string =
-  (import.meta.env?.VITE_WORKSPACE_URL as string | undefined) ?? "https://pazglezerpasante-code.github.io/volksia-workspace/";
+  (import.meta.env?.VITE_WORKSPACE_URL as string | undefined) ?? "https://pazglezerpasante-code.github.io/suri-herramientas/";
 
 const toolbarBtn =
   "grid h-8 w-8 shrink-0 place-items-center rounded-full text-muted transition hover:bg-white/5 hover:text-fg";

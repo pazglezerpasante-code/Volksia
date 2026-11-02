@@ -14,4 +14,4 @@ WOLSKIA_API=https://URL-DE-TU-BACKEND
 # WOLSKIA_PROXY_SECRET debe coincidir con el backend.
 
 # Única URL pública de este ejemplo
-VITE_WORKSPACE_URL=https://pazglezerpasante-code.github.io/volksia-workspace/
+VITE_WORKSPACE_URL=https://pazglezerpasante-code.github.io/suri-herramientas/
