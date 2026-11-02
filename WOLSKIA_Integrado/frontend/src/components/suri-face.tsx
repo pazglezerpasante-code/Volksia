@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RobotMood } from "@/components/robot";
+import type { Emotion } from '@/lib/suri-life';
+
+const EXPRESSION: Record<Emotion,string> = {
+  alegría:'happy', entusiasmo:'happy', tristeza:'sad', enojo:'serious', fastidio:'serious',
+  miedo:'scared', sorpresa:'surprised', aburrimiento:'sleepy', cansancio:'sleepy', curiosidad:'curious',
+  cariño:'warm', ternura:'warm', vergüenza:'shy', orgullo:'proud', 'celos leves':'curious',
+  ansiedad:'scared', nostalgia:'sad', pereza:'sleepy', calma:'calm', picardía:'playful',
+  culpa:'sad', esperanza:'warm', soledad:'sad', confusión:'curious', admiración:'surprised',
+};
 
 /* ══ SURI con vida ═══════════════════════════════════════════
    El robot de las imágenes (public/robot/wolskia-*-ne*.webp: las mismas
@@ -87,10 +96,15 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
   const [sleeping, setSleeping] = useState(false);
   const [act, setAct] = useState<Act>("greet");
   const [say, setSay] = useState<string | null>(FRASES.saludo);
+  const [feeling,setFeeling] = useState<Emotion>('calma');
+  const [temperature,setTemperature] = useState<number|null>(null);
+  const [storm,setStorm] = useState(false);
   // refs para que los timers vean siempre el valor actual sin re-suscribirse
   const live = useRef({ mood, sleeping: false, act: "greet" as Act, last: 0, nextBlink: 0, nextLook: 0, nextThought: 0, lastThought: -1, base: null as null | number });
   live.current.mood = mood;
   const timers = useRef<number[]>([]);
+  const managedLife = useRef(false);
+  const lastLifeLine = useRef('');
   const later = (fn: () => void, ms: number) => {
     const id = window.setTimeout(fn, ms);
     timers.current.push(id);
@@ -143,6 +157,30 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
       setSay(null);
     }
   }, [doAct, doSay, sleep]);
+
+  // El motor persistente dirige el reposo; los estados de trabajo tienen prioridad.
+  useEffect(() => {
+    const sync = (event: Event) => {
+      const d = (event as CustomEvent<{asleep:boolean;quiet:boolean;line:string;emotion:Emotion;temperature:number|null;storm:boolean}>).detail;
+      managedLife.current = true;
+      setFeeling(d.emotion);
+      setTemperature(d.temperature);
+      setStorm(d.storm);
+      if (root.current) root.current.dataset.emotion = d.emotion;
+      if (live.current.mood !== 'idle') return;
+      sleep(d.asleep && !d.quiet);
+      if (d.quiet) setSay(null);
+      else if (d.line && d.line !== lastLifeLine.current) {
+        lastLifeLine.current = d.line;
+        doSay(d.line, 6000);
+      }
+    };
+    window.addEventListener('suri-life-state', sync);
+    window.dispatchEvent(new Event('suri-life-request'));
+    return () => window.removeEventListener('suri-life-state', sync);
+  }, [doSay, sleep]);
+
+  useEffect(()=>{window.dispatchEvent(new Event('suri-life-request'));},[mood]);
 
   /* Saludo inicial */
   useEffect(() => {
@@ -238,12 +276,12 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
       }
       if (l.mood !== "idle") return;
       const idle = (now - l.last) / 1000;
-      if (!l.sleeping && idle > TIEMPOS.dormir) {
+      if (!managedLife.current && !l.sleeping && idle > TIEMPOS.dormir) {
         sleep(true);
         return;
       }
       if (l.sleeping) return;
-      if (now >= l.nextThought && l.act === null && idle >= 4 && idle < TIEMPOS.bostezar) {
+      if (!managedLife.current && now >= l.nextThought && l.act === null && idle >= 4 && idle < TIEMPOS.bostezar) {
         // Choose a different thought each time; never send these to the chat or memory.
         const next = (l.lastThought + 1 + Math.floor(Math.random() * (FRASES.pensamientos.length - 1))) % FRASES.pensamientos.length;
         l.lastThought = next;
@@ -259,11 +297,11 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
       if (idle > TIEMPOS.bostezar && l.act === null && !el.dataset.yawned) {
         el.dataset.yawned = "1";
         doAct("yawn", (TIEMPOS.dormir - TIEMPOS.bostezar) * 1000);
-        doSay(FRASES.bostezo, (TIEMPOS.dormir - TIEMPOS.bostezar) * 1000);
+        if(!managedLife.current) doSay(FRASES.bostezo, (TIEMPOS.dormir - TIEMPOS.bostezar) * 1000);
       } else if (idle > TIEMPOS.estirar && idle <= TIEMPOS.bostezar && l.act === null && !el.dataset.stretched) {
         el.dataset.stretched = "1";
         doAct("stretch", 2200);
-        doSay(FRASES.estirar, 2000);
+        if(!managedLife.current) doSay(FRASES.estirar, 2000);
       } else if (now >= l.nextLook && l.act === null) {
         l.nextLook = now + 1800 + Math.random() * 2200;
         setLook((Math.random() * 2 - 1) * 1.1, (Math.random() * 2 - 1) * 0.7);
@@ -319,14 +357,14 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
       );
     };
     if (typeof Ctor.requestPermission === "function") {
-      Ctor.requestPermission()
-        .then((r) => (r === "granted" ? attach() : (gyro.current = "no")))
-        .catch(() => (gyro.current = "no"));
+      // Sin cuadros de permisos: el movimiento con el dedo ya funciona.
+      gyro.current = 'no';
     } else attach();
   }, [setLook]);
 
   /* Un toque en Suri: reacciona */
   const poke = () => {
+    window.dispatchEvent(new Event('suri-poke'));
     startGyro();
     const l = live.current;
     l.last = Date.now();
@@ -360,6 +398,8 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
       className={`suri-face${compact ? " suri-face-compact" : ""}`}
       data-mood={mood}
       data-state={state}
+      data-expression={EXPRESSION[feeling]}
+      data-weather={storm?'storm':temperature!==null&&temperature>30?'hot':temperature!==null&&temperature<10?'cold':undefined}
       data-warn={warn ? "1" : undefined}
       style={{ width: size, height: size }}
       onPointerDown={poke}
@@ -398,6 +438,17 @@ export function SuriFace({ mood, size = 260, compact = false }: { mood: RobotMoo
               <i />
             </span>
           ))}
+          <svg className="sr-feelings" viewBox="0 0 100 100" aria-hidden="true">
+            {eyes.map((eye,i)=><g key={i}>
+              <ellipse className="sr-blush" cx={eye.x*100+(i===0?-3:3)} cy={eye.y*100+5} rx="4" ry="1.8"/>
+              <path className="sr-tear" d={`M${eye.x*100+2} ${eye.y*100+3} q-2 4 0 4 q2 0 0-4`} />
+            </g>)}
+            <path className="sr-sweat" d="M68 34q-4 7 0 7q4 0 0-7"/>
+            <g className="sr-scarf"><path d="M34 56Q50 63 65 56"/><path d="M60 59L63 70"/></g>
+            <g className="sr-heart"><path d="M73 24C66 16 59 25 73 33C87 25 80 16 73 24"/></g>
+            <g className="sr-question"><text x="68" y="29">?</text></g>
+            <g className="sr-spark"><path d="M27 26v8m-4-4h8M73 45v6m-3-3h6"/></g>
+          </svg>
           {sleeping ? (
             <span className="sr-zzz" aria-hidden="true">
               <b>z</b>

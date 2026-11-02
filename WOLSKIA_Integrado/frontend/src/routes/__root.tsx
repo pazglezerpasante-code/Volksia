@@ -1,6 +1,7 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
+import { SuriLife } from "@/components/suri-life";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -37,6 +38,7 @@ export const Route = createRootRoute({
         <PreviewHostBridge />
         <AuthProvider>
           <Outlet />
+          <SuriLife />
         </AuthProvider>
         <Scripts />
       </body>

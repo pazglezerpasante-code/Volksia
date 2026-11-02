@@ -224,6 +224,7 @@ function Chat({
   async function send(raw?: string) {
     const userText = (raw ?? text).trim();
     if ((!userText && attachments.length === 0) || busy) return;
+    window.dispatchEvent(new CustomEvent('suri-life', { detail: { text: userText, busy: true } }));
     voice.cancel();
     window.speechSynthesis?.cancel();
     moodTimers.current.forEach(clearTimeout);
@@ -366,6 +367,7 @@ function Chat({
       setLines((prev) => [...prev, { who: "wolskia", kind: operation || binaryExcel || genericSpreadsheet ? "tool" : "chat",
         text: missing ? detail + "\n\nEl Excel sigue guardado. Si todos estaban de vacaciones, respondé «todos vacaciones» sin adjuntar el Excel otra vez." : detail }]);
     } finally {
+      window.dispatchEvent(new CustomEvent('suri-life', { detail: { busy: false, success: !failed } }));
       generation.current = null;
       setBusy(false);
       if (!failed) moodTimers.current.push(window.setTimeout(() => setMood("celebrate"), 700));
