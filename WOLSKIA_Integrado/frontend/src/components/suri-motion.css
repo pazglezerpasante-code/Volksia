@@ -1,0 +1,1038 @@
+/* Cada capa tiene un solo movimiento: respiración, postura, pose y mirada. */
+.suri-face .sr-stage {
+  translate: var(--approach-x, 0%) var(--approach-y, 0%);
+  transition:
+    translate 0.6s cubic-bezier(0.2, 0.8, 0.3, 1),
+    transform 0.9s cubic-bezier(0.22, 0.8, 0.25, 1);
+}
+.suri-face .sr-reflection-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px;
+  border-radius: 50%;
+  background: #fff9db;
+  box-shadow:
+    0 0 9px 2px #f8e7a070,
+    0 0 22px 8px #f8e7a018;
+  animation: sr-reflection-breathe 3s ease-in-out infinite;
+  pointer-events: none;
+}
+.suri-face:focus-visible {
+  outline: 1px solid #a8b8c7;
+  outline-offset: 5px;
+  border-radius: 18px;
+}
+.suri-chat:has(.suri-face[data-state="hide"]) {
+  overflow: clip;
+}
+.suri-face[data-state="hide"] .sr-stage {
+  animation: sr-peek-edge 6.5s cubic-bezier(0.32, 0, 0.25, 1) both;
+  translate: 0 0;
+}
+.suri-face[data-state="hide"] .sr-light-guide,
+.suri-face[data-state="hide"] .sr-shadow,
+.suri-face[data-state="hide"] .sr-say {
+  opacity: 0;
+  pointer-events: none;
+}
+.suri-face[data-state="dance"] .sr-stage {
+  animation: sr-dance 4.4s cubic-bezier(0.3, 0, 0.3, 1) both;
+  translate: 0 0;
+}
+.suri-face[data-state="dance"] .sr-eye > i {
+  transform: scale(1.1, 0.55);
+  border-radius: 65% 65% 35% 35%;
+}
+.suri-face[data-state="startle"] .sr-stage {
+  animation: sr-cursor-surprise 1s cubic-bezier(0.16, 0.8, 0.25, 1) both;
+}
+.suri-face[data-state="startle"] .sr-eye > i {
+  transform: scale(1.15, 1.2);
+}
+@keyframes sr-reflection-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+@keyframes sr-peek-edge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  22% {
+    transform: translateX(var(--peek-travel, 150px)) translateY(4%) scale(0.95);
+  }
+  40% {
+    transform: translateX(calc(var(--peek-travel, 150px) - 24px)) translateY(1%) scale(0.97);
+  }
+  55% {
+    transform: translateX(var(--peek-travel, 150px)) translateY(3%) scale(0.95);
+  }
+  72% {
+    transform: translateX(calc(var(--peek-travel, 150px) - 36px)) scale(0.98);
+  }
+  88% {
+    transform: translateX(-1%) scale(1.02, 0.98);
+  }
+}
+@keyframes sr-dance {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  10%,
+  45% {
+    transform: translate(-3%, -2%) scale(0.98, 1.025);
+  }
+  20%,
+  55% {
+    transform: translate(3%, 0) scale(1.025, 0.98);
+  }
+  32%,
+  67% {
+    transform: translate(0, -5%) scale(0.985, 1.03);
+  }
+  38%,
+  74% {
+    transform: translate(0, 1%) scale(1.03, 0.96);
+  }
+  86% {
+    transform: translateY(-1.8%) scale(0.99, 1.02);
+  }
+}
+@keyframes sr-cursor-surprise {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(2%) scale(0.97);
+  }
+  55% {
+    transform: translateY(-1.2%) scale(1.012);
+  }
+}
+.suri-face .sr-light-guide {
+  width: 52px !important;
+  height: 52px !important;
+  min-width: 52px !important;
+  min-height: 52px !important;
+  margin-left: -8px;
+  margin-top: -8px;
+}
+.sr-insect {
+  overflow: visible;
+}
+.sr-insect-flight {
+  transform-origin: 28px 29px;
+  animation: sr-insect-hover 2.1s cubic-bezier(0.45, 0, 0.4, 1) infinite;
+}
+.sr-wing-left {
+  transform-origin: 27px 27px;
+  animation: sr-wing-beat 0.11s ease-in-out infinite alternate;
+}
+.sr-wing-right {
+  transform-origin: 29px 27px;
+  animation: sr-wing-beat 0.11s ease-in-out infinite alternate-reverse;
+}
+.sr-insect-aura,
+.sr-insect-lamp {
+  animation: sr-lamp-pulse 2.8s ease-in-out infinite;
+}
+.suri-face[data-state="none"][data-expression="happy"] .sr-body,
+.suri-face[data-state="none"][data-expression="playful"] .sr-body {
+  animation: sr-happy-idle 3.4s cubic-bezier(0.35, 0, 0.3, 1) infinite;
+}
+.suri-face[data-state="none"][data-expression="curious"] .sr-body {
+  animation: sr-curious-idle 5s ease-in-out infinite;
+}
+.suri-face[data-mood="speak"] .sr-body {
+  animation: sr-speaking-life 1.4s ease-in-out infinite;
+}
+.suri-face[data-mood="think"] .sr-body,
+.suri-face[data-mood="processing"] .sr-body {
+  animation: sr-thinking-life 3.2s ease-in-out infinite;
+}
+.suri-face[data-state="play"] .sr-body {
+  animation: sr-playful-life 2.6s ease-in-out infinite;
+}
+.suri-face[data-light-guided] .sr-body {
+  animation: sr-curious-idle 2.4s ease-in-out infinite;
+}
+.suri-face[data-state="pet"] .sr-stage {
+  animation: sr-enjoy-pet 2.2s ease-in-out both;
+}
+.suri-face[data-mood="idle"][data-state="none"] .sr-stage {
+  animation: sr-attentive 8s cubic-bezier(0.35, 0, 0.3, 1) infinite;
+}
+@keyframes sr-attentive {
+  0%,
+  15%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  32% {
+    transform: translate(-1.3%, -0.8%) scale(1.012);
+  }
+  48% {
+    transform: translate(0, 0) scale(1);
+  }
+  68% {
+    transform: translate(1.3%, -1.2%) scale(0.995, 1.012);
+  }
+  84% {
+    transform: translateY(0.4%) scale(1.008, 0.994);
+  }
+}
+@keyframes sr-insect-hover {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  35% {
+    transform: translate(2px, -3px);
+  }
+  70% {
+    transform: translate(-1px, 1px);
+  }
+}
+@keyframes sr-wing-beat {
+  from {
+    transform: scaleX(0.48) scaleY(0.7);
+  }
+  to {
+    transform: scaleX(1.08) scaleY(1.05);
+  }
+}
+@keyframes sr-lamp-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  45% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.78;
+  }
+}
+@keyframes sr-happy-idle {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  30% {
+    transform: translateY(-2.4%) scale(0.994, 1.014);
+  }
+  65% {
+    transform: translateY(-0.5%) scale(1.012, 0.993);
+  }
+}
+@keyframes sr-curious-idle {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  30% {
+    transform: translate(-0.9%, -1.2%);
+  }
+  65% {
+    transform: translate(0.9%, -0.4%) scale(1.007);
+  }
+}
+@keyframes sr-speaking-life {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  35% {
+    transform: translateY(-1.1%) scale(1.006, 1.012);
+  }
+  70% {
+    transform: translateY(0.35%) scale(1.008, 0.997);
+  }
+}
+@keyframes sr-thinking-life {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  35% {
+    transform: translateY(-1.3%) scale(0.998, 1.012);
+  }
+  65% {
+    transform: translateX(0.5%);
+  }
+}
+@keyframes sr-playful-life {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  28% {
+    transform: translate(-1.1%, -1.8%) scale(0.99, 1.018);
+  }
+  65% {
+    transform: translate(1.1%, -0.5%) scale(1.012, 0.99);
+  }
+}
+@keyframes sr-enjoy-pet {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  30%,
+  70% {
+    transform: translateY(1.4%) scale(1.018, 0.98);
+  }
+}
+.suri-face .sr-light-guide {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  z-index: 6;
+  touch-action: none;
+  transform: translate(calc(var(--fly-x, 78) * 1cqw - 18px), calc(var(--fly-y, 25) * 1cqh - 18px));
+  cursor: grab;
+}
+.suri-face .sr-light-guide:active {
+  cursor: grabbing;
+}
+.sr-light-guide svg {
+  width: 100%;
+  height: 100%;
+}
+.sr-light-guide:focus-visible {
+  outline: 2px solid #bfcfb0;
+  outline-offset: 3px;
+}
+.suri-face[data-light-guided] .sr-eye {
+  animation: none;
+}
+.suri-face[data-state="pet"] .sr-eye > i {
+  transform: scale(1.12, 0.12);
+  border-radius: 60%;
+}
+.suri-face[data-state="pet"] .sr-body {
+  animation: sr-alive 3s ease-in-out infinite;
+}
+.suri-face:has(.sr-light-guide) .sr-idle-toy .sr-firefly {
+  display: none;
+}
+.suri-face[data-state="play"]:not([data-light-guided]) .sr-light-guide {
+  animation: sr-fly-explore 6.5s ease-in-out both;
+}
+@keyframes sr-fly-explore {
+  0%,
+  100% {
+    transform: translate(
+      calc(var(--fly-x, 78) * 1cqw - 18px),
+      calc(var(--fly-y, 25) * 1cqh - 18px)
+    );
+  }
+  30% {
+    transform: translate(
+      calc(var(--fly-x, 78) * 1cqw - 18px - 38cqw),
+      calc(var(--fly-y, 25) * 1cqh - 18px - 10cqh)
+    );
+  }
+  65% {
+    transform: translate(
+      calc(var(--fly-x, 78) * 1cqw - 18px + 4cqw),
+      calc(var(--fly-y, 25) * 1cqh - 18px + 7cqh)
+    );
+  }
+}
+.suri-face {
+  --lx: 0;
+  --ly: 0;
+  --breath: 5s;
+  --emotion-y: 0%;
+  position: relative;
+  display: block;
+  flex: none;
+  margin-inline: auto;
+  container-type: size;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+}
+.suri-face .sr-body {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 88%;
+  animation: sr-alive var(--breath) cubic-bezier(0.37, 0, 0.33, 1) infinite;
+}
+.suri-face .sr-stage {
+  position: absolute;
+  inset: 0;
+  rotate: 0deg;
+  transform: translateY(var(--emotion-y));
+  transform-origin: 50% 84%;
+  transition: transform 900ms cubic-bezier(0.22, 0.8, 0.25, 1);
+  mask-image: linear-gradient(#000 87%, transparent);
+}
+.suri-face .sr-pose {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 650ms cubic-bezier(0.22, 0.8, 0.25, 1);
+  pointer-events: none;
+}
+.suri-face .sr-pose[data-visible] {
+  opacity: 1;
+}
+.suri-face .sr-pose:not([data-ready]) .sr-eye {
+  visibility: hidden;
+}
+.suri-face .sr-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+.suri-face .sr-halo {
+  display: none;
+}
+.suri-face .sr-shadow {
+  position: absolute;
+  left: 27%;
+  right: 27%;
+  bottom: 4%;
+  height: 3%;
+  border-radius: 50%;
+  background: #000;
+  opacity: 0.15;
+}
+.suri-face .sr-eye {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(calc(var(--lx) * 42%), calc(var(--ly) * 25%));
+  transition: transform 240ms cubic-bezier(0.16, 0.8, 0.3, 1);
+}
+.suri-face .sr-eye > i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 48%;
+  background: radial-gradient(ellipse at 35% 24%, #ffffff40, transparent 55%), rgb(var(--eye));
+  transform: scale(var(--emotion-eye-x, 1), var(--emotion-eye-y, 1));
+  transition:
+    transform 650ms cubic-bezier(0.22, 0.8, 0.25, 1),
+    border-radius 600ms;
+}
+.suri-face .sr-eye > i::after {
+  content: "";
+  position: absolute;
+  width: 17%;
+  height: 18%;
+  top: 15%;
+  left: 21%;
+  border-radius: 50%;
+  background: #ffffff70;
+}
+.suri-face .sr-brow {
+  position: absolute;
+  left: -5%;
+  top: -30%;
+  width: 110%;
+  height: 9%;
+  border-radius: 50%;
+  background: rgb(var(--eye));
+  opacity: 0;
+  transform: translateY(2px);
+  transition:
+    transform 650ms,
+    opacity 650ms;
+}
+.suri-face[data-expression="curious"] .sr-brow {
+  opacity: 0.55;
+  transform: translateY(-1px);
+}
+.suri-face[data-expression="serious"] .sr-brow {
+  opacity: 0.7;
+  transform: rotate(8deg);
+}
+.suri-face[data-expression="sad"] .sr-brow {
+  opacity: 0.5;
+  transform: rotate(-9deg);
+}
+.suri-face[data-expression="happy"] .sr-eye > i,
+.suri-face[data-expression="warm"] .sr-eye > i {
+  border-radius: 65% 65% 35% 35%;
+}
+.suri-face[data-expression="playful"] .sr-eye:nth-of-type(2) > i {
+  transform: scale(1, 0.24);
+}
+.suri-face[data-tired] .sr-eye > i {
+  transform: scale(var(--emotion-eye-x), 0.48);
+}
+.suri-face[data-blink] .sr-eye > i {
+  transform: scale(1, 0.06);
+  transition-duration: 85ms;
+}
+.suri-face[data-state="drowsy"] .sr-eye > i {
+  transform: scale(1, 0.48);
+  transition-duration: 1400ms;
+}
+.suri-face[data-state="yawn"] .sr-eye > i {
+  animation: sr-heavy-lids 4.5s ease-in-out both;
+}
+.suri-face[data-state="nod"] .sr-eye > i {
+  transform: scale(1, 0.22);
+}
+.suri-face[data-state="settle"] .sr-eye > i,
+.suri-face[data-state="sleep"] .sr-eye > i {
+  transform: scale(1.25, 0.08);
+  transition-duration: 1600ms;
+}
+.suri-face[data-state="wake"] .sr-eye > i {
+  animation: sr-wake-eyes 2.1s ease-in-out both;
+}
+.suri-face[data-state="greet"] .sr-stage,
+.suri-face[data-state="wave"] .sr-stage {
+  animation: sr-hello 1.8s cubic-bezier(0.22, 0.8, 0.25, 1) both;
+}
+.suri-face[data-state="jump"] .sr-stage {
+  animation: sr-hop 0.85s cubic-bezier(0.22, 0.8, 0.25, 1) both;
+}
+.suri-face[data-state="stretch"] .sr-stage {
+  animation: sr-long-stretch 2.8s ease-in-out both;
+}
+.suri-face[data-state="yawn"] .sr-stage {
+  animation: sr-drowsy-nod 4.5s ease-in-out both;
+}
+.suri-face[data-state="nod"] .sr-stage {
+  animation: sr-drowsy-nod 4s ease-in-out infinite;
+}
+.suri-face[data-state="settle"] .sr-stage,
+.suri-face[data-state="sleep"] .sr-stage {
+  transform: translateY(4%) scale(0.98, 0.95);
+}
+.suri-face[data-state="sleep"] .sr-body {
+  animation: sr-sleep-breath 6.6s cubic-bezier(0.37, 0, 0.33, 1) infinite;
+}
+.suri-face[data-state="wake"] .sr-stage {
+  animation: sr-wake-stretch 2.1s cubic-bezier(0.22, 0.8, 0.25, 1) both;
+}
+.suri-face[data-state="tickle"] .sr-stage {
+  animation: sr-tickle 1s ease-in-out both;
+}
+.suri-face[data-state="sneeze"] .sr-stage {
+  animation: sr-sneeze 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.suri-face[data-state="play"] .sr-eye {
+  animation: sr-watch-light 6.5s ease-in-out both;
+}
+.suri-face[data-state="play"] .sr-stage {
+  animation: sr-follow-light 6.5s ease-in-out both;
+}
+.suri-face[data-state="stargaze"] .sr-eye {
+  transform: translate(0, -35%);
+}
+.suri-face[data-state="hum"] .sr-stage {
+  animation: sr-humming 2s ease-in-out infinite;
+}
+.suri-face .sr-feelings,
+.suri-face .sr-idle-toy {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 3;
+}
+.sr-blush {
+  fill: #ee93a1;
+  opacity: 0;
+  transition: opacity 0.9s;
+}
+.sr-heart {
+  fill: #dea3b0;
+  opacity: 0;
+  transform-origin: 73% 28%;
+}
+.sr-tear,
+.sr-sweat {
+  fill: #8dccee;
+  opacity: 0;
+  transition: opacity 0.9s;
+}
+.sr-scarf {
+  fill: none;
+  stroke: #6a9fc1;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 1s;
+}
+.sr-question {
+  font:
+    600 9px system-ui,
+    sans-serif;
+  fill: #a6cce8;
+  opacity: 0;
+}
+.sr-spark {
+  fill: none;
+  stroke: #dfd7a3;
+  stroke-width: 1;
+  stroke-linecap: round;
+  opacity: 0;
+}
+.suri-face[data-effect="heart"] .sr-blush {
+  opacity: 0.45;
+}
+.suri-face[data-effect="heart"] .sr-heart {
+  opacity: 0.75;
+  animation: sr-heart-float 4s ease-in-out infinite;
+}
+.suri-face[data-effect="spark"] .sr-spark {
+  opacity: 0.8;
+  animation: sr-sparkle 3.8s ease-in-out infinite;
+}
+.suri-face[data-effect="question"] .sr-question {
+  opacity: 0.7;
+}
+.suri-face[data-emotion="tristeza"] .sr-tear {
+  opacity: 0.4;
+}
+.suri-face[data-weather="hot"] .sr-sweat {
+  opacity: 0.75;
+  animation: sr-sweat-fall 4s ease-in-out infinite;
+}
+.suri-face[data-weather="cold"] .sr-scarf {
+  opacity: 0.9;
+}
+.suri-face[data-weather="cold"] .sr-body {
+  animation: sr-cold-breath 6s ease-in-out infinite;
+}
+.suri-face[data-weather="storm"] .sr-sweat {
+  opacity: 0.4;
+}
+.suri-face[data-state="sleep"] .sr-feelings {
+  opacity: 0;
+  transition: opacity 1s;
+}
+.sr-firefly,
+.sr-stars,
+.sr-hum {
+  opacity: 0;
+}
+.sr-activity-play .sr-firefly {
+  opacity: 1;
+  animation: sr-firefly-flight 6.5s ease-in-out both;
+}
+.sr-activity-stargaze .sr-stars {
+  animation: sr-stars-shine 5s ease-in-out both;
+}
+.sr-activity-hum .sr-hum {
+  animation: sr-note-float 3s ease-out infinite;
+}
+.suri-face .sr-zzz {
+  position: absolute;
+  left: 65%;
+  top: 21%;
+  font-size: 9cqw;
+  line-height: 1;
+}
+.suri-face .sr-zzz b {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 500;
+  color: #aec0ce;
+  opacity: 0;
+  animation: sr-zzz 4.8s ease-out infinite;
+}
+.sr-zzz b:nth-child(2) {
+  animation-delay: 1.6s;
+}
+.sr-zzz b:nth-child(3) {
+  animation-delay: 3.2s;
+}
+.suri-face .sr-say {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  top: -9%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(260px, 110cqw);
+  padding: 9px 14px;
+  border-radius: 14px;
+  white-space: normal;
+  text-align: center;
+  background: var(--color-fg);
+  color: var(--color-bg);
+  font:
+    600 14px/1.3 system-ui,
+    sans-serif;
+  pointer-events: none;
+  animation: sr-speech-in 350ms ease-out both;
+}
+.suri-face .sr-say::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+  transform: translateX(-50%) rotate(45deg);
+}
+.sr-dream-caption {
+  display: block;
+  font:
+    12px/1.4 system-ui,
+    sans-serif;
+  text-align: center;
+  animation: sr-speech-in 0.7s ease-out both;
+}
+.suri-face[data-paused] * {
+  animation-play-state: paused !important;
+}
+.suri-face .sr-dream {
+  top: 0;
+  right: 96%;
+  width: min(132px, 56cqw);
+  padding: 5px 8px;
+}
+.sr-dream-sheep {
+  animation-timing-function: cubic-bezier(0.35, 0.05, 0.6, 0.95);
+}
+@keyframes sr-alive {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  48% {
+    transform: translateY(-1.8%) scale(1.009, 1.018);
+  }
+}
+@keyframes sr-sleep-breath {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  48% {
+    transform: translateY(-0.35%) scale(1.008, 1.014);
+  }
+}
+@keyframes sr-hello {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  32% {
+    transform: translateY(-1.3%) scale(1.008);
+  }
+  68% {
+    transform: translateY(-0.3%);
+  }
+}
+@keyframes sr-hop {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  20% {
+    transform: translateY(1.8%) scale(1.025, 0.96);
+  }
+  50% {
+    transform: translateY(-5%) scale(0.985, 1.025);
+  }
+  78% {
+    transform: translateY(0.7%) scale(1.02, 0.98);
+  }
+}
+@keyframes sr-long-stretch {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  40%,
+  60% {
+    transform: translateY(-1.7%) scale(0.985, 1.035);
+  }
+  82% {
+    transform: translateY(0.5%) scale(1.008, 0.992);
+  }
+}
+@keyframes sr-drowsy-nod {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  45% {
+    transform: translateY(2%) scale(1.005, 0.975);
+  }
+  65% {
+    transform: translateY(-0.4%);
+  }
+}
+@keyframes sr-heavy-lids {
+  0%,
+  100% {
+    transform: scale(1, 0.4);
+  }
+  40% {
+    transform: scale(1, 0.1);
+  }
+  65% {
+    transform: scale(1, 0.6);
+  }
+}
+@keyframes sr-wake-eyes {
+  0% {
+    transform: scale(1.25, 0.08);
+  }
+  35% {
+    transform: scale(1, 0.4);
+  }
+  50% {
+    transform: scale(1, 0.1);
+  }
+  75% {
+    transform: scale(1, 0.85);
+  }
+  100% {
+    transform: scale(var(--emotion-eye-x), var(--emotion-eye-y));
+  }
+}
+@keyframes sr-wake-stretch {
+  0% {
+    transform: translateY(4%) scale(0.98, 0.95);
+  }
+  45% {
+    transform: translateY(-1%) scale(0.985, 1.03);
+  }
+  70% {
+    transform: translateY(0.5%) scale(1.01, 0.99);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes sr-tickle {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25%,
+  65% {
+    transform: translateX(-0.8%) scale(1.01, 0.99);
+  }
+  45%,
+  80% {
+    transform: translateX(0.8%);
+  }
+}
+@keyframes sr-sneeze {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  45% {
+    transform: translateY(-1%) scale(0.99, 1.025);
+  }
+  55% {
+    transform: translateY(2%) scale(1.025, 0.97);
+  }
+  72% {
+    transform: translateY(-0.4%);
+  }
+}
+@keyframes sr-follow-light {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(-1%);
+  }
+  65% {
+    transform: translateX(1%);
+  }
+}
+@keyframes sr-watch-light {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  30% {
+    transform: translate(-32%, -28%);
+  }
+  65% {
+    transform: translate(35%, -18%);
+  }
+}
+@keyframes sr-firefly-flight {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  30% {
+    transform: translate(-48px, -12px);
+  }
+  65% {
+    transform: translate(0, 9px);
+    opacity: 1;
+  }
+  85% {
+    transform: translate(8px, -10px);
+    opacity: 1;
+  }
+}
+@keyframes sr-humming {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.5%) scale(1.008);
+  }
+}
+@keyframes sr-stars-shine {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  40%,
+  70% {
+    opacity: 0.8;
+  }
+}
+@keyframes sr-note-float {
+  0% {
+    transform: translateY(3px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(3px, -12px);
+    opacity: 0;
+  }
+}
+@keyframes sr-heart-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.04);
+  }
+}
+@keyframes sr-sparkle {
+  50% {
+    opacity: 0.25;
+  }
+}
+@keyframes sr-sweat-fall {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.15;
+  }
+  50% {
+    transform: translateY(2px);
+    opacity: 0.7;
+  }
+}
+@keyframes sr-cold-breath {
+  0%,
+  70%,
+  100% {
+    transform: translateX(0);
+  }
+  78%,
+  88% {
+    transform: translateX(-0.25%);
+  }
+  82%,
+  92% {
+    transform: translateX(0.25%);
+  }
+}
+@keyframes sr-zzz {
+  0% {
+    transform: translate(0, 0) scale(0.7);
+    opacity: 0.45;
+  }
+  25% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(7cqw, -13cqw) scale(1.05);
+    opacity: 0;
+  }
+}
+@keyframes sr-speech-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (max-width: 767px) {
+  .suri-app .suri-chat-greeting .suri-face:not(.suri-face-compact) {
+    margin-bottom: 26px !important;
+  }
+  .suri-face:not(.suri-face-compact) .sr-say {
+    top: auto;
+    bottom: -8%;
+    max-width: min(260px, calc(100vw - 40px));
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  .suri-face:not(.suri-face-compact) .sr-say::after {
+    bottom: auto;
+    top: -4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .suri-face *,
+  .suri-face *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .suri-face .sr-body,
+  .suri-face .sr-stage {
+    transform: none;
+  }
+  .suri-face .sr-zzz b {
+    opacity: 0.6;
+  }
+  .suri-face .sr-zzz b:nth-child(2),
+  .suri-face .sr-zzz b:nth-child(3) {
+    display: none;
+  }
+}

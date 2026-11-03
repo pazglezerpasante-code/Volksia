@@ -25,11 +25,125 @@ export const EMOTIONS = [
   "soledad",
   "confusión",
   "admiración",
+  "alivio",
+  "ilusión",
+  "timidez",
+  "serenidad",
+  "gratitud",
+  "inspiración",
+  "concentración",
+  "determinación",
+  "satisfacción",
+  "asombro",
+  "diversión",
+  "complicidad",
+  "empatía",
+  "paciencia",
+  "desconcierto",
+  "frustración",
+  "optimismo",
+  "añoranza",
+  "somnolencia",
+  "confianza",
 ] as const;
 export type Emotion = (typeof EMOTIONS)[number];
 export const PERSONALITY = { curiosa: 0.9, leal: 1, dramatica: 0.3, sarcasmo: 0.2 };
 // Un único reloj para el motor y el avatar, en segundos sin interacción.
-export const IDLE_TIMINGS = { mirar: 6, estirar: 14, bostezar: 24, jugar: 38, dormir: 60 };
+export const IDLE_TIMINGS = {
+  mirar: 6,
+  estirar: 14,
+  bostezar: 45,
+  jugar: 26,
+  cabecear: 53,
+  acomodar: 58,
+  dormir: 60,
+};
+
+/** La cara, postura, respiración, efecto y microfrase se definen juntos. */
+export const EMOTION_STYLE = Object.fromEntries(
+  EMOTIONS.map((emotion, i) => {
+    const families = {
+      happy: [
+        "alegría",
+        "entusiasmo",
+        "ilusión",
+        "gratitud",
+        "satisfacción",
+        "diversión",
+        "optimismo",
+      ],
+      warm: ["cariño", "ternura", "esperanza", "empatía", "confianza"],
+      shy: ["vergüenza", "timidez"],
+      proud: ["orgullo", "determinación"],
+      curious: ["curiosidad", "celos leves", "confusión", "desconcierto", "inspiración"],
+      sad: ["tristeza", "nostalgia", "culpa", "soledad", "añoranza"],
+      serious: ["enojo", "fastidio", "frustración", "concentración"],
+      scared: ["miedo", "ansiedad"],
+      surprised: ["sorpresa", "admiración", "asombro"],
+      sleepy: ["aburrimiento", "cansancio", "pereza", "somnolencia"],
+      playful: ["picardía", "complicidad"],
+      calm: ["calma", "alivio", "serenidad", "paciencia"],
+    };
+    const expression =
+      Object.entries(families).find(([, names]) => names.includes(emotion))?.[0] ?? "calm";
+    const lines: Partial<Record<Emotion, string>> = {
+      alivio: "Ahí está… un respiro y seguimos.",
+      ilusión: "Tengo ganas de ver cómo queda.",
+      timidez: "Bueno… me dio un poquito de vergüenza.",
+      serenidad: "Sin apuro. Una cosa a la vez.",
+      gratitud: "Gracias por ese ratito.",
+      inspiración: "Se me acaba de ocurrir una idea…",
+      concentración: "Un momentito, estoy mirando los detalles.",
+      determinación: "Vamos a encontrarle la vuelta.",
+      satisfacción: "Qué lindo cuando todo queda en su lugar.",
+      asombro: "¡Ah, mirá eso!",
+      diversión: "¡Esa me hizo reír!",
+      complicidad: "Creo que nos entendemos.",
+      empatía: "Te escucho. Podemos ir de a poco.",
+      paciencia: "Acá estoy, a tu ritmo.",
+      desconcierto: "Mmm… necesito mirar eso otra vez.",
+      frustración: "Probemos por otro lado.",
+      optimismo: "De a poco va tomando forma.",
+      añoranza: "Me acordé del mate imaginario…",
+      somnolencia: "Se me están cerrando los ojitos…",
+      confianza: "Dale, lo revisamos juntos.",
+    };
+    const sleepy = expression === "sleepy";
+    return [
+      emotion,
+      {
+        expression,
+        eyeX: 0.94 + (i % 4) * 0.045,
+        eyeY: sleepy
+          ? 0.38 + (i % 3) * 0.08
+          : expression === "surprised"
+            ? 1.15
+            : 0.75 + (i % 5) * 0.065,
+        bodyY: expression === "sad" ? 1.4 : expression === "proud" ? -1.2 : 0,
+        breath: sleepy ? 6.2 : expression === "scared" ? 3.2 : 4.5 + (i % 4) * 0.35,
+        effect: ["warm", "shy"].includes(expression)
+          ? "heart"
+          : ["happy", "proud"].includes(expression)
+            ? "spark"
+            : expression === "curious"
+              ? "question"
+              : "none",
+        line: lines[emotion] ?? "",
+      },
+    ];
+  }),
+) as Record<
+  Emotion,
+  {
+    expression: string;
+    eyeX: number;
+    eyeY: number;
+    bodyY: number;
+    breath: number;
+    effect: string;
+    line: string;
+  }
+>;
 export const LIFE_CONFIG = {
   idleSleepMinutes: IDLE_TIMINGS.dormir / 60,
   commentMinutes: 20,
@@ -150,8 +264,57 @@ export function reactTo(s: Life, text: string, now = Date.now()): Life {
   } else if (/jaja|chiste/i.test(text)) {
     emotion = "picardía";
     line = "¡Ja! Tengo un chiste de planillas, pero tiene demasiadas celdas.";
+  } else {
+    const cues: [RegExp, Emotion][] = [
+      [/por fin|qué alivio|menos mal/i, "alivio"],
+      [/ilusión|ganas de ver/i, "ilusión"],
+      [/vergüenza|me da cosa/i, "timidez"],
+      [/tranquil|paz|relaj/i, "serenidad"],
+      [/idea|inspir/i, "inspiración"],
+      [/concentr|revisá|detalle/i, "concentración"],
+      [/no me rindo|otra vez|intentemos/i, "determinación"],
+      [/quedó bien|listo|terminamos/i, "satisfacción"],
+      [/wow|increíble|asombro/i, "asombro"],
+      [/divertid|jugar|jugamos/i, "diversión"],
+      [/secreto|cómplice/i, "complicidad"],
+      [/esperá|paciencia/i, "paciencia"],
+      [/no entiendo|confund/i, "desconcierto"],
+      [/no funciona|frustra|no anda/i, "frustración"],
+      [/va a salir|podemos/i, "optimismo"],
+      [/extraño|recuerdo/i, "añoranza"],
+      [/sueño|dormir|cansad/i, "somnolencia"],
+      [/confío|juntos/i, "confianza"],
+      [/te amo|abrazo|mimo/i, "cariño"],
+      [/estoy feliz|qué alegría|que alegria|content[oa]/i, "alegría"],
+      [/emocionad|entusiasm/i, "entusiasmo"],
+      [/enoj|bronca/i, "enojo"],
+      [/molest|fastidi/i, "fastidio"],
+      [/miedo|asust|terror/i, "miedo"],
+      [/sorpresa|sorprend/i, "sorpresa"],
+      [/aburr/i, "aburrimiento"],
+      [/ternura|adorable/i, "ternura"],
+      [/orgullo|orgullos/i, "orgullo"],
+      [/celos|otra ia/i, "celos leves"],
+      [/ansiedad|nervios/i, "ansiedad"],
+      [/nostalgia/i, "nostalgia"],
+      [/pereza|fiaca/i, "pereza"],
+      [/picard|travies/i, "picardía"],
+      [/culpa|perdón|perdon/i, "culpa"],
+      [/esperanza/i, "esperanza"],
+      [/soledad|sol[oa]\b/i, "soledad"],
+      [/admir|impresionante/i, "admiración"],
+    ];
+    const cue = cues.find(([pattern]) => pattern.test(text));
+    if (cue) {
+      emotion = cue[1];
+      line = EMOTION_STYLE[emotion].line || "Acá estoy. Te escucho.";
+    }
   }
-  n.feelings[emotion] = clamp(Math.max(n.feelings[emotion], 60) + 35 * n.settings.intensity / 100);
+  // Una reacción nueva se reconoce sin borrar las emociones que la acompañan.
+  for (const e of EMOTIONS) if (e !== emotion) n.feelings[e] *= 0.72;
+  n.feelings[emotion] = clamp(
+    Math.max(n.feelings[emotion], 60) + (35 * n.settings.intensity) / 100,
+  );
   n.base[emotion] = clamp(n.base[emotion] + 2);
   if (/sos humana|sentís de verdad|sientes de verdad/i.test(text))
     line =
@@ -194,8 +357,15 @@ export function readLife(key: string): Life {
       !Number.isFinite(v.settings.lon)
     )
       return fresh;
-    for (const e of EMOTIONS)
-      if (!Number.isFinite(v.base?.[e]) || !Number.isFinite(v.feelings?.[e])) return fresh;
+    if (!v.base || !v.feelings) return fresh;
+    for (const e of EMOTIONS) {
+      // Migrar v1 conserva recuerdos, puntajes y las 25 emociones anteriores.
+      if (v.base[e] === undefined) v.base[e] = fresh.base[e];
+      if (v.feelings[e] === undefined) v.feelings[e] = fresh.feelings[e];
+      if (!Number.isFinite(v.base[e]) || !Number.isFinite(v.feelings[e])) return fresh;
+      v.base[e] = clamp(v.base[e]);
+      v.feelings[e] = clamp(v.feelings[e]);
+    }
     v.settings.intensity = clamp(v.settings.intensity);
     v.diary = Array.isArray(v.diary)
       ? v.diary.filter((x) => typeof x === "string").slice(0, 30)
@@ -226,17 +396,21 @@ export function weatherLine(w: Weather): string {
   return "Qué lindo día para abrir la ventana y ordenar ideas.";
 }
 
-export function timeLine(now=Date.now()):string {
-  const date=new Date(new Date(now).toLocaleString('en-US',{timeZone:'America/Argentina/Buenos_Aires'}));
-  const day=date.getDay(),hour=date.getHours(),md=`${date.getMonth()+1}-${date.getDate()}`;
-  if(md==='12-25')return '¡Feliz Navidad! Hoy mis circuitos tienen espíritu festivo.';
-  if(md==='1-1')return '¡Feliz año! Una hoja nueva para las ideas.';
-  if(hour<6)return 'Es madrugada. Si podés, dejá un ratito para descansar.';
-  if(hour<10)return 'Buen día. Estoy calentando los circuitos y el mate imaginario.';
-  if(hour>=12&&hour<14)return '¿Ya almorzaste? Una pausa también cuenta.';
-  if(hour>=21)return 'Ya es de noche. Podemos dejar todo ordenado para mañana.';
-  if(day===5)return 'Viernes: energía de cerrar pendientes y bajar un cambio.';
-  if(day===0||day===6)return 'Fin de semana. Seguimos a tu ritmo.';
-  if(day===1)return 'Lunes… arrancamos suave y de a una tarea.';
-  return 'Una cosa a la vez, che. Tenemos tiempo para ordenar las ideas.';
+export function timeLine(now = Date.now()): string {
+  const date = new Date(
+    new Date(now).toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" }),
+  );
+  const day = date.getDay(),
+    hour = date.getHours(),
+    md = `${date.getMonth() + 1}-${date.getDate()}`;
+  if (md === "12-25") return "¡Feliz Navidad! Hoy mis circuitos tienen espíritu festivo.";
+  if (md === "1-1") return "¡Feliz año! Una hoja nueva para las ideas.";
+  if (hour < 6) return "Es madrugada. Si podés, dejá un ratito para descansar.";
+  if (hour < 10) return "Buen día. Estoy calentando los circuitos y el mate imaginario.";
+  if (hour >= 12 && hour < 14) return "¿Ya almorzaste? Una pausa también cuenta.";
+  if (hour >= 21) return "Ya es de noche. Podemos dejar todo ordenado para mañana.";
+  if (day === 5) return "Viernes: energía de cerrar pendientes y bajar un cambio.";
+  if (day === 0 || day === 6) return "Fin de semana. Seguimos a tu ritmo.";
+  if (day === 1) return "Lunes… arrancamos suave y de a una tarea.";
+  return "Una cosa a la vez, che. Tenemos tiempo para ordenar las ideas.";
 }

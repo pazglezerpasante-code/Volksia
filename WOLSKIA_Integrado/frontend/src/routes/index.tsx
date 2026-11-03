@@ -184,6 +184,8 @@ function Chat({
   const pendingText = useRef("");
   const pendingExcel = useRef<File | null>(null);
   const [activeSheet, setActiveSheet] = useState<File | null>(null);
+  const [lastWork, setLastWork] = useState<{prompt:string;file:File|null}|null>(null);
+  const messageInputRef = useRef<HTMLInputElement>(null);
   const spreadsheetHistory = useRef<ChatMessage[]>([]);
   const spreadsheetPending = useRef(false);
   const lastSpreadsheetMode = useRef<"ask" | "edit" | "create" | null>(null);
@@ -249,6 +251,7 @@ function Chat({
     const context = attachments.filter((a) => a.readable).map((file) =>
       "\n\n--- Archivo adjunto: " + file.name + " ---\n" + file.content.slice(0, 24000)).join("");
     const query = (userText || "Analizá los archivos adjuntos.") + context;
+    setLastWork({prompt:userText || 'Continuar con este archivo',file:attachedExcel ?? activeSheet ?? attachments[0]?.file ?? null});
     const attachedForDisplay = attachments.map((file) => `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
     setText("");
     setAttachments([]);
@@ -425,6 +428,7 @@ function Chat({
           )}
         </div>
         <div data-chat-composer className="suri-composer">
+          {lastWork && !busy && !text.trim() && <div className="suri-resume-work"><span>Último pedido: <strong>{lastWork.prompt.slice(0,100)}{lastWork.prompt.length>100?'…':''}</strong>{(activeSheet ?? lastWork.file) && <small>{(activeSheet ?? lastWork.file)!.name}</small>}</span><button type="button" onClick={()=>{setText(lastWork.prompt);const file=activeSheet ?? lastWork.file;if(file&&!attachments.some(a=>a.name===file.name))void attachFiles([file]);messageInputRef.current?.focus();}}>Retomar último pedido</button></div>}
           {activeSheet && <div className="suri-active-sheet"><FileText size={15} /><span>Archivo activo: <strong>{activeSheet.name}</strong></span><button type="button" disabled={busy} aria-label="Dejar de editar esta planilla" onClick={() => { setActiveSheet(null); lastSpreadsheetMode.current = null; spreadsheetHistory.current = []; spreadsheetPending.current = false; spreadsheetNeedsFile.current = false; }}>Quitar <X size={13} /></button></div>}
           {attachments.length ? (
             <div className="mb-2 flex flex-wrap gap-2" aria-label="Archivos adjuntos seleccionados">
@@ -448,6 +452,7 @@ function Chat({
             <input
               className="min-w-0 flex-1 bg-transparent px-2 py-2 outline-none placeholder:text-muted/80"
               placeholder={attachments.length ? "Preguntá sobre los archivos…" : "¿Qué hacemos hoy? Contame tu idea…"}
+              ref={messageInputRef}
               value={text}
               onChange={(e) => setText(e.target.value)}
               onFocus={() => setMood("listen")}
